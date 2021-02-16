@@ -44,7 +44,7 @@ namespace GameFinder.Tests
             var manifestOutput = Path.Combine(steamappsDir, "appmanifest_72850.acf");
             
             File.Copy(manifestFile, manifestOutput, true);
-            var gameDir = Path.Combine(steamappsDir, "Skyrim");
+            var gameDir = Path.Combine(steamappsDir, "common", "Skyrim");
             Directory.CreateDirectory(gameDir);
             
             Assert.True(File.Exists(steamConfig));
