@@ -31,12 +31,5 @@ namespace GameFinder
         /// </summary>
         /// <returns></returns>
         public abstract bool FindAllGames();
-
-        /// <summary>
-        /// Get Game by ID
-        /// </summary>
-        /// <param name="id">ID of the game</param>
-        /// <returns></returns>
-        public abstract TGame? GetByID(int id);
     }
 }

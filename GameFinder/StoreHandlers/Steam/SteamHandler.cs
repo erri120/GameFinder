@@ -212,7 +212,7 @@ namespace GameFinder.StoreHandlers.Steam
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override SteamGame? GetByID(int id)
+        public SteamGame? GetByID(int id)
         {
             return Games.FirstOrDefault(x => x.ID == id);
         }
