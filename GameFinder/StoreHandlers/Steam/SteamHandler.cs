@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using Microsoft.Win32;
@@ -177,6 +178,11 @@ namespace GameFinder.StoreHandlers.Steam
             }
 
             return true;
+        }
+
+        public override SteamGame? GetByID(int id)
+        {
+            return Games.FirstOrDefault(x => x.ID == id);
         }
 
         private static string GetVdfValue(string line)

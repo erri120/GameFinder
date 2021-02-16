@@ -13,5 +13,7 @@ namespace GameFinder
         public abstract bool Init();
 
         public abstract bool FindAllGames();
+
+        public abstract TGame? GetByID(int id);
     }
 }
