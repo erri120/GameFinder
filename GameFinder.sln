@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder", "GameFinder\GameFinder.csproj", "{C8CAC8C6-68D3-4E69-9D6C-8055B1BFBB57}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solutionItems", ".solutionItems", "{87C3DD03-31FE-4D00-B7BF-D492D6299427}"
+ProjectSection(SolutionItems) = preProject
+	.editorconfig = .editorconfig
+	.gitattributes = .gitattributes
+	.gitignore = .gitignore
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.Tests", "GameFinder.Tests\GameFinder.Tests.csproj", "{71531212-A31A-4C35-AFC1-15BDDDC0F668}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8CAC8C6-68D3-4E69-9D6C-8055B1BFBB57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8CAC8C6-68D3-4E69-9D6C-8055B1BFBB57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8CAC8C6-68D3-4E69-9D6C-8055B1BFBB57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8CAC8C6-68D3-4E69-9D6C-8055B1BFBB57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71531212-A31A-4C35-AFC1-15BDDDC0F668}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71531212-A31A-4C35-AFC1-15BDDDC0F668}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71531212-A31A-4C35-AFC1-15BDDDC0F668}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71531212-A31A-4C35-AFC1-15BDDDC0F668}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

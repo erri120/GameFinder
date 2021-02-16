@@ -1,0 +1,79 @@
+﻿"AppState"
+{
+	"appid"		"72850"
+	"Universe"		"1"
+	"LauncherPath"		"C:\\Program Files (x86)\\Steam\\steam.exe"
+	"name"		"The Elder Scrolls V: Skyrim"
+	"StateFlags"		"4"
+	"installdir"		"Skyrim"
+	"LastUpdated"		"1611048743"
+	"UpdateResult"		"0"
+	"SizeOnDisk"		"9255977546"
+	"buildid"		"595133"
+	"LastOwner"		"76561198110222274"
+	"BytesToDownload"		"7315266464"
+	"BytesDownloaded"		"7315266464"
+	"BytesToStage"		"9255977546"
+	"BytesStaged"		"9255977546"
+	"AutoUpdateBehavior"		"0"
+	"AllowOtherDownloadsWhileRunning"		"0"
+	"ScheduledAutoUpdate"		"0"
+	"InstalledDepots"
+	{
+		"226880"
+		{
+			"manifest"		"7775806625498321311"
+			"size"		"1867615778"
+			"dlcappid"		"226880"
+		}
+		"220760"
+		{
+			"manifest"		"11352126252031938"
+			"size"		"143817943"
+			"dlcappid"		"220760"
+		}
+		"211720"
+		{
+			"manifest"		"8455218688827025070"
+			"size"		"1212597529"
+			"dlcappid"		"211720"
+		}
+		"72852"
+		{
+			"manifest"		"5176728229505148062"
+			"size"		"18024240"
+		}
+		"72851"
+		{
+			"manifest"		"430694959351693705"
+			"size"		"4534329853"
+		}
+		"72853"
+		{
+			"manifest"		"3817241784354177437"
+			"size"		"1479592203"
+		}
+	}
+	"DlcDownloads"
+	{
+		"211720"
+		{
+			"BytesDownloaded"		"723802240"
+			"BytesToDownload"		"723802240"
+		}
+		"220760"
+		{
+			"BytesDownloaded"		"76550768"
+			"BytesToDownload"		"76550768"
+		}
+		"226880"
+		{
+			"BytesDownloaded"		"1038126448"
+			"BytesToDownload"		"1038126448"
+		}
+	}
+	"UserConfig"
+	{
+		"language"		"english"
+	}
+}
