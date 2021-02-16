@@ -8,18 +8,38 @@ using Microsoft.Win32;
 
 namespace GameFinder.StoreHandlers.Steam
 {
+    /// <summary>
+    /// Store Handler for Steam Games
+    /// </summary>
     [PublicAPI]
     public class SteamHandler : AStoreHandler<SteamGame>
     {
+        /// <inheritdoc cref="AStoreHandler{TGame}.StoreType"/>
         public override StoreType StoreType => StoreType.Steam;
 
         private const string SteamRegKey = @"Software\Valve\Steam";
 
         private bool DidInit { get; set; }
+        
+        /// <summary>
+        /// Path to the Steam Installation Directory
+        /// </summary>
         public string SteamPath { get; internal set; } = string.Empty;
         private string SteamConfig { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// List of all found Steam Games
+        /// </summary>
         public List<string> SteamUniverses { get; internal set; } = new();
         
+        /// <summary>
+        /// Steam Store Handler init.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Init was already called</exception>
+        /// <exception cref="SteamNotFoundException">Steam not found in registry</exception>
+        /// <exception cref="DirectoryNotFoundException">Steam Directory not found with path from registry</exception>
+        /// <exception cref="FileNotFoundException">Steam Config not found with path from registry</exception>
         public override bool Init()
         {
             if (DidInit)
@@ -74,6 +94,13 @@ namespace GameFinder.StoreHandlers.Steam
             return true;
         }
         
+        /// <summary>
+        /// Find all Games. <see cref="Init"/> has to be called beforehand!
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Init was not called</exception>
+        /// <exception cref="FormatException">Unable to format <see cref="string"/> into <see cref="int"/> or <see cref="long"/></exception>
+        /// <exception cref="DirectoryNotFoundException">Installation Directory of game not found</exception>
         public override bool FindAllGames()
         {
             if (!DidInit)
@@ -180,6 +207,11 @@ namespace GameFinder.StoreHandlers.Steam
             return true;
         }
 
+        /// <summary>
+        /// Get Game by Steam ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public override SteamGame? GetByID(int id)
         {
             return Games.FirstOrDefault(x => x.ID == id);
