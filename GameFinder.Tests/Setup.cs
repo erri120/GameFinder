@@ -19,18 +19,13 @@ namespace GameFinder.Tests
                 IsCI = false;
         }
 
-        public static void SetupSteam()
+        public static string SetupSteam()
         {
-            if (!IsCI) return;
+            //if (!IsCI) return string.Empty;
 
-            var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Assert.NotNull(currentDir);
-            var steamDir = Path.Combine(currentDir!, "Steam");
+            var currentDir = GetCurrentDir();
+            var steamDir = Path.Combine(currentDir, "Steam");
             Directory.CreateDirectory(steamDir);
-            
-            var steamKey = Registry.CurrentUser.CreateSubKey(@"Software\Valve\Steam");
-            steamKey.SetValue("SteamPath", steamDir);
-            steamKey.Dispose();
 
             var steamConfigDir = Path.Combine(steamDir, "config");
             Directory.CreateDirectory(steamConfigDir);
@@ -50,14 +45,54 @@ namespace GameFinder.Tests
             Assert.True(File.Exists(steamConfig));
             Assert.True(File.Exists(manifestFile));
             Assert.True(Directory.Exists(gameDir));
+
+            return steamDir;
         }
 
         public static void SetupGOG()
         {
             if (!IsCI) return;
-            throw new NotImplementedException();
+
+            var currentDir = GetCurrentDir();
+            var gogDir = Path.Combine(currentDir, "GOG");
+            var gameDir = Path.Combine(gogDir, "Gwent");
+            Directory.CreateDirectory(gameDir);
+            var exePath = Path.Combine(gameDir, "Gwent.exe");
+            File.WriteAllText(exePath, "Hello World!", Encoding.UTF8);
+            var uninstallPath = Path.Combine(gameDir, "unins000.exe");
+            File.WriteAllText(uninstallPath, "Hello World!", Encoding.UTF8);
+
+            using var gamesKey = Registry.LocalMachine.CreateSubKey(@"Software\WOW6432Node\GOG.com\Games");
+            using var gameKey = gamesKey.CreateSubKey("1971477531");
+            gameKey.SetValue("BUILDID", "54099623651166556", RegistryValueKind.String);
+            gameKey.SetValue("exe", exePath, RegistryValueKind.String);
+            gameKey.SetValue("exeFile", "Gwent.exe", RegistryValueKind.String);
+            gameKey.SetValue("gameID", "1971477531", RegistryValueKind.String);
+            gameKey.SetValue("gameName", "Gwent", RegistryValueKind.String);
+            gameKey.SetValue("INSTALLDATE", "2021-02-19 14:52:34", RegistryValueKind.String);
+            gameKey.SetValue("installer_language", "english", RegistryValueKind.String);
+            gameKey.SetValue("lang_code", "en-US", RegistryValueKind.String);
+            gameKey.SetValue("language", "english", RegistryValueKind.String);
+            gameKey.SetValue("launchCommand", exePath, RegistryValueKind.String);
+            gameKey.SetValue("launchParam", "", RegistryValueKind.String);
+            gameKey.SetValue("path", gameDir, RegistryValueKind.String);
+            gameKey.SetValue("productID", "1971477531", RegistryValueKind.String);
+            gameKey.SetValue("startMenu", "Gwent", RegistryValueKind.String);
+            gameKey.SetValue("startMenuLink", @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Gwent [GOG.com]\Gwent", RegistryValueKind.String);
+            gameKey.SetValue("supportLink", "", RegistryValueKind.String);
+            gameKey.SetValue("uninstallCommand", uninstallPath, RegistryValueKind.String);
+            gameKey.SetValue("ver", "8.2", RegistryValueKind.String);
+            gameKey.SetValue("workingDir", gameDir, RegistryValueKind.String);
         }
 
+        public static void CleanupGOG()
+        {
+            if (!IsCI) return;
+            
+            using var gamesKey = Registry.LocalMachine.CreateSubKey(@"Software\WOW6432Node\GOG.com\Games");
+            gamesKey.DeleteSubKey("1971477531", true);
+        }
+        
         public static void SetupBethNet()
         {
             if (!IsCI) return;
@@ -76,6 +111,13 @@ namespace GameFinder.Tests
             throw new NotImplementedException();
         }
 
+        private static string GetCurrentDir()
+        {
+            var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Assert.NotNull(currentDir);
+            return currentDir!;
+        }
+        
         private static string GetFile(string name)
         {
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

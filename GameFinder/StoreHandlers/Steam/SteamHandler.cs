@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,32 +20,23 @@ namespace GameFinder.StoreHandlers.Steam
 
         private const string SteamRegKey = @"Software\Valve\Steam";
 
-        private bool DidInit { get; set; }
-        
         /// <summary>
         /// Path to the Steam Installation Directory
         /// </summary>
-        public string SteamPath { get; internal set; } = string.Empty;
-        private string SteamConfig { get; set; } = string.Empty;
+        public readonly string SteamPath;
+        private string SteamConfig { get; set; }
         
         /// <summary>
         /// List of all found Steam Games
         /// </summary>
         public List<string> SteamUniverses { get; internal set; } = new();
-        
-        /// <summary>
-        /// Steam Store Handler init.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException">Init was already called</exception>
-        /// <exception cref="SteamNotFoundException">Steam not found in registry</exception>
-        /// <exception cref="DirectoryNotFoundException">Steam Directory not found with path from registry</exception>
-        /// <exception cref="FileNotFoundException">Steam Config not found with path from registry</exception>
-        public override bool Init()
-        {
-            if (DidInit)
-                throw new ArgumentException("Init was already called!");
 
+        /// <summary>
+        /// SteamHandler constructor without arguments will try to find the Steam path using the registry
+        /// </summary>
+        /// <exception cref="SteamNotFoundException">Steam was not found</exception>
+        public SteamHandler()
+        {
             using var steamKey = Registry.CurrentUser.OpenSubKey(SteamRegKey);
 
             var steamPathKey = steamKey?.GetValue("SteamPath");
@@ -56,24 +48,38 @@ namespace GameFinder.StoreHandlers.Steam
                 throw new SteamNotFoundException($"SteamPath Key in registry at {SteamRegKey} is null or empty!");
 
             if (!Directory.Exists(steamPath))
-                throw new DirectoryNotFoundException($"Unable to find Steam at path found in registry: {steamPath}");
+                throw new SteamNotFoundException($"Unable to find Steam at path found in registry: {steamPath}");
             
             var steamConfig = Path.Combine(steamPath, "config", "config.vdf");
             if (!File.Exists(steamConfig))
-                throw new FileNotFoundException($"Unable to find Steam Config at path found in registry: {SteamConfig}");
+                throw new SteamNotFoundException($"Unable to find Steam Config at path found in registry: {SteamConfig}");
 
             SteamPath = steamPath;
             SteamConfig = steamConfig;
+        }
 
-            DidInit = true;
-            return true;
+        /// <summary>
+        /// SteamHandler constructor with <paramref name="steamPath"/> argument, will not use the registry to find
+        /// the Steam path.
+        /// </summary>
+        /// <param name="steamPath">Path to the directory containing <c>Steam.exe</c></param>
+        /// <exception cref="ArgumentException"><paramref name="steamPath"/> is not a directory or does not exist</exception>
+        /// <exception cref="SteamNotFoundException">Unable to find Steam Config in <paramref name="steamPath"/></exception>
+        public SteamHandler(string steamPath)
+        {
+            if (!Directory.Exists(steamPath))
+                throw new ArgumentException($"Directory does not exist: {steamPath}", nameof(steamPath));
+
+            var steamConfig = Path.Combine(steamPath, "config", "config.vdf");
+            if (!File.Exists(steamConfig))
+                throw new SteamNotFoundException($"Unable to find Steam Config at path found in registry: {SteamConfig}");
+            
+            SteamPath = steamPath;
+            SteamConfig = steamConfig;
         }
 
         private bool FindAllUniverses()
         {
-            if (!DidInit)
-                throw new ArgumentException("SteamHandler is not yet initialized!");
-
             var lines = File.ReadAllLines(SteamConfig, Encoding.UTF8);
             foreach (var line in lines)
             {
@@ -94,18 +100,8 @@ namespace GameFinder.StoreHandlers.Steam
             return true;
         }
         
-        /// <summary>
-        /// Find all Games. <see cref="Init"/> has to be called beforehand!
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException">Init was not called</exception>
-        /// <exception cref="FormatException">Unable to format <see cref="string"/> into <see cref="int"/> or <see cref="long"/></exception>
-        /// <exception cref="DirectoryNotFoundException">Installation Directory of game not found</exception>
         public override bool FindAllGames()
         {
-            if (!DidInit)
-                throw new ArgumentException("SteamHandler is not yet initialized!");
-
             if (!FindAllUniverses())
                 return false;
 
@@ -129,13 +125,13 @@ namespace GameFinder.StoreHandlers.Steam
                             continue;
                         }
 
-                        if (line.ContainsCaseInsensitive("\"name\""))
+                        if (line.ContainsCaseInsensitive("\"name\"") && game.Name == string.Empty)
                         {
                             game.Name = GetVdfValue(line);
                             continue;
                         }
 
-                        if (line.ContainsCaseInsensitive("\"installdir\""))
+                        if (line.ContainsCaseInsensitive("\"installdir\"") && game.Path == string.Empty)
                         {
                             var path = Path.Combine(universe, "common", GetVdfValue(line));
                             if (!Directory.Exists(path))
@@ -144,7 +140,7 @@ namespace GameFinder.StoreHandlers.Steam
                             continue;
                         }
 
-                        if (line.ContainsCaseInsensitive("\"LastUpdated\""))
+                        if (line.ContainsCaseInsensitive("\"LastUpdated\"") && game.LastUpdated == DateTime.UnixEpoch)
                         {
                             var sTimeStamp = GetVdfValue(line);
                             if (!long.TryParse(sTimeStamp, out var timeStamp))
@@ -154,7 +150,7 @@ namespace GameFinder.StoreHandlers.Steam
                             continue;
                         }
 
-                        if (line.ContainsCaseInsensitive("\"SizeOnDisk\""))
+                        if (line.ContainsCaseInsensitive("\"SizeOnDisk\"") && game.SizeOnDisk == -1)
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
@@ -163,7 +159,7 @@ namespace GameFinder.StoreHandlers.Steam
                             continue;
                         }
                         
-                        if (line.ContainsCaseInsensitive("\"BytesToDownload\""))
+                        if (line.ContainsCaseInsensitive("\"BytesToDownload\"") && game.BytesToDownload == -1)
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
@@ -172,7 +168,7 @@ namespace GameFinder.StoreHandlers.Steam
                             continue;
                         }
                         
-                        if (line.ContainsCaseInsensitive("\"BytesDownloaded\""))
+                        if (line.ContainsCaseInsensitive("\"BytesDownloaded\"") && game.BytesDownloaded == -1)
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
@@ -181,7 +177,7 @@ namespace GameFinder.StoreHandlers.Steam
                             continue;
                         }
                         
-                        if (line.ContainsCaseInsensitive("\"BytesToStage\""))
+                        if (line.ContainsCaseInsensitive("\"BytesToStage\"") && game.BytesToStage == -1)
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
@@ -190,7 +186,7 @@ namespace GameFinder.StoreHandlers.Steam
                             continue;
                         }
                         
-                        if (line.ContainsCaseInsensitive("\"BytesStaged\""))
+                        if (line.ContainsCaseInsensitive("\"BytesStaged\"") && game.BytesStaged == -1)
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
@@ -212,9 +208,21 @@ namespace GameFinder.StoreHandlers.Steam
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public SteamGame? GetByID(int id)
+        public SteamGame GetByID(int id)
         {
-            return Games.FirstOrDefault(x => x.ID == id);
+            return Games.First(x => x.ID == id);
+        }
+
+        /// <summary>
+        /// Try get Game by Steam ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="game"></param>
+        /// <returns></returns>
+        public bool TryGetByID(int id, [MaybeNullWhen(false)] out SteamGame? game)
+        {
+            game = Games.FirstOrDefault(x => x.ID == id);
+            return game != null;
         }
 
         private static string GetVdfValue(string line)

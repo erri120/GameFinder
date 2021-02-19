@@ -3,21 +3,28 @@ using Xunit;
 
 namespace GameFinder.Tests
 {
-    public class SteamTests
+    public class SteamTests : AStoreHandlerTest<SteamHandler, SteamGame>
     {
-        public SteamTests()
+        protected override SteamHandler DoSetup()
         {
-            Setup.SetupSteam();
+            var steamDir = Setup.SetupSteam();
+            return new SteamHandler(steamDir);
         }
-        
-        [Fact]
-        public void TestSteamHandler()
+
+        protected override void ChecksAfterFindingGames(SteamHandler storeHandler)
         {
-            var steamHandler = new SteamHandler();
-            Assert.True(steamHandler.Init());
-            Assert.NotNull(steamHandler.SteamPath);
-            Assert.True(steamHandler.FindAllGames());
-            Assert.NotEmpty(steamHandler.Games);
+            Assert.True(storeHandler.TryGetByID(72850, out var skyrim));
+            Assert.NotNull(skyrim);
+            Assert.Equal(72850, skyrim!.ID);
+            Assert.Equal("The Elder Scrolls V: Skyrim", skyrim!.Name);
+            Assert.Equal(9255977546, skyrim!.SizeOnDisk);
+            Assert.Equal(7315266464, skyrim!.BytesDownloaded);
+            Assert.Equal(7315266464, skyrim!.BytesToDownload);
+            Assert.Equal(9255977546, skyrim!.BytesStaged);
+            Assert.Equal(9255977546, skyrim!.BytesToStage);
+
+            var lastUpdated = Utils.ToDateTime(1611048743);
+            Assert.Equal(lastUpdated, skyrim!.LastUpdated);
         }
     }
 }

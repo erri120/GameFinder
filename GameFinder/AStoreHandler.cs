@@ -21,13 +21,7 @@ namespace GameFinder
         public abstract StoreType StoreType { get; }
 
         /// <summary>
-        /// Initialize the Store Handler
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool Init();
-
-        /// <summary>
-        /// Find all games, <see cref="Init"/> has to be called beforehand!
+        /// Find all games
         /// </summary>
         /// <returns></returns>
         public abstract bool FindAllGames();
