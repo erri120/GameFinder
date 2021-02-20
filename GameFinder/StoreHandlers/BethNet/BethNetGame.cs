@@ -5,6 +5,7 @@ namespace GameFinder.StoreHandlers.BethNet
     [PublicAPI]
     public class BethNetGame : AStoreGame
     {
+        /// <inheritdoc />
         public override StoreType StoreType => StoreType.BethNet;
 
         public long ID { get; internal set; } = -1;
