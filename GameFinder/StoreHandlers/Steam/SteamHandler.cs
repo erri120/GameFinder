@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 
@@ -38,14 +39,10 @@ namespace GameFinder.StoreHandlers.Steam
         public SteamHandler()
         {
             using var steamKey = Registry.CurrentUser.OpenSubKey(SteamRegKey);
+            if (steamKey == null)
+                throw new RegistryKeyNullException(SteamRegKey);
 
-            var steamPathKey = steamKey?.GetValue("SteamPath");
-            if (steamPathKey == null)
-                throw new SteamNotFoundException($"SteamPath Key does not exist in registry at {steamKey}");
-
-            var steamPath = steamPathKey.ToString() ?? string.Empty;
-            if (string.IsNullOrEmpty(steamPath))
-                throw new SteamNotFoundException($"SteamPath Key in registry at {steamKey} is null or empty!");
+            var steamPath = RegistryHelper.GetStringValueFromRegistry(steamKey, "SteamPath");
 
             if (!Directory.Exists(steamPath))
                 throw new SteamNotFoundException($"Unable to find Steam at path found in registry: {steamPath}");
