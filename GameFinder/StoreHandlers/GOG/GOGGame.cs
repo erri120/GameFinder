@@ -45,10 +45,54 @@ namespace GameFinder.StoreHandlers.GOG
         
         public string? WorkingDir { get; internal set; }
         
-        /// <inheritdoc cref="AStoreGame.ToString"/>
+#region Overrides
+        
+        /// <inheritdoc />
+        public override int CompareTo(AStoreGame? other)
+        {
+            return other switch
+            {
+                null => 1,
+                GOGGame game => GameID.CompareTo(game.GameID),
+                _ => base.CompareTo(other)
+            };
+        }
+        
+        /// <inheritdoc />
+        public override bool Equals(AStoreGame? other)
+        {
+            return other switch
+            {
+                null => false,
+                GOGGame game => GameID.Equals(game.GameID),
+                _ => base.Equals(other)
+            };
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return obj switch
+            {
+                null => false,
+                GOGGame game => Equals(game),
+                AStoreGame aStoreGame => base.Equals(aStoreGame),
+                _ => false
+            };
+        }
+        
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return GameID;
+        }
+        
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"{base.ToString()} ({GameID})";
         }
+        
+        #endregion
     }
 }
