@@ -89,7 +89,7 @@ namespace GameFinder.Tests
         {
             if (!IsCI) return;
             
-            using var gamesKey = Registry.LocalMachine.OpenSubKey(@"Software\WOW6432Node\GOG.com\Games");
+            using var gamesKey = Registry.LocalMachine.OpenSubKey(@"Software\WOW6432Node\GOG.com\Games", true);
             gamesKey?.DeleteSubKeyTree("1971477531", true);
         }
         
@@ -117,8 +117,11 @@ namespace GameFinder.Tests
         {
             if (!IsCI) return;
             //does not work atm due to UnauthorizedAccessException
-            Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net", true);
-            Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Fallout Shelter", true);
+            using var nodeKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Bethesda Softworks\", true);
+            nodeKey?.DeleteSubKeyTree("Bethesda.net", true);
+
+            using var uninstallKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall", true);
+            uninstallKey?.DeleteSubKeyTree("Fallout Shelter", true);
         }
         
         public static void SetupOrigin()
