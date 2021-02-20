@@ -24,7 +24,7 @@ namespace GameFinder.StoreHandlers.BethNet
 
             var installLocation = RegistryHelper.GetStringValueFromRegistry(regKey, "installLocation");
             if (!Directory.Exists(installLocation))
-                throw new NotImplementedException($"Unable to find Bethesda.net Launcher at path from registry: {installLocation}");
+                throw new BethNetNotFoundException($"Unable to find Bethesda.net Launcher at path from registry: {installLocation}");
             
             LauncherPath = installLocation;
         }
@@ -53,7 +53,7 @@ namespace GameFinder.StoreHandlers.BethNet
                     var displayName = RegistryHelper.GetStringValueFromRegistry(subKey, "DisplayName");
 
                     if (!Directory.Exists(path))
-                        throw new NotImplementedException();
+                        throw new BethNetGameNotFoundException($"Path from registry at {subKey} does not exist: {path}");
                     
                     var game = new BethNetGame
                     {

@@ -12,7 +12,7 @@ namespace GameFinder.StoreHandlers.GOG
     }
 
     [PublicAPI]
-    public class GOGNotFoundException : GOGException
+    public sealed class GOGNotFoundException : GOGException
     {
         public GOGNotFoundException([NotNull] string message) : base(message) { }
 
