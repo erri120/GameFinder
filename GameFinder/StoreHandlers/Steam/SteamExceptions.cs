@@ -20,9 +20,25 @@ namespace GameFinder.StoreHandlers.Steam
     }
 
     [PublicAPI]
+    public sealed class SteamUniverseNotFoundException : SteamException
+    {
+        public SteamUniverseNotFoundException([NotNull] string message) : base(message) { }
+
+        public SteamUniverseNotFoundException([NotNull] string message, [NotNull] Exception e) : base(message, e) { }
+    }
+
+    [PublicAPI]
+    public sealed class SteamGameNotFoundException : SteamException
+    {
+        public SteamGameNotFoundException([NotNull] string message) : base(message) { }
+
+        public SteamGameNotFoundException([NotNull] string message, [NotNull] Exception e) : base(message, e) { }
+    }
+    
+    [PublicAPI]
     public sealed class SteamVdfParsingException : SteamException
     {
-        public string Line { get; }
+        public readonly string Line;
 
         public SteamVdfParsingException(string line, [NotNull] string message) : base(message)
         {

@@ -41,18 +41,18 @@ namespace GameFinder.StoreHandlers.Steam
 
             var steamPathKey = steamKey?.GetValue("SteamPath");
             if (steamPathKey == null)
-                throw new SteamNotFoundException($"SteamPath Key does not exist in registry at {SteamRegKey}");
+                throw new SteamNotFoundException($"SteamPath Key does not exist in registry at {steamKey}");
 
             var steamPath = steamPathKey.ToString() ?? string.Empty;
             if (string.IsNullOrEmpty(steamPath))
-                throw new SteamNotFoundException($"SteamPath Key in registry at {SteamRegKey} is null or empty!");
+                throw new SteamNotFoundException($"SteamPath Key in registry at {steamKey} is null or empty!");
 
             if (!Directory.Exists(steamPath))
                 throw new SteamNotFoundException($"Unable to find Steam at path found in registry: {steamPath}");
             
             var steamConfig = Path.Combine(steamPath, "config", "config.vdf");
             if (!File.Exists(steamConfig))
-                throw new SteamNotFoundException($"Unable to find Steam Config at path found in registry: {SteamConfig}");
+                throw new SteamNotFoundException($"Unable to find Steam Config: {SteamConfig}");
 
             SteamPath = steamPath;
             SteamConfig = steamConfig;
@@ -72,7 +72,7 @@ namespace GameFinder.StoreHandlers.Steam
 
             var steamConfig = Path.Combine(steamPath, "config", "config.vdf");
             if (!File.Exists(steamConfig))
-                throw new SteamNotFoundException($"Unable to find Steam Config at path found in registry: {SteamConfig}");
+                throw new SteamNotFoundException($"Unable to find Steam Config: {SteamConfig}");
             
             SteamPath = steamPath;
             SteamConfig = steamConfig;
@@ -88,7 +88,7 @@ namespace GameFinder.StoreHandlers.Steam
                 var path = Path.Combine(vdfValue, "steamapps");
 
                 if (!Directory.Exists(path))
-                    throw new DirectoryNotFoundException($"Unable to find Universe at {path}");
+                    throw new SteamUniverseNotFoundException($"Unable to find Universe at {path}");
                 
                 SteamUniverses.Add(path);
             }
@@ -119,7 +119,7 @@ namespace GameFinder.StoreHandlers.Steam
                         {
                             var sID = GetVdfValue(line);
                             if (!int.TryParse(sID, out var id))
-                                throw new FormatException($"Unable to parse appid \"{sID}\" as int in file {acfFile}");
+                                throw new SteamVdfParsingException(line, $"Unable to parse appid \"{sID}\" as int in file {acfFile}");
                             
                             game.ID = id;
                             continue;
@@ -135,7 +135,7 @@ namespace GameFinder.StoreHandlers.Steam
                         {
                             var path = Path.Combine(universe, "common", GetVdfValue(line));
                             if (!Directory.Exists(path))
-                                throw new DirectoryNotFoundException($"Unable to find installdir found in {acfFile}: {path}");
+                                throw new SteamGameNotFoundException($"Unable to find installdir found in {acfFile}: {path}");
                             game.Path = path;
                             continue;
                         }
@@ -144,7 +144,7 @@ namespace GameFinder.StoreHandlers.Steam
                         {
                             var sTimeStamp = GetVdfValue(line);
                             if (!long.TryParse(sTimeStamp, out var timeStamp))
-                                throw new FormatException($"Unable to parse LastUpdated \"{sTimeStamp}\" unix timestamp as long in file {acfFile}");
+                                throw new SteamVdfParsingException(line, $"Unable to parse LastUpdated \"{sTimeStamp}\" unix timestamp as long in file {acfFile}");
                             var dateTime = timeStamp.ToDateTime();
                             game.LastUpdated = dateTime;
                             continue;
@@ -154,7 +154,7 @@ namespace GameFinder.StoreHandlers.Steam
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
-                                throw new FormatException($"Unable to parse SizeOnDisk \"{sBytes}\" as long in file {acfFile}");
+                                throw new SteamVdfParsingException(line, $"Unable to parse SizeOnDisk \"{sBytes}\" as long in file {acfFile}");
                             game.SizeOnDisk = bytes;
                             continue;
                         }
@@ -163,7 +163,7 @@ namespace GameFinder.StoreHandlers.Steam
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
-                                throw new FormatException($"Unable to parse BytesToDownload \"{sBytes}\" as long in file {acfFile}");
+                                throw new SteamVdfParsingException(line, $"Unable to parse BytesToDownload \"{sBytes}\" as long in file {acfFile}");
                             game.BytesToDownload = bytes;
                             continue;
                         }
@@ -172,7 +172,7 @@ namespace GameFinder.StoreHandlers.Steam
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
-                                throw new FormatException($"Unable to parse BytesDownloaded \"{sBytes}\" as long in file {acfFile}");
+                                throw new SteamVdfParsingException(line, $"Unable to parse BytesDownloaded \"{sBytes}\" as long in file {acfFile}");
                             game.BytesDownloaded = bytes;
                             continue;
                         }
@@ -181,7 +181,7 @@ namespace GameFinder.StoreHandlers.Steam
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
-                                throw new FormatException($"Unable to parse BytesToStage \"{sBytes}\" as long in file {acfFile}");
+                                throw new SteamVdfParsingException(line, $"Unable to parse BytesToStage \"{sBytes}\" as long in file {acfFile}");
                             game.BytesToStage = bytes;
                             continue;
                         }
@@ -190,7 +190,7 @@ namespace GameFinder.StoreHandlers.Steam
                         {
                             var sBytes = GetVdfValue(line);
                             if (!long.TryParse(sBytes, out var bytes))
-                                throw new FormatException($"Unable to parse BytesStaged \"{sBytes}\" as long in file {acfFile}");
+                                throw new SteamVdfParsingException(line, $"Unable to parse BytesStaged \"{sBytes}\" as long in file {acfFile}");
                             game.BytesStaged = bytes;
                             continue;
                         }
@@ -229,7 +229,7 @@ namespace GameFinder.StoreHandlers.Steam
         {
             var split = line.Split("\"");
             if (split.Length != 5)
-                throw new SteamVdfParsingException(line, "Unable to parse vdf line: can not split line correctly");
+                throw new SteamVdfParsingException(line, "Unable to parse lin in vdf file: can not split line correctly");
             return split[3];
         }
     }
