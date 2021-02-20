@@ -28,7 +28,7 @@ namespace GameFinder.StoreHandlers.Steam
         private string SteamConfig { get; set; }
         
         /// <summary>
-        /// List of all found Steam Games
+        /// List of all found Steam Universes
         /// </summary>
         public List<string> SteamUniverses { get; internal set; } = new();
 

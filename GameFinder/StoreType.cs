@@ -21,7 +21,7 @@ namespace GameFinder
         /// <summary>
         /// Bethesda Launcher
         /// </summary>
-        [Description("Bethesda Launcher")]
+        [Description("Bethesda.net Launcher")]
         BethNet,
         
         /// <summary>

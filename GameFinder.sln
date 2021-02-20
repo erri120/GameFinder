@@ -7,6 +7,10 @@ ProjectSection(SolutionItems) = preProject
 	.editorconfig = .editorconfig
 	.gitattributes = .gitattributes
 	.gitignore = .gitignore
+	CHANGELOG.md = CHANGELOG.md
+	LICENSE = LICENSE
+	README.md = README.md
+	CONTRIBUTING.md = CONTRIBUTING.md
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.Tests", "GameFinder.Tests\GameFinder.Tests.csproj", "{71531212-A31A-4C35-AFC1-15BDDDC0F668}"
