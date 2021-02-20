@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Text;
+using System.Text.Json;
 
 namespace GameFinder
 {
@@ -24,6 +27,20 @@ namespace GameFinder
 
             var newString = s.Substring(pos1+1, pos2-1);
             return newString;
+        }
+
+        internal static T? FromJson<T>(string file) where T : class
+        {
+            if (!File.Exists(file))
+                throw new FileNotFoundException(null, file);
+
+            var jsonText = File.ReadAllText(file, Encoding.UTF8);
+            var value = JsonSerializer.Deserialize<T>(jsonText, new JsonSerializerOptions
+            {
+                IgnoreNullValues = true,
+                ReadCommentHandling = JsonCommentHandling.Skip
+            });
+            return value;
         }
     }
 }

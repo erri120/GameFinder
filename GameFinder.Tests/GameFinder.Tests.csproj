@@ -29,6 +29,9 @@
       <None Update="files\appmanifest_72850.acf">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="files\8AAFB83044E76B812D3D8C9652E8C13C.item">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

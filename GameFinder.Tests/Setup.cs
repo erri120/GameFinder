@@ -130,16 +130,32 @@ namespace GameFinder.Tests
             throw new NotImplementedException();
         }
         
-        public static void SetupEpicGamesStore()
+        public static string SetupEpicGamesStore()
         {
-            if (!IsCI) return;
-            throw new NotImplementedException();
+            var currentDir = GetCurrentDir();
+            var egsDir = Path.Combine(currentDir, "EGS");
+            var manifestDir = Path.Combine(egsDir, "Manifests");
+            var gameDir = Path.Combine(egsDir, "games", "UnrealTournament");
+
+            Directory.CreateDirectory(egsDir);
+            Directory.CreateDirectory(manifestDir);
+            Directory.CreateDirectory(gameDir);
+            
+            var manifestFile = GetFile("8AAFB83044E76B812D3D8C9652E8C13C.item");
+            var contents = File.ReadAllText(manifestFile, Encoding.UTF8);
+            contents = contents.Replace("$InstallLocation$", gameDir.Replace(@"\", @"\\"));
+            
+            var manifestOutput = Path.Combine(manifestDir, "8AAFB83044E76B812D3D8C9652E8C13C.item");
+            File.WriteAllText(manifestOutput, contents, Encoding.UTF8);
+
+            return manifestDir;
         }
 
         private static string GetCurrentDir()
         {
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.NotNull(currentDir);
+            Assert.True(Directory.Exists(currentDir));
             return currentDir!;
         }
         
