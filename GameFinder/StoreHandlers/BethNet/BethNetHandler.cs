@@ -35,6 +35,7 @@ namespace GameFinder.StoreHandlers.BethNet
             if (uninstallRegKey == null)
                 throw new RegistryKeyNullException(UninstallRegKey);
 
+            //idea from https://github.com/TouwaStar/Galaxy_Plugin_Bethesda/blob/master/betty/local.py
             var subKeyNames = uninstallRegKey.GetSubKeyNames();
             foreach (var subKeyName in subKeyNames)
             {
