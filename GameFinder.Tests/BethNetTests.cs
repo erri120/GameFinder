@@ -23,7 +23,8 @@ namespace GameFinder.Tests
 
         protected override void DoCleanup()
         {
-            Setup.CleanupBethNet();
+            //does not work atm
+            //Setup.CleanupBethNet();
         }
     }
 }

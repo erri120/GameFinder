@@ -116,6 +116,7 @@ namespace GameFinder.Tests
         public static void CleanupBethNet()
         {
             if (!IsCI) return;
+            //does not work atm due to UnauthorizedAccessException
             Registry.LocalMachine.DeleteSubKey(@"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net", true);
             Registry.LocalMachine.DeleteSubKey(@"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Fallout Shelter", true);
         }
