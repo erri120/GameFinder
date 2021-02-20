@@ -50,7 +50,7 @@ namespace GameFinder.StoreHandlers.Steam
         /// <inheritdoc cref="AStoreGame.ToString"/>
         public override string ToString()
         {
-            return $"{Name} ({ID})";
+            return $"{base.ToString()} ({ID})";
         }
     }
 }

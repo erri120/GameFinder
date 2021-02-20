@@ -44,5 +44,11 @@ namespace GameFinder.StoreHandlers.GOG
         public string? Version { get; internal set; }
         
         public string? WorkingDir { get; internal set; }
+        
+        /// <inheritdoc cref="AStoreGame.ToString"/>
+        public override string ToString()
+        {
+            return $"{base.ToString()} ({GameID})";
+        }
     }
 }

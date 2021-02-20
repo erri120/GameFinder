@@ -89,14 +89,35 @@ namespace GameFinder.Tests
         {
             if (!IsCI) return;
             
-            using var gamesKey = Registry.LocalMachine.CreateSubKey(@"Software\WOW6432Node\GOG.com\Games");
-            gamesKey.DeleteSubKey("1971477531", true);
+            using var gamesKey = Registry.LocalMachine.OpenSubKey(@"Software\WOW6432Node\GOG.com\Games");
+            gamesKey?.DeleteSubKey("1971477531", true);
         }
         
         public static void SetupBethNet()
         {
             if (!IsCI) return;
-            throw new NotImplementedException();
+            
+            var currentDir = GetCurrentDir();
+            var bethNetDir = Path.Combine(currentDir, "BethNet");
+            var gameDir = Path.Combine(bethNetDir, "games", "Fallout Shelter");
+            Directory.CreateDirectory(bethNetDir);
+            Directory.CreateDirectory(gameDir);
+
+            using var launcherRegKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net");
+            launcherRegKey.SetValue("installLocation", bethNetDir, RegistryValueKind.String);
+            
+            using var regKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Fallout Shelter");
+            regKey.SetValue("DisplayName", "Fallout Shelter", RegistryValueKind.String);
+            regKey.SetValue("Path", gameDir, RegistryValueKind.String);
+            regKey.SetValue("ProductID", (long)8, RegistryValueKind.QWord);
+            regKey.SetValue("UninstallString", @"""c:\program files (x86)\bethesda.net launcher\bethesdanetupdater.exe"" bethesdanet://uninstall/8");
+        }
+
+        public static void CleanupBethNet()
+        {
+            if (!IsCI) return;
+            Registry.LocalMachine.DeleteSubKey(@"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net", true);
+            Registry.LocalMachine.DeleteSubKey(@"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Fallout Shelter", true);
         }
         
         public static void SetupOrigin()
