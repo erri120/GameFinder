@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
-## [1.0.0] - 2021-02-XX
+## [1.1.0] - 2021-02-21
+
+### Added
+
+- Added support for `netstandard2.1`
+
+## [1.0.0] - 2021-02-21
 
 ### Added
 
@@ -18,6 +24,7 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.1.0...HEAD
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.1.0]: https://github.com/erri120/GameFinder/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/erri120/GameFinder/releases/v1.0.0
