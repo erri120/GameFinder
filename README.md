@@ -54,7 +54,7 @@ The `config.vdf` file uses Valve's KeyValue format which is similar to JSON:
 }
 ```
 
-What we want to look for are these `BaseInstallFolder_` values which point to a Universe folder. The `steamapps` subdirectory contains the `appmanifest_*.acf` files we need. `.acf` files have the same KeyValue format as `.vdf` files so parsing very easy:
+What we want to look for are these `BaseInstallFolder_X` values which point to a Universe folder. The `steamapps` subdirectory contains the `appmanifest_*.acf` files we need. `.acf` files have the same KeyValue format as `.vdf` files so parsing very easy:
 
 ```text
 "AppState"
@@ -77,7 +77,7 @@ What we want to look for are these `BaseInstallFolder_` values which point to a 
 }
 ```
 
-Important is this file are the `appid`, `name` and `installdir` fields. Note: `installdir` is the name of the folder in `Universe/steamapps/common/` where the game is installed. It is not absolute but relative to the `common` folder.
+Important in this file are the `appid`, `name` and `installdir` fields. Note: `installdir` is the name of the folder in `Universe/steamapps/common/` where the game is installed. It is not absolute but relative to the `common` folder.
 
 ### Finding GOG Games
 
@@ -87,7 +87,7 @@ GOG stores all information in the registry. This can either be at `HKEY_LOCAL_MA
 
 ![GOG Games Tree in Registry](assets/docs/readme-gog-1.png)
 
-Now you can iterate over all sub-keys to get all the informations you need:
+Now you can iterate over all sub-keys to get all the information you need:
 
 ![GOG Game in Registry](assets/docs/readme-gog-2.png)
 
@@ -101,7 +101,7 @@ Finding games installed with the Bethesda.net Launcher was very rather tricky be
 
 1) open the uninstaller registry key at `HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall`
 2) iterate over every sub-key:
-    - filter out the sub-keys that open the Bethesda Launcher with `bethesdanet://uninstall/`
+    - find the sub-keys that open the Bethesda Launcher with `bethesdanet://uninstall/` as an argument
 
 ![Bethesda.net Launcher Games Uninstaller in Registry](assets/docs/readme-bethnet-1.png)
 
@@ -109,8 +109,11 @@ With this you can find all games installed via Bethesda.net. The important field
 
 ### Finding EGS Games
 
-_TODO_
 Source: [EGSHandler.cs](GameFinder/StoreHandlers/EGS/EGSHandler.cs)
+
+The Epic Games Store uses manifest files, similar to Steam, which contain all information we need. The path to the manifest folder can be found by opening the registry key `HKEY_CURRENT_USER\SOFTWARE\Epic Games\EOS` and getting the `ModSdkMetadataDir` value. Inside the manifest folder you will find `.item` files which are actually just JSON files with a different extension.
+
+See [`8AAFB83044E76B812D3D8C9652E8C13C.item`](GameFinder.Tests/files/8AAFB83044E76B812D3D8C9652E8C13C.item) for an example file. Important fields are `InstallLocation`, `DisplayName` and `CatelogItemId`.
 
 ### Finding Origin Games
 
