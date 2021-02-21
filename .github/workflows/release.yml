@@ -8,7 +8,7 @@ on:
         required: true
 
 env:
-  PROJECT_FOLDER: GameFinder
+  OUTPUT_FOLDER: GameFinder/bin/Debug
   PROJECT_FILE: GameFinder/GameFinder.csproj
 
 jobs:
@@ -64,10 +64,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: artifact
-        path: ${{ env.PROJECT_FOLDER }}/bin/Debug/*.nupkg
+        path: ${{ env.OUTPUT_FOLDER }}/*.nupkg
 
     - name: Push
-      run: dotnet push ${{ env.PROJECT_FOLDER }}/bin/Debug/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ${{ env.OUTPUT_FOLDER }}/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
     
     - name: Create Release
       id: create_release
@@ -80,4 +80,4 @@ jobs:
         body: ${{ steps.changelog_reader.outputs.changes }}
         draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
         prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
-        files: ${{ env.PROJECT_FOLDER }}/bin/Debug/*.nupkg
+        files: ${{ env.OUTPUT_FOLDER }}/*.nupkg
