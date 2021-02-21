@@ -19,7 +19,7 @@ namespace GameFinder.Tests
 
         protected virtual TStoreHandler DoSetup()
         {
-            return new ();
+            return new TStoreHandler();
         }
         
         protected virtual void ChecksBeforeFindingGames(TStoreHandler storeHandler) { }

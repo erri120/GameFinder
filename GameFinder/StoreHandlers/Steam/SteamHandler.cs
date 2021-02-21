@@ -26,11 +26,11 @@ namespace GameFinder.StoreHandlers.Steam
         /// </summary>
         public readonly string SteamPath;
         private string SteamConfig { get; set; }
-        
+
         /// <summary>
         /// List of all found Steam Universes
         /// </summary>
-        public List<string> SteamUniverses { get; internal set; } = new();
+        public List<string> SteamUniverses { get; internal set; } = new List<string>();
 
         /// <summary>
         /// SteamHandler constructor without arguments will try to find the Steam path using the registry

@@ -1,7 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+#if NET5_0
 using System.Text.Json;
+#endif
+#if NETSTANDARD2_1
+using Newtonsoft.Json;
+#endif
 
 namespace GameFinder
 {
@@ -35,12 +40,26 @@ namespace GameFinder
                 throw new FileNotFoundException(null, file);
 
             var jsonText = File.ReadAllText(file, Encoding.UTF8);
+
+#if NET5_0
             var value = JsonSerializer.Deserialize<T>(jsonText, new JsonSerializerOptions
             {
                 IgnoreNullValues = true,
                 ReadCommentHandling = JsonCommentHandling.Skip
             });
             return value;
+#endif
+#if NETSTANDARD2_1
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+
+            using var textReader = new StringReader(jsonText);
+            using var reader = new JsonTextReader(textReader);
+            var value = serializer.Deserialize<T>(reader);
+            return value;
+#endif
         }
     }
 }

@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <Title>GameFinder</Title>
         <Authors>erri120</Authors>
@@ -12,6 +11,8 @@
         <RepositoryUrl>https://github.com/erri120/GameFinder.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <RepositoryBranch>master</RepositoryBranch>
+        <LangVersion>8</LangVersion>
+        <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -27,4 +28,8 @@
       <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    </ItemGroup>
+    
 </Project>
