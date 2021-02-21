@@ -54,10 +54,26 @@ jobs:
         path: ./CHANGELOG.md
     
     - name: Pack
-      run: dotnet pack ${{ env.PROJECT_FILE }} --no-build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}" --include-symbols
+      run: dotnet pack ${{ env.PROJECT_FILE }} --no-build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: artifact
-        path: ${{ env.PROJECT_FOLDER }}/bin/Debug/*.symbols.nupkg
+        path: ${{ env.PROJECT_FOLDER }}/bin/Debug/*.nupkg
+
+    - name: Push
+      run: dotnet push ${{ env.PROJECT_FOLDER }}/bin/Debug/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: v${{ steps.changelog_reader.outputs.version }}
+        name: Release ${{ steps.changelog_reader.outputs.version }}
+        body: ${{ steps.changelog_reader.outputs.changes }}
+        draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
+        prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
+        files: ${{ env.PROJECT_FOLDER }}/bin/Debug/*.nupkg
