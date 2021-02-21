@@ -57,6 +57,7 @@ jobs:
       run: dotnet pack ${{ env.PROJECT_FILE }} --no-build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}" --include-symbols
     
     - name: Upload Artifact
+      uses: actions/upload-artifact@v2
       with:
         name: artifact
         path: ${{ env.PROJECT_FOLDER }}/bin/Debug/*.symbols.nupkg
