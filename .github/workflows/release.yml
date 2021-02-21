@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+
+env:
+  PROJECT_FOLDER: GameFinder
+  PROJECT_FILE: GameFinder/GameFinder.csproj
+  DOTNET_SDK_VERSION: "5.0.x"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Get version from input
+      id: tag_name
+      shell: bash
+      env:
+        INPUT_VERSION: ${{ github.event.inputs.version }}
+      run: |
+        echo ::set-output name=current_version::${INPUT_VERSION}
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+    - name: Verify .NET Core
+      run: dotnet --info
+
+    - name: Clear local NuGet cache (workaround for failed restores on windows-latest)
+      run: dotnet clean && dotnet nuget locals all --clear
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_FILE }}
+    
+    - name: Build
+      run: dotnet build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
+    
+    - name: Test
+      run: dotnet test --no-build --no-restore --verbosity normal
+    
+    - name: Get Changelog Entry
+      id: changelog_reader
+      uses: mindsers/changelog-reader-action@v2
+      with:
+        version: ${{ steps.tag_name.outputs.current_version }}
+        path: ./CHANGELOG.md
+    
+    - name: Pack
+      run: dotnet pack ${{ env.PROJECT_FILE }} --no-build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}" --include-symbols
+    
+    - name: Upload Artifact
+      with:
+        name: artifact
+        path: ${{ env.PROJECT_FOLDER }}/bin/Debug/*.symbols.nupkg
