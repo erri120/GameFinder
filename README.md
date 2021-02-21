@@ -1,5 +1,7 @@
 # GameFinder
 
+[![CI](https://github.com/erri120/GameFinder/actions/workflows/ci.yml/badge.svg)](https://github.com/erri120/GameFinder/actions/workflows/ci.yml) [![Nuget](https://img.shields.io/nuget/v/GameFinder)](https://www.nuget.org/packages/GameFinder/)
+
 .NET 5 library for finding games on Windows.
 
 ## Supported Stores
