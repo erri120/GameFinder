@@ -10,7 +10,6 @@ on:
 env:
   PROJECT_FOLDER: GameFinder
   PROJECT_FILE: GameFinder/GameFinder.csproj
-  DOTNET_SDK_VERSION: "5.0.x"
 
 jobs:
   build:
@@ -24,12 +23,17 @@ jobs:
         INPUT_VERSION: ${{ github.event.inputs.version }}
       run: |
         echo ::set-output name=current_version::${INPUT_VERSION}
+    
     - uses: actions/checkout@v2
-
-    - name: Setup .NET Core
+    
+    - name: Setup .NET Core 3.1
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+        dotnet-version: 3.1.x
+    - name: Setup .NET 5.0.x
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
 
     - name: Verify .NET Core
       run: dotnet --info
