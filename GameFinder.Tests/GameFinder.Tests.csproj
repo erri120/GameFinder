@@ -8,7 +8,7 @@
 
         <LangVersion>8</LangVersion>
 
-        <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net5.0-windows;netcoreapp3.1</TargetFrameworks>
 
         <OutputType>Library</OutputType>
     </PropertyGroup>
