@@ -3,6 +3,15 @@
     <PropertyGroup>
         <TargetFramework>net5.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
+        <Title>GameFinder</Title>
+        <Authors>erri120</Authors>
+        <Description>.NET 5 library for finding games on Windows.</Description>
+        <Copyright>GPL-3.0 License</Copyright>
+        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/erri120/GameFinder</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/erri120/GameFinder.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryBranch>master</RepositoryBranch>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
