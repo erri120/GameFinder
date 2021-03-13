@@ -11,6 +11,8 @@ ProjectSection(SolutionItems) = preProject
 	LICENSE = LICENSE
 	README.md = README.md
 	CONTRIBUTING.md = CONTRIBUTING.md
+	Directory.Build.targets = Directory.Build.targets
+	Directory.Build.props = Directory.Build.props
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.Tests", "GameFinder.Tests\GameFinder.Tests.csproj", "{71531212-A31A-4C35-AFC1-15BDDDC0F668}"
