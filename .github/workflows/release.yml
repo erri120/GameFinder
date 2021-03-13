@@ -46,6 +46,14 @@ jobs:
     - name: Test
       run: dotnet test --no-build --no-restore --verbosity normal
     
+    - name: Publish Example Project
+      run: dotnet publish GameFinder.Example/GameFinder.Example.csproj --no-restore -o "out" -p:PublishSingleFile=true -p:PublishTrimmed=true -c Release
+    
+    - name: Zip Example Project
+      run: |
+        cd out/
+        7z a -tzip GameFinder.Example.zip out/*.exe out/*.dll
+    
     - name: Get Changelog Entry
       id: changelog_reader
       uses: mindsers/changelog-reader-action@v2
@@ -77,4 +85,6 @@ jobs:
         body: ${{ steps.changelog_reader.outputs.changes }}
         draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
         prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
-        files: '**/*.nupkg'
+        files: |
+          **/*.nupkg
+          GameFinder.Example.zip
