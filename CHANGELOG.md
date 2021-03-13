@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.2.0] - 2021-03-13
+
+### Changed
+
+- Updated project structure: each StoreHandler now has it's own package.
+
 ## [1.1.0] - 2021-02-21
 
 ### Added
@@ -24,7 +30,8 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.2.0...HEAD
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.2.0]: https://github.com/erri120/GameFinder/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/erri120/GameFinder/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/erri120/GameFinder/releases/v1.0.0
