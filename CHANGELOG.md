@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.3.0] - 2021-03-13
+
+### Added
+
+- XboxHandler for finding games installed via Xbox Game Pass App (or all UWP apps, see README for more information)
+- Example application using all game handlers
+
 ## [1.2.0] - 2021-03-13
 
 ### Changed
@@ -30,8 +37,9 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.3.0...HEAD
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.3.0]: https://github.com/erri120/GameFinder/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/erri120/GameFinder/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/erri120/GameFinder/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/erri120/GameFinder/releases/v1.0.0
