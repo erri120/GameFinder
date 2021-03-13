@@ -5,6 +5,14 @@
         <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.GOG.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\GameFinder.StoreHandlers.GOG.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" PrivateAssets="all" />
     </ItemGroup>
