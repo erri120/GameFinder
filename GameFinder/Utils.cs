@@ -12,6 +12,14 @@ namespace GameFinder
 {
     internal static class Utils
     {
+#if NET5_0
+        internal static JsonSerializerOptions DefaultSerializerOptions = new JsonSerializerOptions
+        {
+            IgnoreNullValues = true,
+            ReadCommentHandling = JsonCommentHandling.Skip
+        };
+#endif
+        
         internal static bool ContainsCaseInsensitive(this string s, string value)
         {
             return s.Contains(value, StringComparison.OrdinalIgnoreCase);
@@ -42,11 +50,7 @@ namespace GameFinder
             var jsonText = File.ReadAllText(file, Encoding.UTF8);
 
 #if NET5_0
-            var value = JsonSerializer.Deserialize<T>(jsonText, new JsonSerializerOptions
-            {
-                IgnoreNullValues = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
-            });
+            var value = JsonSerializer.Deserialize<T>(jsonText, DefaultSerializerOptions);
             return value;
 #endif
 #if NETSTANDARD2_1
