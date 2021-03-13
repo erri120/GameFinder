@@ -14,6 +14,7 @@ namespace GameFinder.Tests
 
         protected override void ChecksAfterFindingGames(BethNetHandler storeHandler)
         {
+            base.ChecksAfterFindingGames(storeHandler);
             var game = storeHandler.Games.FirstOrDefault(x => x.ID.Equals(8));
             Assert.NotNull(game);
             Assert.Equal(8, game!.ID);

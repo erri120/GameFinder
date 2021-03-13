@@ -12,7 +12,6 @@ namespace GameFinder.Tests
             var storeHandler = DoSetup();
             ChecksBeforeFindingGames(storeHandler);
             Assert.True(storeHandler.FindAllGames());
-            Assert.NotEmpty(storeHandler.Games);
             ChecksAfterFindingGames(storeHandler);
             DoCleanup();
         }
@@ -23,7 +22,12 @@ namespace GameFinder.Tests
         }
         
         protected virtual void ChecksBeforeFindingGames(TStoreHandler storeHandler) { }
-        protected virtual void ChecksAfterFindingGames(TStoreHandler storeHandler) { }
+
+        protected virtual void ChecksAfterFindingGames(TStoreHandler storeHandler)
+        {
+            Assert.NotEmpty(storeHandler.Games);
+        }
+        
         protected virtual void DoCleanup() { }
     }
 }

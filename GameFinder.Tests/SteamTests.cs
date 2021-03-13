@@ -13,6 +13,7 @@ namespace GameFinder.Tests
 
         protected override void ChecksAfterFindingGames(SteamHandler storeHandler)
         {
+            base.ChecksAfterFindingGames(storeHandler);
             Assert.True(storeHandler.TryGetByID(72850, out var skyrim));
             Assert.NotNull(skyrim);
             Assert.Equal(72850, skyrim!.ID);

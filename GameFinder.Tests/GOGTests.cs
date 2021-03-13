@@ -14,6 +14,7 @@ namespace GameFinder.Tests
 
         protected override void ChecksAfterFindingGames(GOGHandler storeHandler)
         {
+            base.ChecksAfterFindingGames(storeHandler);
             var game = storeHandler.Games.FirstOrDefault(x => x.GameID.Equals(1971477531));
             Assert.NotNull(game);
             Assert.Equal(1971477531, game!.GameID);

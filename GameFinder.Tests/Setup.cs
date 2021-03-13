@@ -9,15 +9,7 @@ namespace GameFinder.Tests
 {
     public static class Setup
     {
-        private static readonly bool IsCI;
-        
-        static Setup()
-        {
-            var ciEnv = Environment.GetEnvironmentVariable("CI", EnvironmentVariableTarget.Process);
-            if (ciEnv == null) return;
-            if (!bool.TryParse(ciEnv, out IsCI))
-                IsCI = false;
-        }
+        private static bool IsCI => TestUtils.IsCI;
 
         public static string SetupSteam()
         {
