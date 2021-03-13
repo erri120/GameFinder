@@ -3,6 +3,7 @@
     <PropertyGroup>
         <Title>GameFinder.RegistryUtils</Title>
         <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>

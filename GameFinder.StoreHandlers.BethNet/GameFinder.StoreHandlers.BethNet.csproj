@@ -3,6 +3,7 @@
     <PropertyGroup>
         <Title>GameFinder.StoreHandlers.BethNet</Title>
         <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
