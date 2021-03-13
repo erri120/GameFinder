@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using CommandLine;
 using GameFinder.StoreHandlers.BethNet;
 using GameFinder.StoreHandlers.EGS;
@@ -10,15 +12,27 @@ namespace GameFinder.Example
 {
     public static class Program
     {
+        private const string LogFile = "log.log";
+
+        private static FileStream? _logFileStream;
+        private static StreamWriter? _streamWriter;
+        
         public static void Main(string[] args)
         {
+            _logFileStream = File.Open(LogFile, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+            _streamWriter = new StreamWriter(_logFileStream, Encoding.UTF8);
+            
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(Run);
+            
+            _streamWriter.Dispose();
+            _logFileStream.Dispose();
         }
 
         private static void Log(string s)
         {
             Console.WriteLine(s);
+            _streamWriter?.WriteLine(s);
         }
 
         private static void RunHandler<THandler, TGame>(string handlerName, Action<TGame> logGame) where THandler : AStoreHandler<TGame>, new() where TGame : AStoreGame
