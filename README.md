@@ -10,6 +10,7 @@
 - GOG
 - Bethesda.net Launcher
 - Epic Games Store
+- Xbox Game Pass (UWP apps, see [Finding Xbox Games](#finding-xbox-games) for more information)
 - ~~Origin~~ _TODO_
 
 ## Example
@@ -116,6 +117,106 @@ Source: [EGSHandler.cs](GameFinder.StoreHandlers.EGS/EGSHandler.cs)
 The Epic Games Store uses manifest files, similar to Steam, which contain all information we need. The path to the manifest folder can be found by opening the registry key `HKEY_CURRENT_USER\SOFTWARE\Epic Games\EOS` and getting the `ModSdkMetadataDir` value. Inside the manifest folder you will find `.item` files which are actually just JSON files with a different extension.
 
 See [`8AAFB83044E76B812D3D8C9652E8C13C.item`](GameFinder.Tests/files/8AAFB83044E76B812D3D8C9652E8C13C.item) for an example file. Important fields are `InstallLocation`, `DisplayName` and `CatelogItemId`.
+
+### Finding Xbox Games
+
+Source: [XboxHandler.cs](GameFinder.StoreHandlers.Xbox/XboxHandler.cs)
+
+These games are installed through the Xbox Game Pass app or the Windows Store. These games are UWP packages and in a UWP container. I had to use the Windows 10 SDK to get all packages:
+
+```c#
+internal static IEnumerable<Package> GetUWPPackages()
+{
+   var manager = new PackageManager();
+   var user = WindowsIdentity.GetCurrent().User;
+   var packages = manager.FindPackagesForUser(user.Value)
+       .Where(x => !x.IsFramework && !x.IsResourcePackage && x.SignatureKind == PackageSignatureKind.Store)
+       .Where(x => x.InstalledLocation != null);
+   return packages;
+}
+```
+
+Since the packages uses the Windows 10 SDK I had to change the project settings to reflect that:
+
+```xml
+ <PropertyGroup>
+     <TargetFrameworks>net5.0-windows10.0.18362.0;netstandard2.1</TargetFrameworks>
+ </PropertyGroup>
+ 
+ <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+     <Reference Include="Windows, Version=255.255.255.255, Culture=neutral, PublicKeyToken=null, ContentType=WindowsRuntime">
+         <HintPath>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0\Windows.winmd</HintPath>
+     </Reference>
+ </ItemGroup>
+```
+
+Since the query from above will get us all UWP packages, some of those might not be Xbox games. The solution to this is getting a list of all games the current user owns on Xbox Game Pass which we can get using the Xbox REST API:
+
+```
+https://titlehub.xboxlive.com/users/xuid({_xuid})/titles/titlehistory/decoration/details
+```
+
+The main problem is getting the `xuid` parameter. This library can accept the `xuid` parameter in the `XboxHandler` constructor and get the title history. Using the title history the library will filter out all installed UWP packages that are not present in the title history.
+
+The following information is on how to get the `xuid` parameter:
+
+Follow [this](https://docs.microsoft.com/en-us/advertising/guides/authentication-oauth-live-connect) guide on how to get started with Live Connect Authentication. After the user logged in with OAuth at `https://login.live.com/oauth20_authorize.srf` you can get the following parameters from the redirection url: `#access_token`, `refresh_token`, `expires_in`, `token_type` and `user_id`.
+
+The access token is needed to authenticate at `https://user.auth.xboxlive.com/user/authenticate` by doing a POST with the following data (remember to use content-type `application/json`):
+
+```json
+{
+   "RelyingPart": "http://auth.xboxlive.com",
+   "TokenType": "JWT",
+   "Properties": {
+      "AuthMethod": "RPS",
+      "SiteName": "user.auth.xboxlive.com",
+      "RpsTicket": "<access_token>"
+   }
+}
+```
+
+The response is also JSON:
+
+```json
+{
+   "Token": "the-only-important-field"
+}
+```
+
+Now you need to authorize and get the final token. This is another POST request with JSON data to `https://xsts.auth.xboxlive.com/xsts/authorize`:
+
+```json
+{
+   "RelyingParty": "http://xboxlive.com",
+   "TokenType": "JWT",
+   "Properties": {
+      "SandboxID": "RETAIL",
+      "UserTokens": ["<token you got from the previous response>"]
+   }
+}
+```
+
+The response is of course also in JSON:
+
+```json
+{
+   "DisplayClaims": {
+      "xui": [
+         {
+            "uhs": "",
+            "usr": "",
+            "utr": "",
+            "prv": "",
+            "xid": "THIS IS THE XUID TOKEN",
+            "gtg": ""
+         }
+      ]
+   }
+}
+```
+
+After all this requesting you finally have the xuid you can use in the constructor.
 
 ### Finding Origin Games
 
