@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
+## 1.3.1 - 2021-03-XX
+
+### Changed
+
+- GameFinder.Example will also log to file
+
 ## [Released]
 
 ## [1.3.0] - 2021-03-13
