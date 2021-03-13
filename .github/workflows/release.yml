@@ -52,7 +52,7 @@ jobs:
     - name: Zip Example Project
       run: |
         cd out/
-        7z a -tzip GameFinder.Example.zip out/*.exe out/*.dll
+        7z a -tzip GameFinder.Example.zip *.exe *.dll
     
     - name: Get Changelog Entry
       id: changelog_reader
