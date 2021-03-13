@@ -34,6 +34,12 @@ namespace GameFinder
         /// Epic Games store
         /// </summary>
         [Description("Epic Games Store")]
-        EpicGamesStore
+        EpicGamesStore,
+        
+        /// <summary>
+        /// Xbox Game Pass
+        /// </summary>
+        [Description("Xbox Game Pass")]
+        Xbox
     }
 }
