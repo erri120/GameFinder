@@ -12,7 +12,7 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryBranch>master</RepositoryBranch>
         <LangVersion>8</LangVersion>
-        <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -25,7 +25,6 @@
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" PrivateAssets="all" />
-      <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">

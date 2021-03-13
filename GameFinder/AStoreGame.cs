@@ -31,8 +31,8 @@ namespace GameFinder
         {
             return string.Compare(Name, other?.Name, StringComparison.OrdinalIgnoreCase);
         }
-
-        /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+        
+        /// <inheritdoc />
         public virtual bool Equals(AStoreGame? other)
         {
             return string.Equals(Name, other?.Name, StringComparison.OrdinalIgnoreCase);

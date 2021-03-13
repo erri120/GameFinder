@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
+        <LangVersion>8</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" PrivateAssets="all" />
+      <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    </ItemGroup>
+
+</Project>

@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
 [assembly:InternalsVisibleTo("GameFinder.Tests")]
-[assembly:InternalsVisibleTo("GameFinder.RegistryUtils")]
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.BethNet")]
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.EGS")]
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.GOG")]

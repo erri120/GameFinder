@@ -33,7 +33,7 @@ If you build some sort of game library manager like [Playnite](https://github.co
 
 ### Finding Steam Games
 
-Source: [SteamHandler.cs](GameFinder/StoreHandlers/Steam/SteamHandler.cs)
+Source: [SteamHandler.cs](GameFinder.StoreHandlers.Steam/SteamHandler.cs)
 
 Steam games can be easily found by searching through _"Steam Universes"_. An Universe is simply a folder where you install Steam games. You can find all Universes by parsing the `config.vdf` file in `Steam/config`. We can get the Steam folder by opening the registry key `HKEY_CURRENT_USER\Software\Valve\Steam` and getting the `SteamPath` value.
 
@@ -83,7 +83,7 @@ Important in this file are the `appid`, `name` and `installdir` fields. Note: `i
 
 ### Finding GOG Games
 
-Source: [GOGHandler.cs](GameFinder/StoreHandlers/GOG/GOGHandler.cs)
+Source: [GOGHandler.cs](GameFinder.StoreHandlers.GOG/GOGHandler.cs)
 
 GOG stores all information in the registry. This can either be at `HKEY_LOCAL_MACHINE\Software\GOG.com\Games` or `HKEY_LOCAL_MACHINE\Software\WOW6432Node\GOG.com\Games`. Simply open the registry key and get all sub-key names. Each sub-key in `GOG.com\Games` is an installed game with the ID being the name of the sub-key:
 
@@ -97,7 +97,7 @@ Important fields are `path`, `gameID` and `gameName`.
 
 ### Finding BethNet Games
 
-Source: [BethNetHandler.cs](GameFinder/StoreHandlers/BethNet/BethNetHandler.cs)
+Source: [BethNetHandler.cs](GameFinder.StoreHandlers.BethNet/BethNetHandler.cs)
 
 Finding games installed with the Bethesda.net Launcher was very rather tricky because there are no config files you can parse or simple registry keys you can open. I ended up using a similar method to the GOG Galaxy Bethesda.net plugin by TouwaStar: [GitHub](https://github.com/TouwaStar/Galaxy_Plugin_Bethesda). The interesting part is the `_scan_games_registry_keys` function in [`betty/local.py`](https://github.com/TouwaStar/Galaxy_Plugin_Bethesda/blob/master/betty/local.py#L154):
 
@@ -111,7 +111,7 @@ With this you can find all games installed via Bethesda.net. The important field
 
 ### Finding EGS Games
 
-Source: [EGSHandler.cs](GameFinder/StoreHandlers/EGS/EGSHandler.cs)
+Source: [EGSHandler.cs](GameFinder.StoreHandlers.EGS/EGSHandler.cs)
 
 The Epic Games Store uses manifest files, similar to Steam, which contain all information we need. The path to the manifest folder can be found by opening the registry key `HKEY_CURRENT_USER\SOFTWARE\Epic Games\EOS` and getting the `ModSdkMetadataDir` value. Inside the manifest folder you will find `.item` files which are actually just JSON files with a different extension.
 
