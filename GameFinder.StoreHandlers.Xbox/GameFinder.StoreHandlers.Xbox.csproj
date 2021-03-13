@@ -2,6 +2,15 @@
 
     <PropertyGroup>
         <TargetFrameworks>net5.0-windows10.0.18362.0;netstandard2.1</TargetFrameworks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.Xbox.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\GameFinder.StoreHandlers.Xbox.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
