@@ -87,4 +87,4 @@ jobs:
         prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
         files: |
           **/*.nupkg
-          GameFinder.Example.zip
+          out/GameFinder.Example.zip
