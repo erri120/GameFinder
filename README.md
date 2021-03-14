@@ -176,6 +176,8 @@ The access token is needed to authenticate at `https://user.auth.xboxlive.com/us
 }
 ```
 
+(DTO: [AuthenticationRequest](GameFinder.StoreHandlers.Xbox/DTO/AuthenticationRequest.cs))
+
 The response is also JSON:
 
 ```json
@@ -183,6 +185,8 @@ The response is also JSON:
    "Token": "the-only-important-field"
 }
 ```
+
+(DTO: [AuthorizationData](GameFinder.StoreHandlers.Xbox/DTO/AuthorizationData.cs))
 
 Now you need to authorize and get the final token. This is another POST request with JSON data to `https://xsts.auth.xboxlive.com/xsts/authorize`:
 
@@ -196,6 +200,8 @@ Now you need to authorize and get the final token. This is another POST request 
    }
 }
 ```
+
+(DTO: [AuthorizationRequest](GameFinder.StoreHandlers.Xbox/DTO/AuthorizationRequest.cs))
 
 The response is of course also in JSON:
 
@@ -215,6 +221,8 @@ The response is of course also in JSON:
    }
 }
 ```
+
+(DTO: [AuthorizationData](GameFinder.StoreHandlers.Xbox/DTO/AuthorizationData.cs))
 
 After all this requesting you finally have the xuid you can use in the constructor.
 
