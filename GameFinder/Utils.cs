@@ -65,5 +65,17 @@ namespace GameFinder
             return value;
 #endif
         }
+
+        internal static void DoNoThrow(Action a)
+        {
+            try
+            {
+                a();
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+        }
     }
 }

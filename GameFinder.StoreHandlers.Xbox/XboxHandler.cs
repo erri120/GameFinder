@@ -60,14 +60,13 @@ namespace GameFinder.StoreHandlers.Xbox
                     if (!isXbox)
                         continue;
                 }
-                
-                Games.Add(new XboxGame
+
+                var game = new XboxGame
                 {
                     Name = package.Id.Name,
                     Path = package.InstalledLocation.Path,
-                    
+
                     Description = package.Description,
-                    Logo = package.Logo,
                     Publisher = package.Id.Publisher,
                     DisplayName = package.DisplayName,
                     FamilyName = package.Id.FamilyName,
@@ -81,7 +80,11 @@ namespace GameFinder.StoreHandlers.Xbox
                     InstalledLocationDisplayName = package.InstalledLocation.DisplayName,
                     InstalledLocationDisplayType = package.InstalledLocation.DisplayType,
                     PublisherDisplayName = package.PublisherDisplayName
-                });
+                };
+                
+                Utils.DoNoThrow(() => game.Logo = package.Logo);
+
+                Games.Add(game);
             }
 
             return true;
