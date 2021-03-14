@@ -6,13 +6,22 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
-## 1.3.1 - 2021-03-XX
+## [Released]
+
+## [1.3.1] - 2021-03-14
+
+### Added
+
+- Added helper DTOs to XboxHandler
 
 ### Changed
 
 - GameFinder.Example will also log to file
+- Replaced Placeholder Exceptions in EGSHandler with EGSExceptions
 
-## [Released]
+### Fixed
+
+- Fixed AccessDeniedException in XboxHandler when trying to access Package properties
 
 ## [1.3.0] - 2021-03-13
 
@@ -43,8 +52,9 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.3.1...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.3.1]: https://github.com/erri120/GameFinder/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/erri120/GameFinder/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/erri120/GameFinder/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/erri120/GameFinder/compare/v1.0.0...v1.1.0
