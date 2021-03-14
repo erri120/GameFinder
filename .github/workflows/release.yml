@@ -64,12 +64,12 @@ jobs:
     #- name: Pack
     #  run: dotnet pack ${{ env.PROJECT_FILE }} --no-build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
     
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifact
-        path: '**/*.nupkg'
-        if-no-files-found: error
+    #- name: Upload Artifact
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: artifact
+    #    path: '**/*.nupkg'
+    #    if-no-files-found: error
 
     - name: Push
       run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
