@@ -62,14 +62,14 @@ namespace GameFinder.StoreHandlers.GOG
                     throw new FormatException($"Unable to parse buildID {sBuildID} in {subKey}");
                 
                 var gameName = RegistryHelper.GetStringValueFromRegistry(subKey, "gameName");
-                var exe = RegistryHelper.GetStringValueFromRegistry(subKey, "exe");
-                var exeFile = RegistryHelper.GetStringValueFromRegistry(subKey, "exeFile");
                 var path = RegistryHelper.GetStringValueFromRegistry(subKey, "path");
 
                 var sInstallDate = RegistryHelper.GetStringValueFromRegistry(subKey, "INSTALLDATE");
                 if (!DateTime.TryParse(sInstallDate, out var installationDate))
                     throw new FormatException($"Unable to parse {sInstallDate} as DateTime in {key}");
                 
+                var exe = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "exe");
+                var exeFile = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "exeFile");
                 var installerLanguage = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "installer_language");
                 var langCode = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "lang_code");
                 var language = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "language");

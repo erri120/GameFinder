@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 - Include snupkg in output
 
+### Fixed
+
+- Fixed `exe` and `exeFile` values not being optional for GOGHandler. DLCs don't have this set.
+
 ## [1.4.0] - 2021-03-26
 
 ### Changed
