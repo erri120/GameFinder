@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 ### Changed
 
 - Include snupkg in output
+- Skip broken EGS manifest files
 
 ### Fixed
 

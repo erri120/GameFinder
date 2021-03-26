@@ -44,7 +44,17 @@ namespace GameFinder.StoreHandlers.EGS
             foreach (var itemFilePath in itemFiles)
             {
                 //var id = Path.GetFileNameWithoutExtension(itemFilePath);
-                var manifestFile = Utils.FromJson<EGSManifestFile>(itemFilePath);
+                EGSManifestFile? manifestFile;
+                
+                try
+                {
+                    manifestFile = Utils.FromJson<EGSManifestFile>(itemFilePath);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+                
                 if (manifestFile == null)
                     throw new EGSException($"Unable to parse {itemFilePath} as Json!");
 
