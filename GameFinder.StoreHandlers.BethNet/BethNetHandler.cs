@@ -28,7 +28,8 @@ namespace GameFinder.StoreHandlers.BethNet
             
             LauncherPath = installLocation;
         }
-        
+
+        /// <inheritdoc />
         public override bool FindAllGames()
         {
             using var uninstallRegKey = Registry.LocalMachine.OpenSubKey(UninstallRegKey);
@@ -81,6 +82,12 @@ namespace GameFinder.StoreHandlers.BethNet
             }
             
             return true;
+        }
+        
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "BethNetHandler";
         }
     }
 }

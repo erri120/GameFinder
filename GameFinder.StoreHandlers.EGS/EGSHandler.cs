@@ -36,7 +36,8 @@ namespace GameFinder.StoreHandlers.EGS
 
             MetadataPath = metadataPath;
         }
-        
+
+        /// <inheritdoc />
         public override bool FindAllGames()
         {
             var itemFiles = Directory.EnumerateFiles(MetadataPath, "*.item", SearchOption.TopDirectoryOnly);
@@ -76,6 +77,12 @@ namespace GameFinder.StoreHandlers.EGS
                 
                 gameProperty.SetValue(game, manifestProperty.GetValue(manifestFile));
             }
+        }
+        
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "EGSHandler";
         }
     }
 }

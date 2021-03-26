@@ -96,7 +96,8 @@ namespace GameFinder.StoreHandlers.Steam
 
             return true;
         }
-        
+
+        /// <inheritdoc />
         public override bool FindAllGames()
         {
             if (!FindAllUniverses())
@@ -226,6 +227,12 @@ namespace GameFinder.StoreHandlers.Steam
             if (split.Length != 5)
                 throw new SteamVdfParsingException(line, "Unable to parse lin in vdf file: can not split line correctly");
             return split[3];
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "SteamHandler";
         }
     }
 }

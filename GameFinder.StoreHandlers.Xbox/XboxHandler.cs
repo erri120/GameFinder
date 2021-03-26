@@ -39,7 +39,8 @@ namespace GameFinder.StoreHandlers.Xbox
 
             _xuid = xuid;
         }
-        
+
+        /// <inheritdoc />
         public override bool FindAllGames()
         {
             var packages = WindowsUtils.GetUWPPackages();
@@ -110,6 +111,12 @@ namespace GameFinder.StoreHandlers.Xbox
 #endif
 
             return content?.Titles;
+        }
+        
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "XboxHandler";
         }
     }
 }

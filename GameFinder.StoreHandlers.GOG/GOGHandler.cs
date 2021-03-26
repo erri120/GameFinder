@@ -32,7 +32,8 @@ namespace GameFinder.StoreHandlers.GOG
             
             _regKey = GOG64RegKey;
         }
-        
+
+        /// <inheritdoc />
         public override bool FindAllGames()
         {
             using var gogKey = Registry.LocalMachine.OpenSubKey(_regKey);
@@ -116,6 +117,12 @@ namespace GameFinder.StoreHandlers.GOG
             }
 
             return true;
+        }
+        
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "GOGHandler";
         }
     }
 }
