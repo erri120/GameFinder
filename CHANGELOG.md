@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
+## 1.4.0
+
+### Changed
+
+- Update Newtonsoft.Json to 13.0.1
+- Update Windows SDK to 10.0.19041.0
+
 ## [Released]
 
 ## [1.3.1] - 2021-03-14
