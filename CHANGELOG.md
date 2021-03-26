@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ### Changed
 
+- All StoreHandlers are less strict about missing directories
 - Update Newtonsoft.Json to 13.0.1
 - Update Windows SDK to 10.0.19041.0
 

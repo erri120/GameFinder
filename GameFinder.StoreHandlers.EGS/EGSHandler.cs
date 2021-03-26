@@ -56,9 +56,6 @@ namespace GameFinder.StoreHandlers.EGS
                     Path = manifestFile.InstallLocation!
                 };
                 CopyProperties(game, manifestFile);
-
-                if (!Directory.Exists(game.InstallLocation))
-                    throw new EGSException($"InstallLocation from {itemFilePath} does not exist! {game.InstallLocation}");
                 
                 Games.Add(game);
             }

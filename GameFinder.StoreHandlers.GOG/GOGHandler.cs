@@ -65,9 +65,6 @@ namespace GameFinder.StoreHandlers.GOG
                 var exeFile = RegistryHelper.GetStringValueFromRegistry(subKey, "exeFile");
                 var path = RegistryHelper.GetStringValueFromRegistry(subKey, "path");
 
-                if (!Directory.Exists(path))
-                    throw new DirectoryNotFoundException($"Game Directory {path} from registry {key} does not exist!");
-
                 var sInstallDate = RegistryHelper.GetStringValueFromRegistry(subKey, "INSTALLDATE");
                 if (!DateTime.TryParse(sInstallDate, out var installationDate))
                     throw new FormatException($"Unable to parse {sInstallDate} as DateTime in {key}");

@@ -131,8 +131,6 @@ namespace GameFinder.StoreHandlers.Steam
                         if (line.ContainsCaseInsensitive("\"installdir\"") && game.Path == string.Empty)
                         {
                             var path = Path.Combine(universe, "common", GetVdfValue(line));
-                            if (!Directory.Exists(path))
-                                throw new SteamGameNotFoundException($"Unable to find installdir found in {acfFile}: {path}");
                             game.Path = path;
                             continue;
                         }

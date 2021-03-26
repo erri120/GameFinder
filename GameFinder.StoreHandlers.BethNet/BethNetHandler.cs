@@ -52,9 +52,6 @@ namespace GameFinder.StoreHandlers.BethNet
                     var productID = RegistryHelper.GetQWordValueFromRegistry(subKey, "ProductID");
                     var path = RegistryHelper.GetStringValueFromRegistry(subKey, "Path").RemoveQuotes();
                     var displayName = RegistryHelper.GetStringValueFromRegistry(subKey, "DisplayName");
-
-                    if (!Directory.Exists(path))
-                        throw new BethNetGameNotFoundException($"Path from registry at {subKey} does not exist: {path}");
                     
                     var game = new BethNetGame
                     {
