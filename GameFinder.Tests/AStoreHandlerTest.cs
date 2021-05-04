@@ -11,7 +11,8 @@ namespace GameFinder.Tests
         {
             var storeHandler = DoSetup();
             ChecksBeforeFindingGames(storeHandler);
-            Assert.True(storeHandler.FindAllGames());
+            var res = storeHandler.FindAllGames();
+            Assert.True(res.IsOk(), res.ErrorsToString());
             ChecksAfterFindingGames(storeHandler);
             DoCleanup();
         }
