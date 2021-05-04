@@ -41,11 +41,18 @@ namespace GameFinder.Example
             try
             {
                 var handler = new THandler();
-                if (!handler.FindAllGames())
+                var res = handler.FindAllGames();
+                if (res.HasErrors)
+                {
+                    Log($"{handlerName} has errors:\n{res.ErrorsToString()}");
+                }
+                
+                if (!res.Value)
                 {
                     Log($"Unable to find {handlerName} games");
                     return;
                 }
+                
                 Log($"Found {handler.Games.Count} {handlerName} games");
                 handler.Games.ForEach(logGame);
             }
