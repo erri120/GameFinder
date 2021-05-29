@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.5.0] - 2021-05-29
+
+### Changed
+
+All functions are now no-throw and return `Return<T>` for better error handling and error aggregation. Checkout the example on how to use this: [Link](https://github.com/erri120/GameFinder/blob/20f1cefda485cb7e22fa158cc29ff06fe2b96e21/GameFinder.Example/Program.cs#L43-L57).
+
 ## [1.4.1] - 2021-03-26
 
 ### Changed
@@ -71,8 +77,9 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.4.1...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.5.0...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.4.2]: https://github.com/erri120/GameFinder/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/erri120/GameFinder/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/erri120/GameFinder/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/erri120/GameFinder/compare/v1.3.0...v1.3.1
