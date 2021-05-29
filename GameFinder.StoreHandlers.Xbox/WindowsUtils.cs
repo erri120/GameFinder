@@ -13,7 +13,7 @@ namespace GameFinder.StoreHandlers.Xbox
             var manager = new PackageManager();
             var user = WindowsIdentity.GetCurrent().User;
             if (user == null)
-                throw new XboxException("Unable to get current user, user is null!");
+                return new List<Package>();
 
             //requires admin privileges if we don't supply the current user
             var packages = manager.FindPackagesForUser(user.Value)

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GameFinder.StoreHandlers.Xbox.DTO;
 using JetBrains.Annotations;
+using static GameFinder.ResultUtils;
 
 #if NET5_0
 using System.Net.Http.Json;
@@ -23,26 +24,38 @@ namespace GameFinder.StoreHandlers.Xbox
         
         public XboxHandler() : this(null) { }
         
+        private readonly List<string> _initErrors = new List<string>();
+        
         /// <summary>
         /// Initializes the Xbox StoreHandler. The optional <paramref name="xuid"/> parameter is used for to request
         /// the title history of a user. See the README for more information.
         /// </summary>
         /// <param name="xuid"></param>
-        /// <exception cref="XboxAppNotFoundException"></exception>
         public XboxHandler(string? xuid = null)
         {
             var os = Environment.OSVersion;
             if (os.Platform != PlatformID.Win32NT)
-                throw new XboxAppNotFoundException($"Xbox App not found! OS Platform ID is not {PlatformID.Win32NT}");
+            {
+                _initErrors.Add($"Xbox App not found! OS Platform ID is not {PlatformID.Win32NT}");
+                return;
+            }
+            
             if (os.Version.Major < 10)
-                throw new XboxAppNotFoundException($"Xbox App not found! OS Version has to be Windows 10 or greater!");
+            {
+                _initErrors.Add("Xbox App not found! OS Version has to be Windows 10 or greater!");
+                return;
+            }
 
             _xuid = xuid;
         }
 
         /// <inheritdoc />
-        public override bool FindAllGames()
+        public override Result<bool> FindAllGames()
         {
+            if (_initErrors.Any()) return NotOk(_initErrors);
+
+            var res = new Result<bool>();
+            
             var packages = WindowsUtils.GetUWPPackages();
 
             List<TitleHistoryResponse.Title>? titles = null;
@@ -88,7 +101,7 @@ namespace GameFinder.StoreHandlers.Xbox
                 Games.Add(game);
             }
 
-            return true;
+            return Ok(res);
         }
 
         private async Task<List<TitleHistoryResponse.Title>?> GetTitlesFromXbox()

@@ -25,6 +25,6 @@ namespace GameFinder
         /// Find all games
         /// </summary>
         /// <returns></returns>
-        public abstract bool FindAllGames();
+        public abstract Result<bool> FindAllGames();
     }
 }
