@@ -156,7 +156,7 @@ namespace GameFinder.StoreHandlers.Steam
                 foreach (Match match in matches)
                 {
                     var groups = match.Groups;
-                    var path = groups["path"].Value;
+                    var path = Path.Combine(groups["path"].Value, "steamapps");
                     if (!Directory.Exists(path))
                     {
                         res.AddError($"Unable to find Universe at {path}");
