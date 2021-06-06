@@ -38,7 +38,7 @@ Source: [SteamHandler.cs](GameFinder.StoreHandlers.Steam/SteamHandler.cs)
 
 Steam games can be easily found by searching through _"Steam Universes"_. An Universe is simply a folder where you install Steam games. You can find all Universes by parsing some configuration files in the Steam folder. We can get the Steam folder by opening the registry key `HKEY_CURRENT_USER\Software\Valve\Steam` and getting the `SteamPath` value.
 
-The `config/config.vdf` file uses Valve's KeyValue format which is similar to JSON.  What we want to look for are these `BaseInstallFolder_X` values which point to a Universe folder.
+The `config/config.vdf` file uses Valve's KeyValue format which is similar to JSON. What we want to look for are these `BaseInstallFolder_X` values which point to a Universe folder.
 
 ```text
 "InstallConfigStore"
@@ -57,7 +57,7 @@ The `config/config.vdf` file uses Valve's KeyValue format which is similar to JS
 }
 ```
 
-The `steamapps/libraryfolders.vdf` uses the same type of formatting as above.  The lines with a numeric key point to a Universe folder.  These numbers should match up with the `BaseInstallFolder_X` values in `config/config.vdf`.
+The `steamapps/libraryfolders.vdf` uses the same type of formatting as above. The lines with a numeric key point to a Universe folder. These numbers should match up with the `BaseInstallFolder_X` values in `config/config.vdf`.
 
 ```text
 "LibraryFolders"
@@ -69,9 +69,9 @@ The `steamapps/libraryfolders.vdf` uses the same type of formatting as above.  T
 }
 ```
 
-Both `config/config.vdf` and `steamapps/libraryfolders.vdf` are parsed for possible Universe locations.  Theoretically, Steam keeps these files synced but there have been some user reports of this not happening.
+Both `config/config.vdf` and `steamapps/libraryfolders.vdf` are parsed for possible Universe locations. Steam should keep these files synced but there have been some user reports of this not happening.
 
-The `steamapps` subdirectory contains the `appmanifest_*.acf` files we need. `.acf` files have the same KeyValue format as `.vdf` files so parsing very easy:
+The `steamapps` subdirectory contains the `appmanifest_*.acf` files we need. `.acf` files have the same KeyValue format as `.vdf` files so parsing is very easy:
 
 ```text
 "AppState"
