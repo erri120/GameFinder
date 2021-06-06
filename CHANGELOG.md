@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.5.1] - 2021-06-06
+
+### Changed
+
+- Steam: `libraryfolders.vdf` will now also get parsed ([#7](https://github.com/erri120/GameFinder/pull/7))
+
 ## [1.5.0] - 2021-05-29
 
 ### Changed
@@ -77,9 +83,10 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.5.0...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.5.1...master
 [Released]: https://github.com/erri120/GameFinder/releases
-[1.4.2]: https://github.com/erri120/GameFinder/compare/v1.4.1...v1.5.0
+[1.5.1]: https://github.com/erri120/GameFinder/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/erri120/GameFinder/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/erri120/GameFinder/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/erri120/GameFinder/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/erri120/GameFinder/compare/v1.3.0...v1.3.1
