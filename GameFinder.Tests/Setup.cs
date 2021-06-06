@@ -23,9 +23,12 @@ namespace GameFinder.Tests
             Directory.CreateDirectory(steamConfigDir);
             var steamConfig = Path.Combine(steamConfigDir, "config.vdf");
             File.WriteAllText(steamConfig, "Hello World!", Encoding.UTF8);
-
+            
             var steamappsDir = Path.Combine(steamDir, "steamapps");
             Directory.CreateDirectory(steamappsDir);
+
+            var steamLibraries = Path.Combine(steamappsDir, "libraryfolders.vdf");
+            File.WriteAllText(steamLibraries, "Hello World!", Encoding.UTF8);
 
             var manifestFile = GetFile("appmanifest_72850.acf");
             var manifestOutput = Path.Combine(steamappsDir, "appmanifest_72850.acf");
