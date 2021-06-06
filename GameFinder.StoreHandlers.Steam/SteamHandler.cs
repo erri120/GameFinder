@@ -149,9 +149,10 @@ namespace GameFinder.StoreHandlers.Steam
             }
 
             lines = File.ReadAllLines(SteamLibraries, Encoding.UTF8);
+            var rx = new Regex(@"\s+""\d+\""\s+""(?<path>.+)""");
+
             foreach (var line in lines)
             {
-                var rx = new Regex(@"\s+""\d+\""\s+""(?<path>.+)""");
                 var matches = rx.Matches(line);
                 foreach (Match match in matches)
                 {
