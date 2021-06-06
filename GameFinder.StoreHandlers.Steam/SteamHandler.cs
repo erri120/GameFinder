@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using Microsoft.Win32;
@@ -27,6 +28,7 @@ namespace GameFinder.StoreHandlers.Steam
         /// </summary>
         public readonly string? SteamPath;
         private string? SteamConfig { get; set; }
+        private string? SteamLibraries { get; set; }
 
         /// <summary>
         /// List of all found Steam Universes
@@ -73,9 +75,17 @@ namespace GameFinder.StoreHandlers.Steam
                 return;
             }
 
+            var steamLibraries = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
+            if (!File.Exists(steamLibraries))
+            {
+                _initErrors.Add($"Unable to find libraryfolders.vdf at {steamLibraries}");
+                return;
+            }
+
             FoundSteam = true;
             SteamPath = steamPath;
             SteamConfig = steamConfig;
+            SteamLibraries = steamLibraries;
         }
 
         /// <summary>
@@ -96,16 +106,24 @@ namespace GameFinder.StoreHandlers.Steam
                 return;
             }
 
+            var steamLibraries = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
+            if (!File.Exists(steamLibraries))
+            {
+                _initErrors.Add($"Unable to find libraryfolders.vdf at {steamLibraries}");
+                return;
+            }
+
             FoundSteam = true;
             SteamPath = steamPath;
             SteamConfig = steamConfig;
+            SteamLibraries = steamLibraries;
         }
 
         private Result<bool> FindAllUniverses()
         {
             if (!FoundSteam) return NotOk(_initErrors);
             if (SteamConfig == null) return NotOk(_initErrors);
-            if (SteamConfig == null) return NotOk(_initErrors);
+            if (SteamLibraries == null) return NotOk(_initErrors);
 
             var res = new Result<bool>();
             var lines = File.ReadAllLines(SteamConfig, Encoding.UTF8);
@@ -130,6 +148,29 @@ namespace GameFinder.StoreHandlers.Steam
                 SteamUniverses.Add(path);
             }
 
+            lines = File.ReadAllLines(SteamLibraries, Encoding.UTF8);
+            var rx = new Regex(@"\s+""\d+\""\s+""(?<path>.+)""");
+
+            foreach (var line in lines)
+            {
+                var matches = rx.Matches(line);
+                foreach (Match match in matches)
+                {
+                    var groups = match.Groups;
+                    var path = Path.Combine(groups["path"].Value, "steamapps");
+                    if (!Directory.Exists(path))
+                    {
+                        res.AddError($"Unable to find Universe at {path}");
+                        continue;
+                    }
+
+                    if (!SteamUniverses.Contains(path))
+                    {
+                        SteamUniverses.Add(path);
+                    }
+                }
+            }
+
             if (SteamPath == null) return Ok(res);
             
             var defaultPath = Path.Combine(SteamPath, "steamapps");
@@ -144,7 +185,7 @@ namespace GameFinder.StoreHandlers.Steam
         {
             if (!FoundSteam) return NotOk(_initErrors);
             if (SteamConfig == null) return NotOk(_initErrors);
-            if (SteamConfig == null) return NotOk(_initErrors);
+            if (SteamLibraries == null) return NotOk(_initErrors);
             
             var universeRes = FindAllUniverses();
             if (!universeRes.Value)
