@@ -38,6 +38,10 @@ Source: [SteamHandler.cs](GameFinder.StoreHandlers.Steam/SteamHandler.cs)
 
 Steam games can be easily found by searching through _"Steam Universes"_. An Universe is simply a folder where you install Steam games. You can find all Universes by parsing some configuration files in the Steam folder. We can get the Steam folder by opening the registry key `HKEY_CURRENT_USER\Software\Valve\Steam` and getting the `SteamPath` value.
 
+Steam changed the format of their configuration files multiple times which is why you have to differentiate between different formats:
+
+#### Steam Versions before 1623193086 (2021-06-07)
+
 The `config/config.vdf` file uses Valve's KeyValue format which is similar to JSON. What we want to look for are these `BaseInstallFolder_X` values which point to a Universe folder.
 
 ```text
@@ -70,6 +74,35 @@ The `steamapps/libraryfolders.vdf` uses the same type of formatting as above. Th
 ```
 
 Both `config/config.vdf` and `steamapps/libraryfolders.vdf` are parsed for possible Universe locations. Steam should keep these files synced but there have been some user reports of this not happening.
+
+#### Steam Versions after 1623193086 (2021-06-07)
+
+In the new format only `steamapps/libraryfolders.vdf` contains the Universe locations:
+
+```text
+"libraryfolders"
+{
+	"contentstatsid"		"1616900521946793171"
+	"1"
+	{
+		"path"		"M:\\SteamLibrary"
+		"label"		""
+		"mounted"		"1"
+		"contentid"		"5393764431939341339"
+	}
+	"2"
+	{
+		"path"		"E:\\SteamLibrary"
+		"label"		""
+		"mounted"		"1"
+		"contentid"		"6734528685854492248"
+	}
+}
+```
+
+They now store an array of objects instead of strings which contain additional information like `label` and `mounted`.
+
+#### Parsing appmanifest files
 
 The `steamapps` subdirectory contains the `appmanifest_*.acf` files we need. `.acf` files have the same KeyValue format as `.vdf` files so parsing is very easy:
 
