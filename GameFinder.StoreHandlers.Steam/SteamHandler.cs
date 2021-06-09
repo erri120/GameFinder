@@ -149,8 +149,9 @@ namespace GameFinder.StoreHandlers.Steam
             }
 
             lines = File.ReadAllLines(SteamLibraries, Encoding.UTF8);
+            
+            // old libraryfolders.vdf format
             var rx = new Regex(@"\s+""\d+\""\s+""(?<path>.+)""");
-
             foreach (var line in lines)
             {
                 var matches = rx.Matches(line);
@@ -171,6 +172,73 @@ namespace GameFinder.StoreHandlers.Steam
                 }
             }
 
+            // new libraryfolders.vdf format (2021-06)
+            var inBlock = false;
+            string? currentPath = null;
+            bool? isMounted = null;
+            for (var i = 2; i < lines.Length - 1; i++)
+            {
+                var line = lines[i];
+                if (line.Contains("\t{"))
+                {
+                    if (inBlock)
+                    {
+                        res.AddError("Found new block while already in a block! This format is not supported, please report this on GitHub.");
+                        break;
+                    }
+                    
+                    inBlock = true;
+                    continue;
+                }
+
+                if (line.Contains("\t}"))
+                {
+                    if (!inBlock)
+                    {
+                        res.AddError("Found end block statement but we are not in a block! This format is not supported, please report this on GitHub.");
+                        break;
+                    }
+                    
+                    if (currentPath != null && isMounted.HasValue && isMounted.Value)
+                    {
+                        if(!SteamUniverses.Contains(currentPath))
+                            SteamUniverses.Add(currentPath);
+                    }
+
+                    currentPath = null;
+                    isMounted = null;
+                    inBlock = false;
+                    continue;
+                }
+
+                if (inBlock && line.ContainsCaseInsensitive("path") || line.ContainsCaseInsensitive("mounted"))
+                {
+                    var vdfValue = GetVdfValue(line);
+                    if (vdfValue.HasErrors)
+                    {
+                        res.AppendErrors(vdfValue.Errors);
+                        continue;
+                    }
+
+                    if (line.ContainsCaseInsensitive("path"))
+                    {
+                        currentPath = Path.Combine(vdfValue.Value, "steamapps");
+                    }
+                    else
+                    {
+                        var sMounted = vdfValue.Value;
+                        if (!int.TryParse(sMounted, out var iMounted))
+                        {
+                            res.AddError($"Unable to parse mounted \"{sMounted}\" as int");
+                            continue;
+                        }
+
+                        isMounted = iMounted == 1;
+                    }
+                    
+                }
+            }
+            
             if (SteamUniverses.Count == 0)
             {
                 _initErrors.Add("Found 0 Steam Universes!");
