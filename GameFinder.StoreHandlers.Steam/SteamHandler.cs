@@ -171,6 +171,11 @@ namespace GameFinder.StoreHandlers.Steam
                 }
             }
 
+            if (SteamUniverses.Count == 0)
+            {
+                _initErrors.Add("Found 0 Steam Universes!");
+            }
+            
             if (SteamPath == null) return Ok(res);
             
             var defaultPath = Path.Combine(SteamPath, "steamapps");
