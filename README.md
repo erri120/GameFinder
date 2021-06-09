@@ -40,7 +40,7 @@ Steam games can be easily found by searching through _"Steam Universes"_. An Uni
 
 Steam changed the format of their configuration files multiple times which is why you have to differentiate between different formats:
 
-#### Steam Versions before 1623193086 (2021-06-07)
+#### Steam Versions before 1623193086 (2021-06-08)
 
 The `config/config.vdf` file uses Valve's KeyValue format which is similar to JSON. What we want to look for are these `BaseInstallFolder_X` values which point to a Universe folder.
 
@@ -75,7 +75,7 @@ The `steamapps/libraryfolders.vdf` uses the same type of formatting as above. Th
 
 Both `config/config.vdf` and `steamapps/libraryfolders.vdf` are parsed for possible Universe locations. Steam should keep these files synced but there have been some user reports of this not happening.
 
-#### Steam Versions after 1623193086 (2021-06-07)
+#### Steam Versions after 1623193086 (2021-06-08)
 
 In the new format only `steamapps/libraryfolders.vdf` contains the Universe locations:
 

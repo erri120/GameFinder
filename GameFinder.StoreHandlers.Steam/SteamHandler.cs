@@ -172,7 +172,7 @@ namespace GameFinder.StoreHandlers.Steam
                 }
             }
 
-            // new libraryfolders.vdf format (2021-06)
+            // new libraryfolders.vdf format (2021-06-08)
             var inBlock = false;
             string? currentPath = null;
             bool? isMounted = null;
