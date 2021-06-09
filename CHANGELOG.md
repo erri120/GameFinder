@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 ### Changed
 
 - Steam, GOG and EGS Handlers will not also include init errors in the final result
+- Steam: Added support for new `libraryfolders.vdf` format introduced in update 1623193086 (2021-06-07). See README for more information.
 
 ## [1.5.1] - 2021-06-06
 
