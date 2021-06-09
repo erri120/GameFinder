@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using Microsoft.Win32;
@@ -53,6 +54,9 @@ namespace GameFinder.StoreHandlers.GOG
             }
 
             var res = new Result<bool>();
+            if (_initErrors.Any())
+                res.AppendErrors(_initErrors);
+            
             var keys = gogKey.GetSubKeyNames();
             foreach (var key in keys)
             {

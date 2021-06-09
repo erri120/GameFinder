@@ -60,6 +60,8 @@ namespace GameFinder.StoreHandlers.EGS
             if (MetadataPath == null) return NotOk(_initErrors);
 
             var res = new Result<bool>();
+            if (_initErrors.Any())
+                res.AppendErrors(_initErrors);
             
             var itemFiles = Directory.EnumerateFiles(MetadataPath, "*.item", SearchOption.TopDirectoryOnly);
             foreach (var itemFilePath in itemFiles)

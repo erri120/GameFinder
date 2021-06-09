@@ -190,8 +190,13 @@ namespace GameFinder.StoreHandlers.Steam
             var universeRes = FindAllUniverses();
             if (!universeRes.Value)
                 return NotOk(universeRes);
-
+            
             var res = new Result<bool>();
+            if (universeRes.HasErrors)
+                res.AppendErrors(universeRes);
+            if (_initErrors.Any())
+                res.AppendErrors(_initErrors);
+            
             foreach (var universe in SteamUniverses)
             {
                 var acfFiles = Directory.EnumerateFiles(universe, "*.acf", SearchOption.TopDirectoryOnly);
