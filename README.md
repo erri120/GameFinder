@@ -6,11 +6,11 @@
 
 ## Supported Stores
 
-- Steam
-- GOG
-- Bethesda.net Launcher
-- Epic Games Store
-- Xbox Game Pass (UWP apps, see [Finding Xbox Games](#finding-xbox-games) for more information)
+- [Steam](#finding-steam-games)
+- [GOG](#finding-gog-games)
+- [Bethesda.net Launcher](#finding-bethnet-games)
+- [Epic Games Store](#finding-egs-games)
+- [Xbox Game Pass](#finding-xbox-games) (UWP apps, see [Finding Xbox Games](#finding-xbox-games) for more information)
 - ~~Origin~~ _TODO_
 
 ## Example
