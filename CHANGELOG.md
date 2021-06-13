@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.5.3] - 2021-06-13
+
+### Changed
+
+- Steam: Fixed double slashes in Paths ([#8](https://github.com/erri120/GameFinder/issues/8))
+- Steam: Improved parsing of `config.vdf`, `libraryfolders.vdf` and `*.acf` files
+
 ## [1.5.2] - 2021-06-09
 
 ### Changed
@@ -90,8 +97,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.5.2...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.5.3...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.5.3]: https://github.com/erri120/GameFinder/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/erri120/GameFinder/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/erri120/GameFinder/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/erri120/GameFinder/compare/v1.4.1...v1.5.0
