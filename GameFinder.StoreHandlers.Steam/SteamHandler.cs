@@ -126,130 +126,46 @@ namespace GameFinder.StoreHandlers.Steam
             if (SteamLibraries == null) return NotOk(_initErrors);
 
             var res = new Result<bool>();
-            var lines = File.ReadAllLines(SteamConfig, Encoding.UTF8);
-            foreach (var line in lines)
+
+            var configRes = ParseSteamConfig(SteamConfig);
+            var libraryFoldersRes = ParseLibraryFolders(SteamLibraries);
+
+            if (configRes.HasErrors)
+                res.AppendErrors(configRes.Errors);
+            if (libraryFoldersRes.HasErrors)
+                res.AppendErrors(libraryFoldersRes.Errors);
+
+            var allPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            allPaths.UnionWith(configRes.Value);
+            allPaths.UnionWith(libraryFoldersRes.Value);
+
+            foreach (var path in allPaths)
             {
-                if (!line.ContainsCaseInsensitive("BaseInstallFolder_")) continue;
-                var vdfRes = GetVdfValue(line);
-                if (vdfRes.HasErrors)
+                var universePath = Path.Combine(path, "steamapps");
+                if (!Directory.Exists(universePath))
                 {
-                    res.AppendErrors(vdfRes);
+                    res.AddError($"Universe does not exist at {universePath}");
                     continue;
                 }
                 
-                var path = Path.Combine(vdfRes.Value, "steamapps");
-
-                if (!Directory.Exists(path))
-                {
-                    res.AddError($"Unable to find Universe at {path}");
-                    continue;
-                }
+                SteamUniverses.Add(universePath);
+            }
+            
+            if (SteamPath == null)
+            {
+                if (SteamUniverses.Count == 0)
+                    res.AddError("Found 0 Steam Universes!");
                 
-                SteamUniverses.Add(path);
+                return Ok(res);
             }
-
-            lines = File.ReadAllLines(SteamLibraries, Encoding.UTF8);
-            
-            // old libraryfolders.vdf format
-            var rx = new Regex(@"\s+""\d+\""\s+""(?<path>.+)""");
-            foreach (var line in lines)
-            {
-                var matches = rx.Matches(line);
-                foreach (Match match in matches)
-                {
-                    var groups = match.Groups;
-                    var path = Path.Combine(groups["path"].Value, "steamapps");
-                    if (!Directory.Exists(path))
-                    {
-                        res.AddError($"Unable to find Universe at {path}");
-                        continue;
-                    }
-
-                    if (!SteamUniverses.Contains(path))
-                    {
-                        SteamUniverses.Add(path);
-                    }
-                }
-            }
-
-            // new libraryfolders.vdf format (2021-06-08)
-            var inBlock = false;
-            string? currentPath = null;
-            bool? isMounted = null;
-            for (var i = 2; i < lines.Length - 1; i++)
-            {
-                var line = lines[i];
-                if (line.Contains("\t{"))
-                {
-                    if (inBlock)
-                    {
-                        res.AddError("Found new block while already in a block! This format is not supported, please report this on GitHub.");
-                        break;
-                    }
-                    
-                    inBlock = true;
-                    continue;
-                }
-
-                if (line.Contains("\t}"))
-                {
-                    if (!inBlock)
-                    {
-                        res.AddError("Found end block statement but we are not in a block! This format is not supported, please report this on GitHub.");
-                        break;
-                    }
-                    
-                    if (currentPath != null && isMounted.HasValue && isMounted.Value)
-                    {
-                        if(!SteamUniverses.Contains(currentPath))
-                            SteamUniverses.Add(currentPath);
-                    }
-
-                    currentPath = null;
-                    isMounted = null;
-                    inBlock = false;
-                    continue;
-                }
-
-                if (inBlock && line.ContainsCaseInsensitive("path") || line.ContainsCaseInsensitive("mounted"))
-                {
-                    var vdfValue = GetVdfValue(line);
-                    if (vdfValue.HasErrors)
-                    {
-                        res.AppendErrors(vdfValue.Errors);
-                        continue;
-                    }
-
-                    if (line.ContainsCaseInsensitive("path"))
-                    {
-                        currentPath = Path.Combine(vdfValue.Value, "steamapps");
-                    }
-                    else
-                    {
-                        var sMounted = vdfValue.Value;
-                        if (!int.TryParse(sMounted, out var iMounted))
-                        {
-                            res.AddError($"Unable to parse mounted \"{sMounted}\" as int");
-                            continue;
-                        }
-
-                        isMounted = iMounted == 1;
-                    }
-                    
-                }
-            }
-            
-            if (SteamUniverses.Count == 0)
-            {
-                _initErrors.Add("Found 0 Steam Universes!");
-            }
-            
-            if (SteamPath == null) return Ok(res);
             
             var defaultPath = Path.Combine(SteamPath, "steamapps");
             if (Directory.Exists(defaultPath))
                 SteamUniverses.Add(defaultPath);
 
+            if (SteamUniverses.Count == 0)
+                res.AddError("Found 0 Steam Universes!");
+            
             return Ok(res);
         }
 
@@ -275,173 +191,16 @@ namespace GameFinder.StoreHandlers.Steam
                 var acfFiles = Directory.EnumerateFiles(universe, "*.acf", SearchOption.TopDirectoryOnly);
                 foreach (var acfFile in acfFiles)
                 {
-                    var lines = File.ReadAllLines(acfFile, Encoding.UTF8);
-                    var game = new SteamGame();
-
-                    foreach (var line in lines)
+                    var parseRes = ParseAcfFile(acfFile);
+                    if (parseRes.HasErrors)
                     {
-                        if (line.ContainsCaseInsensitive("\"appid\""))
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-                            
-                            var sID = vdfRes.Value;
-                            if (!int.TryParse(sID, out var id))
-                            {
-                                res.AddError($"Unable to parse appid \"{sID}\" as int in file {acfFile}");
-                                break;
-                            }
-                            
-                            game.ID = id;
-                            continue;
-                        }
-
-                        if (line.ContainsCaseInsensitive("\"name\"") && game.Name == string.Empty)
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-
-                            game.Name = vdfRes.Value;
-                            continue;
-                        }
-
-                        if (line.ContainsCaseInsensitive("\"installdir\"") && game.Path == string.Empty)
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-                            
-                            var path = Path.Combine(universe, "common", vdfRes.Value);
-                            game.Path = path;
-                            continue;
-                        }
-
-                        if (line.ContainsCaseInsensitive("\"LastUpdated\"") && game.LastUpdated == DateTime.UnixEpoch)
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-                            
-                            var sTimeStamp = vdfRes.Value;
-                            if (!long.TryParse(sTimeStamp, out var timeStamp))
-                            {
-                                res.AddError($"Unable to parse LastUpdated \"{sTimeStamp}\" unix timestamp as long in file {acfFile}");
-                                break;
-                            }
-                            var dateTime = timeStamp.ToDateTime();
-                            game.LastUpdated = dateTime;
-                            continue;
-                        }
-
-                        if (line.ContainsCaseInsensitive("\"SizeOnDisk\"") && game.SizeOnDisk == -1)
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-                            
-                            var sBytes = vdfRes.Value;
-                            if (!long.TryParse(sBytes, out var bytes))
-                            {
-                                res.AddError($"Unable to parse SizeOnDisk \"{sBytes}\" as long in file {acfFile}");
-                                break;
-                            }
-                            game.SizeOnDisk = bytes;
-                            continue;
-                        }
-                        
-                        if (line.ContainsCaseInsensitive("\"BytesToDownload\"") && game.BytesToDownload == -1)
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-                            
-                            var sBytes = vdfRes.Value;
-                            if (!long.TryParse(sBytes, out var bytes))
-                            {
-                                res.AddError($"Unable to parse BytesToDownload \"{sBytes}\" as long in file {acfFile}");
-                                break;
-                            }
-                            game.BytesToDownload = bytes;
-                            continue;
-                        }
-                        
-                        if (line.ContainsCaseInsensitive("\"BytesDownloaded\"") && game.BytesDownloaded == -1)
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-                            
-                            var sBytes = vdfRes.Value;
-                            if (!long.TryParse(sBytes, out var bytes))
-                            {
-                                res.AddError($"Unable to parse BytesDownloaded \"{sBytes}\" as long in file {acfFile}");
-                                break;
-                            }
-                            game.BytesDownloaded = bytes;
-                            continue;
-                        }
-                        
-                        if (line.ContainsCaseInsensitive("\"BytesToStage\"") && game.BytesToStage == -1)
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-                            
-                            var sBytes = vdfRes.Value;
-                            if (!long.TryParse(sBytes, out var bytes))
-                            {
-                                res.AddError($"Unable to parse BytesToStage \"{sBytes}\" as long in file {acfFile}");
-                                break;
-                            }
-                            game.BytesToStage = bytes;
-                            continue;
-                        }
-                        
-                        if (line.ContainsCaseInsensitive("\"BytesStaged\"") && game.BytesStaged == -1)
-                        {
-                            var vdfRes = GetVdfValue(line);
-                            if (vdfRes.HasErrors)
-                            {
-                                res.AppendErrors(vdfRes);
-                                break;
-                            }
-                            
-                            var sBytes = vdfRes.Value;
-                            if (!long.TryParse(sBytes, out var bytes))
-                            {
-                                res.AddError($"Unable to parse BytesStaged \"{sBytes}\" as long in file {acfFile}");
-                                break;
-                            }
-                            game.BytesStaged = bytes;
-                            continue;
-                        }
+                        res.AppendErrors(parseRes);
                     }
+
+                    if (!parseRes.HasValue) continue;
+
+                    var game = parseRes.Value;
+                    game.Path = Path.Combine(universe, "common", game.Path);
                     
                     Games.Add(game);
                 }
@@ -471,7 +230,265 @@ namespace GameFinder.StoreHandlers.Steam
             game = Games.FirstOrDefault(x => x.ID == id);
             return game != null;
         }
+        
+        internal static Result<List<string>> ParseSteamConfig(string file)
+        {
+            var res = new Result<List<string>>(new List<string>());
 
+            if (!File.Exists(file))
+            {
+                res.AddError($"The config file at {file} does not exist!");
+                return res;
+            }
+
+            var text = File.ReadAllText(file, Encoding.UTF8);
+            
+            var regex = new Regex(@"\""BaseInstallFolder_\d*\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
+            var matches = regex.Matches(text);
+
+            if (matches.Count == 0)
+            {
+                res.AddError($"Found no matches in file {file}");
+                return res;
+            }
+            
+            GetAllMatches("path", matches, path => res.Value.Add(MakeValidPath(path)));
+            return res;
+        }
+
+        internal static Result<List<string>> ParseLibraryFolders(string file)
+        {
+            var res = new Result<List<string>>(new List<string>());
+
+            if (!File.Exists(file))
+            {
+                res.AddError($"The config file at {file} does not exist!");
+                return res;
+            }
+
+            var lines = File.ReadLines(file, Encoding.UTF8);
+            var firstLine = lines.First();
+
+            // old format (before 1623193086 2021-06-08)
+            if (firstLine.Contains("LibraryFolders", StringComparison.Ordinal))
+            {
+                var text = File.ReadAllText(file, Encoding.UTF8);
+                
+                var regex = new Regex(@"\s+""\d+\""\s+""(?<path>.+)""", RegexOptions.Compiled);
+                var matches = regex.Matches(text);
+
+                if (matches.Count == 0)
+                {
+                    res.AddError($"Found no matches in file {file}");
+                    return res;
+                }
+            
+                GetAllMatches("path", matches, path => res.Value.Add(MakeValidPath(path)));
+                return res;
+            }
+
+            // new format (after 1623193086 2021-06-08)
+            if (firstLine.Contains("libraryfolders", StringComparison.CurrentCulture))
+            {
+                var text = File.ReadAllText(file, Encoding.UTF8);
+
+                var pathRegex = new Regex(@"\""path\""\s*\""(?<path>[^\""]*)\""");
+                var mountedRegex = new Regex(@"\""mounted\""\s*\""(?<mounted>[^\""]*)\""");
+
+                var pathMatches = pathRegex.Matches(text);
+                var mountedMatches = mountedRegex.Matches(text);
+
+                if (pathMatches.Count == 0)
+                {
+                    res.AddError($"Found no path matches in file {file}");
+                    return res;
+                }
+
+                if (mountedMatches.Count == 0)
+                {
+                    res.AddError($"Found no mounted matches in file {file}");
+                    return res;
+                }
+
+                if (pathMatches.Count != mountedMatches.Count)
+                {
+                    res.AddError($"Number of path matches does not equal number of mounted matches in file {file}");
+                    return res;
+                }
+
+                var pathValues = new List<string>();
+                var mountedValues = new List<string>();
+                
+                GetAllMatches("path", pathMatches, path => pathValues.Add(path));
+                GetAllMatches("mounted", mountedMatches, mounted => mountedValues.Add(mounted));
+
+                if (pathValues.Count != mountedValues.Count)
+                {
+                    res.AddError($"Number of path values does not equal number of mounted values in file {file}");
+                    return res;
+                }
+                
+                for (var i = 0; i < pathValues.Count; i++)
+                {
+                    var path = pathValues[i];
+                    var sMounted = mountedValues[i];
+                    if (sMounted != "1") continue;
+                    
+                    res.Value.Add(MakeValidPath(path));
+                }
+                
+                return res;
+            }
+
+            res.AddError($"Unknown libraryfolders.vdf format, file starts with {firstLine} at {file}");
+            return res;
+        }
+
+        private static readonly IReadOnlyList<string> AcfKeys = new[]
+        {
+            "appid",
+            "name",
+            "installdir",
+            "LastUpdated",
+            "SizeOnDisk",
+            "BytesToDownload",
+            "BytesDownloaded",
+            "BytesToStage",
+            "BytesStaged"
+        };
+        
+        internal static Result<SteamGame> ParseAcfFile(string file)
+        {
+            var res = new Result<SteamGame>(null!);
+
+            if (!File.Exists(file))
+            {
+                res.AddError($"Manifest {file} does not exist!");
+                return res;
+            }
+
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            
+            var lines = File.ReadLines(file, Encoding.UTF8);
+            foreach (var line in lines)
+            {
+                var first = AcfKeys.FirstOrDefault(x => line.ContainsCaseInsensitive($"\"{x}\""));
+                if (first == null) continue;
+                if (dict.ContainsKey(first)) continue;
+
+                var vdfRes = GetVdfValue(line);
+                if (vdfRes.HasErrors)
+                {
+                    res.AppendErrors(vdfRes);
+                    continue;
+                }
+
+                var value = vdfRes.Value;
+                dict.Add(first, value);
+            }
+
+            if (dict.Count != AcfKeys.Count)
+            {
+                foreach (var acfKey in AcfKeys)
+                {
+                    if (dict.TryGetValue(acfKey, out _))
+                        continue;
+                    res.AddError($"Manifest {file} does not contain a value with key {acfKey}");
+                }
+                
+                return res;
+            }
+            
+            var game = new SteamGame();
+
+            var sAppId = dict["appid"];
+            var name = dict["name"];
+            var installDir = dict["installdir"];
+            var sLastUpdated = dict["LastUpdated"];
+            var sSizeOnDisk = dict["SizeOnDisk"];
+            var sBytesToDownload = dict["BytesToDownload"];
+            var sBytesDownloaded = dict["BytesDownloaded"];
+            var sBytesToStage = dict["BytesToStage"];
+            var sBytesStaged = dict["BytesStaged"];
+
+            if (!int.TryParse(sAppId, out var appId))
+            {
+                res.AddError($"Unable to parse appid {sAppId} as int in Manifest {file}");
+                return res;
+            }
+
+            game.ID = appId;
+
+            bool ParseAndSet(string value, string key, Action<long> action)
+            {
+                if (!long.TryParse(value, out var lValue))
+                {
+                    res.AddError($"Unable to parse {key} as long in Manifest {file}");
+                    return false;
+                }
+
+                action(lValue);
+                return true;
+            }
+
+            if (!ParseAndSet(sLastUpdated, "LastUpdated", timeStamp =>
+            {
+                var dateTime = timeStamp.ToDateTime();
+                game.LastUpdated = dateTime;
+            }))
+            {
+                return res;
+            }
+
+            if (!ParseAndSet(sSizeOnDisk, "SizeOnDisk", sizeOnDisk => game.SizeOnDisk = sizeOnDisk))
+                return res;
+
+            if (!ParseAndSet(sBytesToDownload, "BytesToDownload",
+                bytesToDownload => game.BytesToDownload = bytesToDownload))
+                return res;
+
+            if (!ParseAndSet(sBytesDownloaded, "BytesDownloaded",
+                bytesDownloaded => game.BytesDownloaded = bytesDownloaded))
+                return res;
+
+            if (!ParseAndSet(sBytesToStage, "BytesToStage", bytesToStage => game.BytesToStage = bytesToStage))
+                return res;
+
+            if (!ParseAndSet(sBytesStaged, "BytesStaged", bytesStaged => game.BytesStaged = bytesStaged))
+                return res;
+
+            game.Name = name;
+            game.Path = installDir;
+
+            var vRes = new Result<SteamGame>(game);
+            vRes.AppendErrors(res);
+            return vRes;
+        }
+        
+        private static void GetAllMatches(string group, MatchCollection matches, Action<string> action)
+        {
+            foreach (Match match in matches)
+            {
+                var groups = match.Groups;
+#if NET5_0
+                if (!groups.TryGetValue(group, out var currentGroup)) continue;
+                if (!currentGroup.Success) continue;
+#elif NETSTANDARD2_1
+                var currentGroup = groups.FirstOrDefault(x => x.Success && x.Name.Equals(group, StringComparison.OrdinalIgnoreCase));
+                if (currentGroup == null) continue;
+#endif
+
+                action(currentGroup.Value);
+            }
+        }
+        
+        private static string MakeValidPath(string input)
+        {
+            var sb = new StringBuilder(input);
+            sb.Replace("\\\\", "\\");
+            return sb.ToString();
+        }
+        
         private static Result<string> GetVdfValue(string line)
         {
             var split = line.Split("\"");
