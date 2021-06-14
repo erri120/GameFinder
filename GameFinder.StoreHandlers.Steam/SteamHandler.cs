@@ -188,6 +188,12 @@ namespace GameFinder.StoreHandlers.Steam
             
             foreach (var universe in SteamUniverses)
             {
+                if (!Directory.Exists(universe))
+                {
+                    res.AddError($"Universe does not exist at {universe}");
+                    continue;
+                }
+
                 var acfFiles = Directory.EnumerateFiles(universe, "*.acf", SearchOption.TopDirectoryOnly);
                 foreach (var acfFile in acfFiles)
                 {
