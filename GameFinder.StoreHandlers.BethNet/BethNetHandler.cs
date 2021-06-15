@@ -9,9 +9,13 @@ using static GameFinder.ResultUtils;
 
 namespace GameFinder.StoreHandlers.BethNet
 {
+    /// <summary>
+    /// Store Handler for Bethesda.net Games. 
+    /// </summary>
     [PublicAPI]
     public class BethNetHandler : AStoreHandler<BethNetGame>
     {
+        /// <inheritdoc cref="AStoreHandler{TGame}.StoreType"/>
         public override StoreType StoreType => StoreType.BethNet;
 
         private const string Launcher32RegKey = @"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net";
@@ -19,11 +23,19 @@ namespace GameFinder.StoreHandlers.BethNet
         
         private const string Uninstall32RegKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
         private const string Uninstall64RegKey = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
+
+        private const string UninstallString = "bethesdanet://uninstall";
         
+        /// <summary>
+        /// Path to the Launcher.
+        /// </summary>
         public readonly string? LauncherPath;
         
         private readonly List<string> _initErrors = new List<string>();
         
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public BethNetHandler()
         {
             var regKey = Registry.LocalMachine.OpenSubKey(Launcher32RegKey);
@@ -136,7 +148,7 @@ namespace GameFinder.StoreHandlers.BethNet
                 var uninstallString = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "UninstallString");
                 if (uninstallString == null) return res;
 
-                if (!uninstallString.ContainsCaseInsensitive("bethesdanet://uninstall/")) return res;
+                if (!uninstallString.ContainsCaseInsensitive(UninstallString)) return res;
 
                 var qWordRes = RegistryHelper.GetQWordValueFromRegistry(subKey, "ProductID");
                 if (qWordRes.HasErrors)
