@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using Microsoft.Win32;
@@ -13,8 +14,11 @@ namespace GameFinder.StoreHandlers.BethNet
     {
         public override StoreType StoreType => StoreType.BethNet;
 
-        private const string LauncherRegKey = @"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net";
-        private const string UninstallRegKey = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
+        private const string Launcher32RegKey = @"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net";
+        private const string Launcher64RegKey = @"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net";
+        
+        private const string Uninstall32RegKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+        private const string Uninstall64RegKey = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
         
         public readonly string? LauncherPath;
         
@@ -22,14 +26,20 @@ namespace GameFinder.StoreHandlers.BethNet
         
         public BethNetHandler()
         {
-            using var regKey = Registry.LocalMachine.OpenSubKey(LauncherRegKey);
+            var regKey = Registry.LocalMachine.OpenSubKey(Launcher32RegKey);
             if (regKey == null)
             {
-                _initErrors.Add($"Unable to open Registry Key {LauncherRegKey}");
-                return;
+                regKey = Registry.LocalMachine.OpenSubKey(Launcher64RegKey);
+                if (regKey == null)
+                {
+                    _initErrors.Add($"Unable to open Registry Keys {Launcher32RegKey} and {Launcher64RegKey}");
+                    return;
+                }
             }
 
             var regRes = RegistryHelper.GetStringValueFromRegistry(regKey, "installLocation");
+            regKey.Dispose();
+            
             if (regRes.HasErrors)
             {
                 _initErrors.AddRange(regRes.Errors);
@@ -49,77 +59,130 @@ namespace GameFinder.StoreHandlers.BethNet
         /// <inheritdoc />
         public override Result<bool> FindAllGames()
         {
-            if (_initErrors.Count != 0)
-                return NotOk(_initErrors);
+            var res = new Result<bool>();
+            res.AppendErrors(_initErrors);
+
+            var subKey32Names = new List<string>();
+            var subKey64Names = new List<string>();
             
-            using var uninstallRegKey = Registry.LocalMachine.OpenSubKey(UninstallRegKey);
-            if (uninstallRegKey == null)
+            using var uninstall32RegKey = Registry.LocalMachine.OpenSubKey(Uninstall32RegKey);
+            if (uninstall32RegKey == null)
             {
-                return NotOk($"Unable to open Registry Key {UninstallRegKey}");
+                res.AddError($"Unable to open Registry Key {Uninstall32RegKey}");
+            }
+            else
+            {
+                subKey32Names.AddRange(uninstall32RegKey.GetSubKeyNames());
             }
 
-            var res = new Result<bool>();
+            using var uninstall64RegKey = Registry.LocalMachine.OpenSubKey(Uninstall64RegKey);
+            if (uninstall64RegKey == null)
+            {
+                res.AddError($"Unable to open Registry Key {Uninstall64RegKey}");
+            }
+            else
+            {
+                subKey64Names.AddRange(uninstall64RegKey.GetSubKeyNames());
+            }
+
+            if (!subKey32Names.Any() && !subKey64Names.Any())
+            {
+                res.AddError($"Did not find any Sub Keys in the Registry for {Uninstall32RegKey} and {Uninstall64RegKey}");
+                return NotOk(res);
+            }
             
             //idea from https://github.com/TouwaStar/Galaxy_Plugin_Bethesda/blob/master/betty/local.py
-            var subKeyNames = uninstallRegKey.GetSubKeyNames();
-            foreach (var subKeyName in subKeyNames)
+
+            void GetGames(RegistryKey? uninstallKey, IEnumerable<string> subKeyNames)
             {
-                try
+                if (uninstallKey == null) return;
+                
+                foreach (var subKeyName in subKeyNames)
                 {
-                    using var subKey = uninstallRegKey.OpenSubKey(subKeyName);
-                    if (subKey == null) continue;
-
-                    var uninstallString = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "UninstallString");
-                    if (uninstallString == null) continue;
-
-                    if (!uninstallString.ContainsCaseInsensitive("bethesdanet://uninstall/")) continue;
-
-                    var qWordRes = RegistryHelper.GetQWordValueFromRegistry(subKey, "ProductID");
-                    if (qWordRes.HasErrors)
+                    try
                     {
-                        res.AppendErrors(qWordRes);
-                        continue;
+                        using var subKey = uninstallKey.OpenSubKey(subKeyName);
+                        if (subKey == null) continue;
+
+                        var gameRes = GetGameFromRegistry(subKey);
+                        if (gameRes.HasErrors)
+                        {
+                            res.AppendErrors(gameRes);
+                        }
+
+                        if (gameRes.Value == null) continue;
+                    
+                        Games.Add(gameRes.Value);
                     }
-
-                    var productID = qWordRes.Value;
-
-                    var stringRes = RegistryHelper.GetStringValueFromRegistry(subKey, "Path");
-                    if (stringRes.HasErrors)
+                    catch (Exception e)
                     {
-                        res.AppendErrors(stringRes);
-                        continue;
+                        res.AddError($"{e}");
                     }
-                    
-                    var path = stringRes.Value.RemoveQuotes();
-                    
-                    stringRes = RegistryHelper.GetStringValueFromRegistry(subKey, "DisplayName");
-                    if (stringRes.HasErrors)
-                    {
-                        res.AppendErrors(stringRes);
-                        continue;
-                    }
-
-                    var displayName = stringRes.Value;
-                    
-                    var game = new BethNetGame
-                    {
-                        Name = displayName,
-                        Path = path,
-
-                        ID = productID
-                    };
-                    
-                    Games.Add(game);
-                    continue;
-                }
-                catch (Exception)
-                {
-                    //ignore
-                    continue;
                 }
             }
             
+            GetGames(uninstall32RegKey, subKey32Names);
+            GetGames(uninstall64RegKey, subKey64Names);
+            
             return Ok(res);
+        }
+
+        private static Result<BethNetGame?> GetGameFromRegistry(RegistryKey subKey)
+        {
+            var res = new Result<BethNetGame?>(null);
+
+            try
+            {
+                var uninstallString = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "UninstallString");
+                if (uninstallString == null) return res;
+
+                if (!uninstallString.ContainsCaseInsensitive("bethesdanet://uninstall/")) return res;
+
+                var qWordRes = RegistryHelper.GetQWordValueFromRegistry(subKey, "ProductID");
+                if (qWordRes.HasErrors)
+                {
+                    res.AppendErrors(qWordRes);
+                    return res;
+                }
+
+                var productID = qWordRes.Value;
+
+                var stringRes = RegistryHelper.GetStringValueFromRegistry(subKey, "Path");
+                if (stringRes.HasErrors)
+                {
+                    res.AppendErrors(stringRes);
+                    return res;
+                }
+
+                var path = stringRes.Value.RemoveQuotes();
+
+                stringRes = RegistryHelper.GetStringValueFromRegistry(subKey, "DisplayName");
+                if (stringRes.HasErrors)
+                {
+                    res.AppendErrors(stringRes);
+                    return res;
+                }
+
+                var displayName = stringRes.Value;
+
+                var game = new BethNetGame
+                {
+                    Name = displayName,
+                    Path = path,
+
+                    ID = productID
+                };
+
+                var t = new Result<BethNetGame?>(game);
+                t.AppendErrors(res);
+                return t;
+            }
+            catch (Exception e)
+            {
+                res.AddError($"{e}");
+            }
+
+            return res;
         }
         
         /// <inheritdoc />
