@@ -2,18 +2,20 @@
 
 [![CI](https://github.com/erri120/GameFinder/actions/workflows/ci.yml/badge.svg)](https://github.com/erri120/GameFinder/actions/workflows/ci.yml) [![Nuget](https://img.shields.io/nuget/v/GameFinder)](https://www.nuget.org/packages/GameFinder/)
 
-.NET 5 library for finding games on Windows.
+.NET 5 library for finding games on Windows. The following stores are support:
 
-## Supported Stores
+- [Steam](#steam)
+- [GOG](#gog)
+- [Bethesda.net Launcher](#bethesdanet-launcher)
+- [Epic Games Store](#epic-games-store)
+- [Xbox Game Pass](#xbox-game-pass-uwp) (UWP apps, see [Finding Xbox Games](#how-to-find-xbox-game-pass-uwp-games) for more information)
+- [Origin](#origin)
 
-- [Steam](#finding-steam-games)
-- [GOG](#finding-gog-games)
-- [Bethesda.net Launcher](#finding-bethnet-games)
-- [Epic Games Store](#finding-egs-games)
-- [Xbox Game Pass](#finding-xbox-games) (UWP apps, see [Finding Xbox Games](#finding-xbox-games) for more information)
-- ~~Origin~~ _TODO_
+## When to use this Library
 
-## Example
+Most of the time you develop a tool for a single game and then you just find the game using registry keys. This library was made for tools which need to find multiple different games from different stores. I originally wrote most of the code for [Wabbajack](https://github.com/wabbajack-tools/wabbajack) but decided to move the code to its own repository so other tools like [Synthesis](https://github.com/mutagen-modding/Synthesis) can also make use of it.
+
+## Usage
 
 ```c#
 var steamHandler = new SteamHandler();
@@ -24,27 +26,25 @@ foreach (var steamGame in steamHandler.Games)
 }
 ```
 
-## When to use this Library
+## Supported Stores
 
-This library is best used when you have to find multiple different games from different game stores. If you build a tool for only one game then you might better be off finding it via the registry (common method is looking for the Uninstaller). You could still use this library to only find that one game but it's a bit overkill.
+The following sections contain information on how to use a specific handler and what it does in the background. If you only need to know how to use the handler then you just need to read the [Usage](#usage). If you want to know how it works, how others have implemented it or you just want to know how to do it manually; look at the "_How to find_" sub-section.
 
-If you build some sort of game library manager like [Playnite](https://github.com/JosefNemec/Playnite/) or [LaunchBox](https://www.launchbox-app.com/) then you could make massive use of this library.
+### Steam
 
-## How it works
+#### How to find Steam Games
 
-### Finding Steam Games
-
-Source: [SteamHandler.cs](GameFinder.StoreHandlers.Steam/SteamHandler.cs)
+Implementation can be found in `GameFinder.StoreHandlers.Steam`: [SteamHandler](GameFinder.StoreHandlers.Steam/SteamHandler.cs).
 
 Steam games can be easily found by searching through _"Steam Universes"_. An Universe is simply a folder where you install Steam games. You can find all Universes by parsing some configuration files in the Steam folder. We can get the Steam folder by opening the registry key `HKEY_CURRENT_USER\Software\Valve\Steam` and getting the `SteamPath` value.
 
 Steam changed the format of their configuration files multiple times which is why you have to differentiate between different formats:
 
-#### Steam Versions before 1623193086 (2021-06-08)
+##### Steam Versions before 1623193086 (2021-06-08)
 
 The `config/config.vdf` file uses Valve's KeyValue format which is similar to JSON. What we want to look for are these `BaseInstallFolder_X` values which point to a Universe folder.
 
-```text
+```vdf
 "InstallConfigStore"
 {
 	"Software"
@@ -63,7 +63,7 @@ The `config/config.vdf` file uses Valve's KeyValue format which is similar to JS
 
 The `steamapps/libraryfolders.vdf` uses the same type of formatting as above. The lines with a numeric key point to a Universe folder. These numbers should match up with the `BaseInstallFolder_X` values in `config/config.vdf`.
 
-```text
+```vdf
 "LibraryFolders"
 {
 	"TimeNextStatsReport"		"1623187700"
@@ -75,11 +75,11 @@ The `steamapps/libraryfolders.vdf` uses the same type of formatting as above. Th
 
 Both `config/config.vdf` and `steamapps/libraryfolders.vdf` are parsed for possible Universe locations. Steam should keep these files synced but there have been some user reports of this not happening.
 
-#### Steam Versions after 1623193086 (2021-06-08)
+##### Steam Versions after 1623193086 (2021-06-08)
 
 In the new format only `steamapps/libraryfolders.vdf` contains the Universe locations:
 
-```text
+```vdf
 "libraryfolders"
 {
 	"contentstatsid"		"1616900521946793171"
@@ -102,11 +102,11 @@ In the new format only `steamapps/libraryfolders.vdf` contains the Universe loca
 
 They now store an array of objects instead of strings which contain additional information like `label` and `mounted`.
 
-#### Parsing appmanifest files
+##### Parsing Steam's appmanifest files
 
 The `steamapps` subdirectory contains the `appmanifest_*.acf` files we need. `.acf` files have the same KeyValue format as `.vdf` files so parsing is very easy:
 
-```text
+```vdf
 "AppState"
 {
 	"appid"		"8930"
@@ -129,9 +129,11 @@ The `steamapps` subdirectory contains the `appmanifest_*.acf` files we need. `.a
 
 Important in this file are the `appid`, `name` and `installdir` fields. Note: `installdir` is the name of the folder in `Universe/steamapps/common/` where the game is installed. It is not absolute but relative to the `common` folder.
 
-### Finding GOG Games
+### GOG
 
-Source: [GOGHandler.cs](GameFinder.StoreHandlers.GOG/GOGHandler.cs)
+#### How to find GOG Games
+
+Implementation can be found in `GameFinder.StoreHandlers.GOG`: [GOGHandler](GameFinder.StoreHandlers.GOG/GOGHandler.cs).
 
 GOG stores all information in the registry. This can either be at `HKEY_LOCAL_MACHINE\Software\GOG.com\Games` or `HKEY_LOCAL_MACHINE\Software\WOW6432Node\GOG.com\Games`. Simply open the registry key and get all sub-key names. Each sub-key in `GOG.com\Games` is an installed game with the ID being the name of the sub-key:
 
@@ -143,31 +145,37 @@ Now you can iterate over all sub-keys to get all the information you need:
 
 Important fields are `path`, `gameID` and `gameName`.
 
-### Finding BethNet Games
+### Bethesda.net Launcher
 
-Source: [BethNetHandler.cs](GameFinder.StoreHandlers.BethNet/BethNetHandler.cs)
+#### How to find Bethesda.net Launcher Games
+
+Implementation can be found in `GameFinder.StoreHandlers.BethNet`: [BethNetHandler](GameFinder.StoreHandlers.BethNet/BethNetHandler.cs).
 
 Finding games installed with the Bethesda.net Launcher was very rather tricky because there are no config files you can parse or simple registry keys you can open. I ended up using a similar method to the GOG Galaxy Bethesda.net plugin by TouwaStar: [GitHub](https://github.com/TouwaStar/Galaxy_Plugin_Bethesda). The interesting part is the `_scan_games_registry_keys` function in [`betty/local.py`](https://github.com/TouwaStar/Galaxy_Plugin_Bethesda/blob/master/betty/local.py#L154):
 
 1) open the uninstaller registry key at `HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall`
 2) iterate over every sub-key:
-    - find the sub-keys that open the Bethesda Launcher with `bethesdanet://uninstall/` as an argument
+   - find the sub-keys that open the Bethesda Launcher with `bethesdanet://uninstall/` as an argument
 
 ![Bethesda.net Launcher Games Uninstaller in Registry](assets/docs/readme-bethnet-1.png)
 
 With this you can find all games installed via Bethesda.net. The important fields are `DisplayName`, `ProductID` (64bit value) and `Path`.
 
-### Finding EGS Games
+### Epic Games Store
 
-Source: [EGSHandler.cs](GameFinder.StoreHandlers.EGS/EGSHandler.cs)
+#### How to find Epic Games Store Games
+
+Implementation can be found in `GameFinder.StoreHandlers.EGS`: [EGSHandler](GameFinder.StoreHandlers.EGS/EGSHandler.cs).
 
 The Epic Games Store uses manifest files, similar to Steam, which contain all information we need. The path to the manifest folder can be found by opening the registry key `HKEY_CURRENT_USER\SOFTWARE\Epic Games\EOS` and getting the `ModSdkMetadataDir` value. Inside the manifest folder you will find `.item` files which are actually just JSON files with a different extension.
 
 See [`8AAFB83044E76B812D3D8C9652E8C13C.item`](GameFinder.Tests/files/8AAFB83044E76B812D3D8C9652E8C13C.item) for an example file. Important fields are `InstallLocation`, `DisplayName` and `CatelogItemId`.
 
-### Finding Xbox Games
+### Xbox Game Pass (UWP)
 
-Source: [XboxHandler.cs](GameFinder.StoreHandlers.Xbox/XboxHandler.cs)
+#### How to find Xbox Game Pass (UWP) Games
+
+Implementation can be found in `GameFinder.StoreHandlers.Xbox`: [XboxHandler](GameFinder.StoreHandlers.Xbox/XboxHandler.cs).
 
 These games are installed through the Xbox Game Pass app or the Windows Store. These games are UWP packages and in a UWP container. I had to use the Windows 10 SDK to get all packages:
 
@@ -186,6 +194,7 @@ internal static IEnumerable<Package> GetUWPPackages()
 Since the packages uses the Windows 10 SDK I had to change the project settings to reflect that:
 
 ```xml
+<Project Sdk="Microsoft.NET.Sdk">
  <PropertyGroup>
      <TargetFrameworks>net5.0-windows10.0.18362.0;netstandard2.1</TargetFrameworks>
  </PropertyGroup>
@@ -195,6 +204,7 @@ Since the packages uses the Windows 10 SDK I had to change the project settings 
          <HintPath>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0\Windows.winmd</HintPath>
      </Reference>
  </ItemGroup>
+</Project>
 ```
 
 Since the query from above will get us all UWP packages, some of those might not be Xbox games. The solution to this is getting a list of all games the current user owns on Xbox Game Pass which we can get using the Xbox REST API:
@@ -273,9 +283,160 @@ The response is of course also in JSON:
 
 After all this requesting you finally have the xuid you can use in the constructor.
 
-### Finding Origin Games
+### Origin
 
-_TODO_
+#### How to find Origin Games
+
+Implementation can be found in `GameFinder.StoreHandlers.Origin`: [OriginHandler](GameFinder.StoreHandlers.Origin/OriginHandler.cs).
+
+There are 2 components to finding Origin Games. Both can actually be used separately or together with the only difference being the quantity and quality of the data. Depending on your use-case one or the other might look more promising or you just want all the information and use both. The first component uses the locally found Manifests to find out where the game is installed and has access to some extra information about how to run it. The other component uses the Origin API to get massive amounts of data about the game: how it is represented in the store, what content is related to it and much more. I suggest looking at both methods and then deciding what you actually need for your own project.
+
+Regardless of what you choose, both start by looking at `.mfst` files in `C:\ProgramData\Origin\LocalContent`. These files contain a single query string that can be parsed for useful information. The important field is `id`.
+
+##### Parsing Origin's Manifests
+
+Taking a look at the query string in the `.mfst` files, we need the `dipinstallpath` and `id` fields. With the former pointing to the installation of the game. Do note that not all manifests contain the `dipinstallpath` value because every DLC, Addon or other downloadable content has its own Manifest.
+
+After you found the the installation folder there is a subfolder `__Installer` that contains a `installerdata.xml` file which is the manifest generated by the _EAInstaller_:
+
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<DiPManifest version="4.0">
+  <!--Manifest generated by the EAInstaller-4.05.02.00-->
+  <buildMetaData>
+    <featureFlags allowMultipleInstances="0" autoUpdateEnabled="1" dynamicContentSupportEnabled="0" enableDifferentialUpdate="1" enableOriginInGameAPI="0" forceTouchupInstallerAfterUpdate="1" languageChangeSupportEnabled="1" treatUpdatesAsMandatory="1" useGameVersionFromManifest="1" />
+    <gameVersion version="1.8.2.48475" />
+    <requirements osMinVersion="6.0" osReqs64Bit="false" />
+  </buildMetaData>
+  <contentIDs>
+    <contentID>1007968</contentID>
+    <contentID>1011575</contentID>
+    <contentID>1011576</contentID>
+    <contentID>1011577</contentID>
+    <contentID>1010268</contentID>
+    <!-- rest omitted -->
+     
+  </contentIDs>
+  <gameTitles>
+    <gameTitle locale="en_US">Battlefield 4™</gameTitle>
+     <!-- rest omitted -->
+     
+  </gameTitles>
+
+   <runtime>
+      <launcher uid="1-2">
+         <name locale="en_US">Battlefield 4™ (x64)</name>
+         <!-- rest omitted -->
+         <filePath>[HKEY_LOCAL_MACHINE\SOFTWARE\EA Games\Battlefield 4\Install Dir]BFLauncher.exe</filePath>
+         <parameters />
+         <executeElevated>0</executeElevated>
+         <requires64BitOS>1</requires64BitOS>
+         <trial>0</trial>
+      </launcher>
+      <launcher uid="2-2">
+         <name locale="en_US">Battlefield 4™ (x86)</name>
+         <!-- rest omitted -->
+         <filePath>[HKEY_LOCAL_MACHINE\SOFTWARE\EA Games\Battlefield 4\Install Dir]BFLauncher_x86.exe</filePath>
+         <parameters />
+         <executeElevated>0</executeElevated>
+         <requires64BitOS>0</requires64BitOS>
+         <trial>0</trial>
+      </launcher>
+   </runtime>
+   
+   <!-- rest omitted -->
+</DiPManifest>
+```
+
+##### Using the Origin API
+
+We take a look at the `C:\ProgramData\Origin\LocalContent` folder and find folders containing `.mfst` files. These `.mfst` files contain the ID that we can use with Origin API: `https://api{N}.origin.com/ecommerce2/public/{ID}/en_US`. As of time of writing (2021-07-06) there are only 4 hosts available:
+
+- `api1.origin.com`
+- `api2.origin.com`
+- `api3.origin.com`
+- `api4.origin.com`
+
+The ID can found in the `.mfst` file by parsing the query string and getting the `id` value: `https://api3.origin.com/ecommerce2/public/Origin.OFR.50.0001131/en_US`. The resulting JSON data can then be parsed for more information:
+
+```json
+{
+   "itemId": "Origin.ITM.50.0001046",
+   "storeGroupId": "Origin",
+   "financeId": "1032112",
+   "defaultLocale": "DEFAULT",
+   "baseAttributes": {
+      "platform": "PCWIN"
+   },
+   "publishing": {
+      "publishingAttributes": {
+         "contentId": "1000659",
+         "greyMarketControls": true,
+         "isDownloadable": true,
+         "gameDistributionSubType": "Normal Game",
+         "originDisplayType": "Full Game",
+         "isPublished": true
+      },
+      "softwareList": {
+         "software": [
+            {
+               "softwareId": "Origin.SFT.50.0000073",
+               "fulfillmentAttributes": {
+                  "achievementSetOverride": "68222_74369_50844",
+                  "cloudSaveConfigurationOverride": "<saveFileCriteria>\n<exclude order=\"0\">%Documents%/BioWare/Dragon Age Inquisition/Save/ProfileOptions_profile</exclude>\n<include order=\"1\">%Documents%/BioWare/Dragon Age Inquisition/Save/*.DAS</include>\n<include order=\"2\">%Documents%/BioWare/Dragon Age Inquisition/Save/ProfileOptions</include>\n</saveFileCriteria>",
+                  "commerceProfile": "bfx",
+                  "downloadPackageType": "DownloadInPlace",
+                  "enableDLCuninstall": false,
+                  "executePathOverride": "[HKEY_LOCAL_MACHINE\\SOFTWARE\\BioWare\\Dragon Age Inquisition\\Install Dir]\\DragonAgeInquisition.exe",
+                  "oigClientBehavior": "Default",
+                  "installationDirectory": "Dragon Age Inquisition",
+                  "installCheckOverride": "[HKEY_LOCAL_MACHINE\\SOFTWARE\\BioWare\\Dragon Age Inquisition\\Install Dir]\\DragonAgeInquisition.exe",
+                  "monitorInstall": true,
+                  "monitorPlay": true,
+                  "multiPlayerId": "1000659",
+                  "processorArchitecture": "64-bit",
+                  "showSubsSaveGameWarning": true
+               },
+               "softwarePlatform": "PCWIN"
+            }
+         ]
+      }
+   },
+   "mdmHierarchies": {
+      "mdmHierarchy": [
+         {
+            "mdmMasterTitle": {
+               "masterTitleId": 74369,
+               "masterTitle": "DRAGON AGE: INQUISITION"
+            },
+            "mdmFranchise": {
+               "franchiseId": 68222,
+               "franchise": "Dragon Age"
+            },
+            "type": "Primary"
+         }
+      ]
+   },
+   "firstParties": {
+      "firstParty": [
+         {
+            "partner": "Steam",
+            "partnerIdType": "Content ID",
+            "partnerId": "1222690"
+         },
+         {
+            "partner": "Steam",
+            "partnerIdType": "Offer ID",
+            "partnerId": "1255340"
+         }
+      ]
+   },
+   "itemName": "Dragon Age: Inquisition - Game of the Year - PCDD - ROW (Origin.com)",
+   "offerType": "Base Game",
+   "offerId": "Origin.OFR.50.0001131",
+   "projectNumber": "313365"
+}
+```
 
 ## Contributing
 
