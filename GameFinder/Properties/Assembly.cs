@@ -7,3 +7,4 @@
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.GOG")]
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.Steam")]
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.Xbox")]
+[assembly:InternalsVisibleTo("GameFinder.StoreHandlers.Origin")]

@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 #if NET5_0
 using System.Text.Json.Serialization;
-#endif
-#if NETSTANDARD2_1
-using Newtonsoft.Json;
 #endif
 using JetBrains.Annotations;
 
@@ -73,47 +71,19 @@ namespace GameFinder.StoreHandlers.EGS
         public string? LaunchCommand { get; set; }
         public string? LaunchExecutable { get; set; }
         public string? ManifestLocation { get; set; }
-#if NET5_0
         [JsonPropertyName("bIsApplication")]
-#else 
-        [JsonProperty("bIsApplication")]
-#endif
         public bool IsApplication { get; set; }
-#if NET5_0
         [JsonPropertyName("bIsExecutable")]
-#else 
-        [JsonProperty("bIsExecutable")]
-#endif
         public bool IsExecutable { get; set; }
-#if NET5_0
         [JsonPropertyName("bIsManaged")]
-#else 
-        [JsonProperty("bIsManaged")]
-#endif
         public bool IsManaged { get; set; }
-#if NET5_0
         [JsonPropertyName("bNeedsValidation")]
-#else 
-        [JsonProperty("bNeedsValidation")]
-#endif
         public bool NeedsValidation { get; set; }
-#if NET5_0
         [JsonPropertyName("bRequiresAuth")]
-#else 
-        [JsonProperty("bRequiresAuth")]
-#endif
         public bool RequiresAuth { get; set; }
-#if NET5_0
         [JsonPropertyName("bCanRunOffline")]
-#else 
-        [JsonProperty("bCanRunOffline")]
-#endif
         public bool CanRunOffline { get; set; }
-#if NET5_0
         [JsonPropertyName("bAllowMultipleInstances")]
-#else 
-        [JsonProperty("bAllowMultipleInstances")]
-#endif
         public bool AllowMultipleInstances { get; set; }
         public string? AppName { get; set; }
         public string? CatalogItemId { get; set; }
