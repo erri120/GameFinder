@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using GameFinder.StoreHandlers.BethNet;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace GameFinder.Tests
 {
@@ -9,7 +10,7 @@ namespace GameFinder.Tests
         protected override BethNetHandler DoSetup()
         {
             Setup.SetupBethNet();
-            return new BethNetHandler();
+            return new BethNetHandler(Logger);
         }
 
         protected override void ChecksAfterFindingGames(BethNetHandler storeHandler)
@@ -26,6 +27,10 @@ namespace GameFinder.Tests
         {
             //does not work atm
             Setup.CleanupBethNet();
+        }
+
+        public BethNetTests(ITestOutputHelper output) : base(output)
+        {
         }
     }
 }

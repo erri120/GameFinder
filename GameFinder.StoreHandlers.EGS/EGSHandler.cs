@@ -4,66 +4,72 @@ using System.IO;
 using System.Linq;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
-using static GameFinder.ResultUtils;
 
 namespace GameFinder.StoreHandlers.EGS
 {
     [PublicAPI]
     public class EGSHandler : AStoreHandler<EGSGame>
     {
+        /// <inheritdoc/>
         public override StoreType StoreType => StoreType.EpicGamesStore;
 
         private const string RegKey = @"SOFTWARE\Epic Games\EOS";
         
-        public readonly string? MetadataPath;
-        
-        private readonly List<string> _initErrors = new List<string>();
+        private readonly string? _metadataPath;
 
-        public EGSHandler()
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public EGSHandler() : this(NullLogger.Instance) { }
+        
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
+        public EGSHandler(ILogger? logger = null) : base(logger ?? NullLogger.Instance)
         {
             using var regKey = Registry.CurrentUser.OpenSubKey(RegKey);
             if (regKey == null)
             {
-                _initErrors.Add($"Unable to open Registry Key {RegKey}");
+                Logger.LogError("Unable to open Registry Key {RegKey}", RegKey);
                 return;
             }
 
-            var regRes = RegistryHelper.GetStringValueFromRegistry(regKey, "ModSdkMetadataDir");
-            if (regRes.HasErrors)
-            {
-                _initErrors.AddRange(regRes.Errors);
-                return;
-            }
+            var modSdkMetadataDir = RegistryHelper.GetStringValueFromRegistry(regKey, "ModSdkMetadataDir", Logger);
+            if (modSdkMetadataDir == null) return;
             
-            var modSdkMetadataDir = regRes.Value;
             if (!Directory.Exists(modSdkMetadataDir))
             {
-                _initErrors.Add($"ModSdkMetadataDir from registry does not exist! {modSdkMetadataDir}");
+                Logger.LogError("ModSdkMetadataDir from Registry does not exist at {Path}", modSdkMetadataDir);
                 return;
             }
 
-            MetadataPath = modSdkMetadataDir;
+            _metadataPath = modSdkMetadataDir;
         }
 
-        public EGSHandler(string metadataPath)
+        /// <summary>
+        /// Constructor for providing the path of the metadata directory.
+        /// </summary>
+        /// <param name="metadataPath"></param>
+        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
+        /// <exception cref="ArgumentException">Provided path to the directory does not exist</exception>
+        public EGSHandler(string metadataPath, ILogger? logger = null) : base(logger ?? NullLogger.Instance)
         {
             if (!Directory.Exists(metadataPath))
                 throw new ArgumentException($"Metadata directory at {metadataPath} does not exist!", nameof(metadataPath));
 
-            MetadataPath = metadataPath;
+            _metadataPath = metadataPath;
         }
 
         /// <inheritdoc />
-        public override Result<bool> FindAllGames()
+        public override bool FindAllGames()
         {
-            if (MetadataPath == null) return NotOk(_initErrors);
+            if (_metadataPath == null) return false;
 
-            var res = new Result<bool>();
-            if (_initErrors.Any())
-                res.AppendErrors(_initErrors);
-            
-            var itemFiles = Directory.EnumerateFiles(MetadataPath, "*.item", SearchOption.TopDirectoryOnly);
+            var itemFiles = Directory.EnumerateFiles(_metadataPath, "*.item", SearchOption.TopDirectoryOnly);
             foreach (var itemFilePath in itemFiles)
             {
                 //var id = Path.GetFileNameWithoutExtension(itemFilePath);
@@ -80,13 +86,14 @@ namespace GameFinder.StoreHandlers.EGS
                 
                 if (manifestFile == null)
                 {
-                    res.AddError($"Unable to parse {itemFilePath} as Json!");
+                    Logger.LogError("Unable to parse file {Path} as Json", itemFilePath);
                     continue;
                 }
 
                 if (manifestFile.FormatVersion != 0)
                 {
-                    res.AddError($"FormatVersion in file `{itemFilePath}` is not supported: `{manifestFile.FormatVersion}`");
+                    Logger.LogError("FormatVersion in file {Path} is not supported: \"{Version}\"",
+                        itemFilePath, manifestFile.FormatVersion);
                     continue;
                 }
                 
@@ -99,8 +106,8 @@ namespace GameFinder.StoreHandlers.EGS
                 
                 Games.Add(game);
             }
-            
-            return Ok(res);
+
+            return true;
         }
 
         private static void CopyProperties(EGSGame game, EGSManifestFile manifestFile)

@@ -5,7 +5,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GameFinder.StoreHandlers.Xbox.DTO;
 using JetBrains.Annotations;
-using static GameFinder.ResultUtils;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 #if NET5_0
 using System.Net.Http.Json;
@@ -18,46 +19,48 @@ namespace GameFinder.StoreHandlers.Xbox
     {
         private const string XboxAppId = "Microsoft.GamingApp_8wekyb3d8bbwe";
 
+        /// <inheritdoc/>
         public override StoreType StoreType => StoreType.Xbox;
-
+        
         private readonly string? _xuid;
+        private readonly bool _didInit;
         
-        public XboxHandler() : this(null) { }
-        
-        private readonly List<string> _initErrors = new List<string>();
-        
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public XboxHandler() : this(NullLogger.Instance) { }
+
         /// <summary>
         /// Initializes the Xbox StoreHandler. The optional <paramref name="xuid"/> parameter is used for to request
         /// the title history of a user. See the README for more information.
         /// </summary>
         /// <param name="xuid"></param>
-        public XboxHandler(string? xuid = null)
+        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
+        public XboxHandler(ILogger? logger = null, string? xuid = null) : base(logger ?? NullLogger.Instance)
         {
             var os = Environment.OSVersion;
             if (os.Platform != PlatformID.Win32NT)
             {
-                _initErrors.Add($"Xbox App not found! OS Platform ID is not {PlatformID.Win32NT}");
+                Logger.LogError("OS Platform ID is {PlatformID} but {Win32NT} is required", os.Platform, PlatformID.Win32NT);
                 return;
             }
             
             if (os.Version.Major < 10)
             {
-                _initErrors.Add("Xbox App not found! OS Version has to be Windows 10 or greater!");
+                Logger.LogError("OS Version has to be Windows 10 or greater!");
                 return;
             }
 
             _xuid = xuid;
+            _didInit = true;
         }
 
         /// <inheritdoc />
-        public override Result<bool> FindAllGames()
+        public override bool FindAllGames()
         {
-            if (_initErrors.Any()) return NotOk(_initErrors);
-
-            var res = new Result<bool>();
+            if (!_didInit) return false;
             
             var packages = WindowsUtils.GetUWPPackages();
-
             List<TitleHistoryResponse.Title>? titles = null;
             
             if (_xuid != null)
@@ -101,7 +104,7 @@ namespace GameFinder.StoreHandlers.Xbox
                 Games.Add(game);
             }
 
-            return Ok(res);
+            return true;
         }
 
         private async Task<List<TitleHistoryResponse.Title>?> GetTitlesFromXbox()

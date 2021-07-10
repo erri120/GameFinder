@@ -1,39 +1,36 @@
-﻿using Microsoft.Win32;
-using static GameFinder.ResultUtils;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 
 namespace GameFinder.RegistryUtils
 {
     internal static class RegistryHelper
     {
-        private static Result<object> GetObjectFromRegistry(RegistryKey key, string valueName)
+        private static object? GetObjectFromRegistry(RegistryKey key, string valueName, ILogger logger)
         {
             var value = key.GetValue(valueName);
-            return value == null 
-                ? Err<object>($"RegistryKey {key} does not have value {valueName}!") 
-                : Ok(value);
+            if (value == null)
+                logger.LogWarning("RegistryKey {@Key} does not have a value {ValueName}", key, valueName);
+            return value;
         }
         
-        internal static Result<long> GetQWordValueFromRegistry(RegistryKey key, string valueName)
+        internal static long? GetQWordValueFromRegistry(RegistryKey key, string valueName, ILogger logger)
         {
-            var res = GetObjectFromRegistry(key, valueName);
-            return res.HasErrors 
-                ? Err<long, object>(res) 
-                : Ok((long) res.Value);
+            var res = GetObjectFromRegistry(key, valueName, logger);
+            return (long?)res;
         }
         
-        internal static Result<string> GetStringValueFromRegistry(RegistryKey key, string valueName)
+        internal static string? GetStringValueFromRegistry(RegistryKey key, string valueName, ILogger logger)
         {
-            var objectRes = GetObjectFromRegistry(key, valueName);
-            if (objectRes.HasErrors)
-            {
-                return Errs<string>(objectRes.Errors);
-            }
+            var res = GetObjectFromRegistry(key, valueName, logger);
+            if (res == null) return null;
             
-            var sValue = objectRes.Value.ToString() ?? string.Empty;
+            var sValue = res.ToString() ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(sValue)) return sValue;
             
-            return string.IsNullOrEmpty(sValue) 
-                ? Err<string>($"Value {valueName} in RegistryKey {key} is null or empty!") 
-                : Ok(sValue);
+            logger.LogError("Value {ValueName} in RegistryKey {@Key} is null or white space", valueName, key);
+            return null;
+
         }
         
         internal static string? GetNullableStringValueFromRegistry(RegistryKey key, string valueName)

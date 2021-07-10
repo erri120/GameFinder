@@ -1,97 +1,85 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using CommandLine;
 using GameFinder.StoreHandlers.BethNet;
 using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
 using GameFinder.StoreHandlers.Steam;
 using GameFinder.StoreHandlers.Xbox;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace GameFinder.Example
 {
     public static class Program
     {
-        private const string LogFile = "log.log";
-
-        private static FileStream? _logFileStream;
-        private static StreamWriter? _streamWriter;
-        
         public static void Main(string[] args)
         {
-            _logFileStream = File.Open(LogFile, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
-            _streamWriter = new StreamWriter(_logFileStream, Encoding.UTF8);
+            var logger = new NLogLoggerProvider().CreateLogger("");
             
             Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(Run);
-            
-            _streamWriter.Dispose();
-            _logFileStream.Dispose();
+                .WithParsed(x => Run(x, logger));
         }
 
-        private static void Log(string s)
+        private static void RunHandler<THandler, TGame>(string handlerName, ILogger logger,
+            Func<THandler> createHandler, Action<TGame> logGame) 
+            where THandler : AStoreHandler<TGame> where TGame : AStoreGame
         {
-            Console.WriteLine(s);
-            _streamWriter?.WriteLine(s);
-        }
-
-        private static void RunHandler<THandler, TGame>(string handlerName, Action<TGame> logGame) where THandler : AStoreHandler<TGame>, new() where TGame : AStoreGame
-        {
-            Log($"Finding {handlerName} games...");
+            logger.LogInformation("Finding games for {HandlerName}", handlerName);
             try
             {
-                var handler = new THandler();
+                var handler = createHandler();
                 var res = handler.FindAllGames();
-                if (res.HasErrors)
+                if (!res)
                 {
-                    Log($"{handlerName} has errors:\n{res.ErrorsToString()}");
-                }
-                
-                if (!res.Value)
-                {
-                    Log($"Unable to find {handlerName} games");
+                    logger.LogError("Unable to find games for {HandlerName}", handlerName);
                     return;
                 }
-                
-                Log($"Found {handler.Games.Count} {handlerName} games");
+
+                logger.LogInformation("Found {Count} games for {HandlerName}", handler.Games.Count, handlerName);
                 handler.Games.ForEach(logGame);
             }
             catch (Exception e)
             {
-                Log($"Exception trying to find {handlerName} games:\n{e}");
+                logger.LogError(e, "Exception trying to find games for {HandlerName}", handlerName);
             }
         }
         
-        private static void Run(Options options)
+        private static void Run(Options options, ILogger logger)
         {
             if (options.BethNet)
             {
-                RunHandler<BethNetHandler, BethNetGame>("BethNet", 
-                    x => Log($"{x}: {x.Path}"));
+                RunHandler<BethNetHandler, BethNetGame>("BethNet", logger,
+                    () => new BethNetHandler(logger),
+                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
             }
 
             if (options.EGS)
             {
-                RunHandler<EGSHandler, EGSGame>("EGS",
-                    x => Log($"{x}: {x.Path}"));
+                RunHandler<EGSHandler, EGSGame>("EGS", logger,
+                    () => new EGSHandler(logger),
+                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
             }
 
             if (options.GOG)
             {
-                RunHandler<GOGHandler, GOGGame>("GOG",
-                    x => Log($"{x}: {x.Path}"));
+                RunHandler<GOGHandler, GOGGame>("GOG", logger,
+                    () => new GOGHandler(logger),
+                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
             }
 
             if (options.Steam)
             {
-                RunHandler<SteamHandler, SteamGame>("Steam",
-                    x => Log($"{x}: {x.Path}"));
+                RunHandler<SteamHandler, SteamGame>("Steam", logger,
+                    () => new SteamHandler(logger),
+                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
             }
 
             if (options.Xbox)
             {
-                RunHandler<XboxHandler, XboxGame>("Xbox",
-                    x => Log($"{x}: {x.Path}"));
+                RunHandler<XboxHandler, XboxGame>("Xbox", logger,
+                    () => new XboxHandler(logger),
+                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using GameFinder.StoreHandlers.EGS;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace GameFinder.Tests
 {
@@ -9,15 +10,19 @@ namespace GameFinder.Tests
         protected override EGSHandler DoSetup()
         {
             var manifestDir = Setup.SetupEpicGamesStore();
-            return new EGSHandler(manifestDir);
+            return new EGSHandler(manifestDir, Logger);
         }
 
         protected override void ChecksAfterFindingGames(EGSHandler storeHandler)
         {
             base.ChecksAfterFindingGames(storeHandler);
             var game = storeHandler.Games.FirstOrDefault(x =>
-                x.InstallationGuid != null && x.InstallationGuid.Equals("8AAFB83044E76B812D3D8C9652E8C13C"));
+                x.InstallationGuid is "8AAFB83044E76B812D3D8C9652E8C13C");
             Assert.NotNull(game);
+        }
+
+        public EGSTests(ITestOutputHelper output) : base(output)
+        {
         }
     }
 }

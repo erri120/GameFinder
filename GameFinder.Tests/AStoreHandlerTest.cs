@@ -1,8 +1,11 @@
-﻿using Xunit;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace GameFinder.Tests
 {
-    public abstract class AStoreHandlerTest<TStoreHandler, TGame> 
+    public abstract class AStoreHandlerTest<TStoreHandler, TGame>
         where TStoreHandler : AStoreHandler<TGame>, new()
         where TGame : AStoreGame
     {
@@ -12,7 +15,7 @@ namespace GameFinder.Tests
             var storeHandler = DoSetup();
             ChecksBeforeFindingGames(storeHandler);
             var res = storeHandler.FindAllGames();
-            Assert.True(res.IsOk(), res.ErrorsToString());
+            Assert.True(res);
             ChecksAfterFindingGames(storeHandler);
             DoCleanup();
         }
@@ -30,5 +33,35 @@ namespace GameFinder.Tests
         }
         
         protected virtual void DoCleanup() { }
+
+        protected ILogger Logger;
+        
+        protected AStoreHandlerTest(ITestOutputHelper output)
+        {
+            Logger = new TestLogger(output);
+        }
+    }
+
+    public class TestLogger : ILogger
+    {
+        private readonly ITestOutputHelper _testOutputHelper;
+        
+        public TestLogger(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+        
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            var dateTime = DateTime.UtcNow;
+            _testOutputHelper.WriteLine("{0:s}|{1}|{2}", dateTime, logLevel, formatter(state, exception));
+        }
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

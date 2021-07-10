@@ -1,28 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
-using static GameFinder.ResultUtils;
 
 namespace GameFinder.StoreHandlers.GOG
 {
     [PublicAPI]
     public class GOGHandler : AStoreHandler<GOGGame>
     {
-        /// <inheritdoc cref="AStoreHandler{TGame}.StoreType"/>
+        /// <inheritdoc/>
         public override StoreType StoreType => StoreType.GOG;
 
         private const string GOGRegKey = @"Software\GOG.com\Games";
         private const string GOG64RegKey = @"Software\WOW6432Node\GOG.com\Games";
 
         private readonly string? _regKey;
-
-        private readonly List<string> _initErrors = new List<string>();
         
-        public GOGHandler()
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public GOGHandler() : this(NullLogger.Instance) { }
+        
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
+        public GOGHandler(ILogger? logger = null) : base(logger ?? NullLogger.Instance)
         {
             using var regKey = Registry.LocalMachine.OpenSubKey(GOGRegKey);
             if (regKey != null)
@@ -34,7 +39,7 @@ namespace GameFinder.StoreHandlers.GOG
             using var reg64Key = Registry.LocalMachine.OpenSubKey(GOG64RegKey);
             if (reg64Key == null)
             {
-                _initErrors.Add("GOG not found in registry!");
+                Logger.LogError("GOG was not found in the registry");
                 return;
             }
             
@@ -42,100 +47,83 @@ namespace GameFinder.StoreHandlers.GOG
         }
 
         /// <inheritdoc />
-        public override Result<bool> FindAllGames()
+        public override bool FindAllGames()
         {
-            if (_regKey == null)
-                return NotOk(_initErrors);
+            if (_regKey == null) return false;
             
             using var gogKey = Registry.LocalMachine.OpenSubKey(_regKey);
             if (gogKey == null)
             {
-                return NotOk($"Unable to open Registry Key {_regKey}");
+                Logger.LogError("Unable to open Registry Key {@Key}", _regKey);
+                return false;
             }
 
-            var res = new Result<bool>();
-            if (_initErrors.Any())
-                res.AppendErrors(_initErrors);
-            
             var keys = gogKey.GetSubKeyNames();
             foreach (var key in keys)
             {
-                if (!int.TryParse(key, out var gameID))
+                if (!int.TryParse(key, out var gameId))
                 {
-                    res.AddError($"Unable to parse {key} as int!");
+                    Logger.LogError("Unable to parse subkey name \"{Value}\" of {@RegistryKey} as int", key, gogKey);
                     continue;
                 }
 
                 using var subKey = gogKey.OpenSubKey(key);
                 if (subKey == null)
                 {
-                    res.AddError($"Unable to open sub-key {key} in {_regKey}");
+                    Logger.LogError("Unable to open subkey \"{Name}\" of {@RegistryKey}", key, gogKey);
                     continue;
                 }
                 
-                var regRes = RegistryHelper.GetStringValueFromRegistry(subKey, "gameID");
-                if (regRes.HasErrors)
-                {
-                    res.AppendErrors(regRes);
-                    continue;
-                }
+                var sActualGameId = RegistryHelper.GetStringValueFromRegistry(subKey, "gameID", Logger);
+                if (sActualGameId == null) continue;
                 
-                var sActualGameID = regRes.Value;
-                if (!int.TryParse(sActualGameID, out var actualGameID))
+                if (!int.TryParse(sActualGameId, out var actualGameId))
                 {
-                    res.AddError($"Unable to parse {sActualGameID} as int in {subKey}");
+                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {@RegistryKey} as {Type}",
+                        sActualGameId, "gameID", subKey, "int");
                     continue;
                 }
 
-                if (gameID != actualGameID)
+                if (gameId != actualGameId)
                 {
-                    res.AddError($"SubKey name does not match gameID value in {_regKey}: {gameID} != {actualGameID}");
+                    Logger.LogError("Name of subkey does not match gameID value in {@RegistryKey}: {GameId} != {ActualGameId}",
+                        subKey, gameId, actualGameId);
                     continue;
                 }
 
-                regRes = RegistryHelper.GetStringValueFromRegistry(subKey, "BUILDID");
-                if (regRes.HasErrors)
+                var sBuildId = RegistryHelper.GetStringValueFromRegistry(subKey, "BUILDID", Logger);
+                if (sBuildId == null) continue;
+                
+                if (!long.TryParse(sBuildId, out var buildId))
                 {
-                    res.AppendErrors(regRes);
+                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {@RegistryKey} as {Type}",
+                        sBuildId, "BUILDID", subKey, "int");
                     continue;
                 }
+                
+                var gameName = RegistryHelper.GetStringValueFromRegistry(subKey, "gameName", Logger);
+                if (gameName == null) continue;
+                
+                var path = RegistryHelper.GetStringValueFromRegistry(subKey, "path", Logger);
+                if (path == null) continue;
 
-                var sBuildID = regRes.Value;
-                if (!long.TryParse(sBuildID, out var buildID))
-                {
-                    res.AddError($"Unable to parse buildID {sBuildID} in {subKey}");
-                    continue;
-                }
+                var sInstallDate = RegistryHelper.GetStringValueFromRegistry(subKey, "INSTALLDATE", Logger);
+                if (sInstallDate == null) continue;
                 
-                regRes = RegistryHelper.GetStringValueFromRegistry(subKey, "gameName");
-                if (regRes.HasErrors)
-                {
-                    res.AppendErrors(regRes);
-                    continue;
-                }
-                
-                var gameName = regRes.Value;
-                
-                regRes = RegistryHelper.GetStringValueFromRegistry(subKey, "path");
-                if (regRes.HasErrors)
-                {
-                    res.AppendErrors(regRes);
-                    continue;
-                }
-                
-                var path = regRes.Value;
-
-                regRes = RegistryHelper.GetStringValueFromRegistry(subKey, "INSTALLDATE");
-                if (regRes.HasErrors)
-                {
-                    res.AppendErrors(regRes);
-                    continue;
-                }
-                
-                var sInstallDate = regRes.Value;
                 if (!DateTime.TryParse(sInstallDate, out var installationDate))
                 {
-                    res.AddError($"Unable to parse {sInstallDate} as DateTime in {key}");
+                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {@RegistryKey} as {Type}",
+                        sInstallDate, "INSTALLDATE", subKey, "DateTime");
+                    continue;
+                }
+                
+                var sProductId = RegistryHelper.GetStringValueFromRegistry(subKey, "productID", Logger);
+                if (sProductId == null) continue;
+                
+                if (!int.TryParse(sProductId, out var productId))
+                {
+                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {@RegistryKey} as {Type}",
+                        sProductId, "productID", subKey, "int");
                     continue;
                 }
                 
@@ -146,21 +134,6 @@ namespace GameFinder.StoreHandlers.GOG
                 var language = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "language");
                 var launchCommand = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "launchCommand");
                 var launchParam = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "launchParam");
-                
-                regRes = RegistryHelper.GetStringValueFromRegistry(subKey, "productID");
-                if (regRes.HasErrors)
-                {
-                    res.AppendErrors(regRes);
-                    continue;
-                }
-                
-                var sProductID = regRes.Value;
-                if (!int.TryParse(sProductID, out var productID))
-                {
-                    res.AddError($"Unable to parse productID {productID} as int in {subKey}");
-                    continue;
-                }
-
                 var saveGameFolder = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "savegamefolder");
                 var startMenu = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "startMenu");
                 var startMenuLink = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "startMenuLink");
@@ -174,9 +147,9 @@ namespace GameFinder.StoreHandlers.GOG
                     Name = gameName,
                     Path = path,
                     
-                    GameID = gameID,
-                    ProductID = productID,
-                    BuildID = buildID,
+                    GameID = gameId,
+                    ProductID = productId,
+                    BuildID = buildId,
                     EXE = exe,
                     EXEFile = exeFile,
                     InstallationDate = installationDate,
@@ -197,7 +170,7 @@ namespace GameFinder.StoreHandlers.GOG
                 Games.Add(game);
             }
 
-            return Ok(res);
+            return true;
         }
         
         /// <inheritdoc />

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using GameFinder.StoreHandlers.GOG;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace GameFinder.Tests
 {
@@ -9,7 +10,7 @@ namespace GameFinder.Tests
         protected override GOGHandler DoSetup()
         {
             Setup.SetupGOG();
-            return new GOGHandler();
+            return new GOGHandler(Logger);
         }
 
         protected override void ChecksAfterFindingGames(GOGHandler storeHandler)
@@ -36,6 +37,10 @@ namespace GameFinder.Tests
         protected override void DoCleanup()
         {
             Setup.CleanupGOG();
+        }
+
+        public GOGTests(ITestOutputHelper output) : base(output)
+        {
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 
 namespace GameFinder
 {
@@ -25,6 +25,13 @@ namespace GameFinder
         /// Find all games
         /// </summary>
         /// <returns></returns>
-        public abstract Result<bool> FindAllGames();
+        public abstract bool FindAllGames();
+
+        protected readonly ILogger Logger;
+        
+        protected AStoreHandler(ILogger logger)
+        {
+            Logger = logger;
+        }
     }
 }

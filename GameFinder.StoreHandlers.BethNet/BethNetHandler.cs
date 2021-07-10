@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
-using static GameFinder.ResultUtils;
 
 namespace GameFinder.StoreHandlers.BethNet
 {
@@ -15,7 +16,7 @@ namespace GameFinder.StoreHandlers.BethNet
     [PublicAPI]
     public class BethNetHandler : AStoreHandler<BethNetGame>
     {
-        /// <inheritdoc cref="AStoreHandler{TGame}.StoreType"/>
+        /// <inheritdoc />
         public override StoreType StoreType => StoreType.BethNet;
 
         private const string Launcher32RegKey = @"SOFTWARE\WOW6432Node\Bethesda Softworks\Bethesda.net";
@@ -30,13 +31,17 @@ namespace GameFinder.StoreHandlers.BethNet
         /// Path to the Launcher.
         /// </summary>
         public readonly string? LauncherPath;
-        
-        private readonly List<string> _initErrors = new List<string>();
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public BethNetHandler() : this(NullLogger.Instance) { }
         
         /// <summary>
-        /// Constructor.
+        /// Default constructor.
         /// </summary>
-        public BethNetHandler()
+        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
+        public BethNetHandler(ILogger? logger = null) : base(logger ?? NullLogger.Instance)
         {
             var regKey = Registry.LocalMachine.OpenSubKey(Launcher32RegKey);
             if (regKey == null)
@@ -44,24 +49,19 @@ namespace GameFinder.StoreHandlers.BethNet
                 regKey = Registry.LocalMachine.OpenSubKey(Launcher64RegKey);
                 if (regKey == null)
                 {
-                    _initErrors.Add($"Unable to open Registry Keys {Launcher32RegKey} and {Launcher64RegKey}");
+                    Logger.LogError("Unable to open Registry Keys {32RegKey} and {64RegKey}",
+                        Launcher32RegKey, Launcher64RegKey);
                     return;
                 }
             }
 
-            var regRes = RegistryHelper.GetStringValueFromRegistry(regKey, "installLocation");
+            var installLocation = RegistryHelper.GetStringValueFromRegistry(regKey, "installLocation", Logger);
             regKey.Dispose();
-            
-            if (regRes.HasErrors)
-            {
-                _initErrors.AddRange(regRes.Errors);
-                return;
-            }
-            
-            var installLocation = regRes.Value;
+
+            if (installLocation == null) return;
             if (!Directory.Exists(installLocation))
             {
-                _initErrors.Add($"Unable to find Bethesda.net Launcher at path from registry: {installLocation}");
+                Logger.LogError("Unable to find Bethesda.net Launcher at path from Registry: {Path}", installLocation);
                 return;
             }
             
@@ -69,18 +69,17 @@ namespace GameFinder.StoreHandlers.BethNet
         }
 
         /// <inheritdoc />
-        public override Result<bool> FindAllGames()
+        public override bool FindAllGames()
         {
-            var res = new Result<bool>();
-            res.AppendErrors(_initErrors);
-
+            if (LauncherPath == null) return false;
+            
             var subKey32Names = new List<string>();
             var subKey64Names = new List<string>();
             
             using var uninstall32RegKey = Registry.LocalMachine.OpenSubKey(Uninstall32RegKey);
             if (uninstall32RegKey == null)
             {
-                res.AddError($"Unable to open Registry Key {Uninstall32RegKey}");
+                Logger.LogWarning("Unable to open Registry Key {RegKey}", Uninstall32RegKey);
             }
             else
             {
@@ -90,7 +89,7 @@ namespace GameFinder.StoreHandlers.BethNet
             using var uninstall64RegKey = Registry.LocalMachine.OpenSubKey(Uninstall64RegKey);
             if (uninstall64RegKey == null)
             {
-                res.AddError($"Unable to open Registry Key {Uninstall64RegKey}");
+                Logger.LogWarning("Unable to open Registry Key {RegKey}", Uninstall64RegKey);
             }
             else
             {
@@ -99,12 +98,11 @@ namespace GameFinder.StoreHandlers.BethNet
 
             if (!subKey32Names.Any() && !subKey64Names.Any())
             {
-                res.AddError($"Did not find any Sub Keys in the Registry for {Uninstall32RegKey} and {Uninstall64RegKey}");
-                return NotOk(res);
+                Logger.LogError("Did not find any subkeys in Registry for {32RegKey} and {64RegKey}",
+                    Uninstall32RegKey, Uninstall64RegKey);
+                return false;
             }
             
-            //idea from https://github.com/TouwaStar/Galaxy_Plugin_Bethesda/blob/master/betty/local.py
-
             void GetGames(RegistryKey? uninstallKey, IEnumerable<string> subKeyNames)
             {
                 if (uninstallKey == null) return;
@@ -116,85 +114,61 @@ namespace GameFinder.StoreHandlers.BethNet
                         using var subKey = uninstallKey.OpenSubKey(subKeyName);
                         if (subKey == null) continue;
 
-                        var gameRes = GetGameFromRegistry(subKey);
-                        if (gameRes.HasErrors)
-                        {
-                            res.AppendErrors(gameRes);
-                        }
-
-                        if (gameRes.Value == null) continue;
+                        var game = GetGameFromRegistry(subKey, Logger);
+                        if (game == null) continue;
                     
-                        Games.Add(gameRes.Value);
+                        Games.Add(game);
                     }
                     catch (Exception e)
                     {
-                        res.AddError($"{e}");
+                        Logger.LogWarning(e, "Exception while looking for a Bethesda.net Launcher Game at {RegistryKey}", subKeyName);
                     }
                 }
             }
             
             GetGames(uninstall32RegKey, subKey32Names);
             GetGames(uninstall64RegKey, subKey64Names);
-            
-            return Ok(res);
+
+            return true;
         }
 
-        private static Result<BethNetGame?> GetGameFromRegistry(RegistryKey subKey)
+        private static BethNetGame? GetGameFromRegistry(RegistryKey subKey, ILogger logger)
         {
-            var res = new Result<BethNetGame?>(null);
-
             try
             {
                 var uninstallString = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "UninstallString");
-                if (uninstallString == null) return res;
+                if (uninstallString == null) return null;
 
-                if (!uninstallString.ContainsCaseInsensitive(UninstallString)) return res;
+                if (!uninstallString.ContainsCaseInsensitive(UninstallString)) return null;
 
-                var qWordRes = RegistryHelper.GetQWordValueFromRegistry(subKey, "ProductID");
-                if (qWordRes.HasErrors)
-                {
-                    res.AppendErrors(qWordRes);
-                    return res;
-                }
+                var qWordRes = RegistryHelper.GetQWordValueFromRegistry(subKey, "ProductID", logger);
+                if (qWordRes == null) return null;
 
                 var productID = qWordRes.Value;
 
-                var stringRes = RegistryHelper.GetStringValueFromRegistry(subKey, "Path");
-                if (stringRes.HasErrors)
-                {
-                    res.AppendErrors(stringRes);
-                    return res;
-                }
+                var path = RegistryHelper.GetStringValueFromRegistry(subKey, "Path", logger);
+                if (path == null) return null;
 
-                var path = stringRes.Value.RemoveQuotes();
-
-                stringRes = RegistryHelper.GetStringValueFromRegistry(subKey, "DisplayName");
-                if (stringRes.HasErrors)
-                {
-                    res.AppendErrors(stringRes);
-                    return res;
-                }
-
-                var displayName = stringRes.Value;
-
+                path = path.RemoveQuotes();
+                
+                var displayName = RegistryHelper.GetStringValueFromRegistry(subKey, "DisplayName", logger);
+                if (displayName == null) return null;
+                
                 var game = new BethNetGame
                 {
                     Name = displayName,
                     Path = path,
-
                     ID = productID
                 };
 
-                var t = new Result<BethNetGame?>(game);
-                t.AppendErrors(res);
-                return t;
+                return game;
             }
             catch (Exception e)
             {
-                res.AddError($"{e}");
+                logger.LogWarning(e, "Exception while looking for a Bethesda.net Launcher Game at {@RegistryKey}", subKey);
             }
 
-            return res;
+            return null;
         }
         
         /// <inheritdoc />

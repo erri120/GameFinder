@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using GameFinder.StoreHandlers.Steam;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace GameFinder.Tests
 {
@@ -9,7 +11,7 @@ namespace GameFinder.Tests
         protected override SteamHandler DoSetup()
         {
             var steamDir = Setup.SetupSteam();
-            return new SteamHandler(steamDir);
+            return new SteamHandler(steamDir, Logger);
         }
 
         protected override void ChecksAfterFindingGames(SteamHandler storeHandler)
@@ -35,10 +37,8 @@ namespace GameFinder.Tests
             const string file = "files\\steam\\config.vdf";
             Assert.True(File.Exists(file));
 
-            var res = SteamHandler.ParseSteamConfig(file);
-            var paths = res.Value;
+            var paths = SteamHandler.ParseSteamConfig(file, Logger);
             
-            Assert.False(res.HasErrors);
             Assert.Equal(3, paths.Count);
             Assert.Contains(paths, x => x.Equals("F:\\SteamLibrary"));
             Assert.Contains(paths, x => x.Equals("M:\\SteamLibrary"));
@@ -52,10 +52,8 @@ namespace GameFinder.Tests
         {
             Assert.True(File.Exists(file));
 
-            var res = SteamHandler.ParseLibraryFolders(file);
-            var paths = res.Value;
+            var paths = SteamHandler.ParseLibraryFolders(file, Logger);
             
-            Assert.False(res.HasErrors);
             Assert.Equal(2, paths.Count);
             Assert.Contains(paths, x => x.Equals("F:\\SteamLibrary"));
             Assert.Contains(paths, x => x.Equals("E:\\SteamLibrary"));
@@ -67,11 +65,10 @@ namespace GameFinder.Tests
             const string file = "files\\steam\\appmanifest_8930.acf";
             Assert.True(File.Exists(file));
 
-            var res = SteamHandler.ParseAcfFile(file);
-            Assert.False(res.HasErrors);
+            var game = SteamHandler.ParseAcfFile(file, Logger);
+            Assert.NotNull(game);
             
-            var game = res.Value;
-            Assert.Equal(8930, game.ID);
+            Assert.Equal(8930, game!.ID);
             Assert.Equal("Sid Meier's Civilization V", game.Name);
             Assert.Equal("Sid Meier's Civilization V", game.Path);
             Assert.Equal(9235434479, game.SizeOnDisk);
@@ -80,6 +77,10 @@ namespace GameFinder.Tests
             Assert.Equal(11499, game.BytesToStage);
             Assert.Equal(114992, game.BytesStaged);
             Assert.Equal(((long) 1600350073).ToDateTime(), game.LastUpdated);
+        }
+
+        public SteamTests(ITestOutputHelper output) : base(output)
+        {
         }
     }
 }

@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" PrivateAssets="all" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
