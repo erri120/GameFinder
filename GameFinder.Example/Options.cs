@@ -18,5 +18,8 @@ namespace GameFinder.Example
 
         [Option("xbox", HelpText = "Search for Xbox games")]
         public bool Xbox { get; set; } = true;
+
+        [Option("origin", HelpText = "Search for Origin games")]
+        public bool Origin { get; set; } = true;
     }
 }

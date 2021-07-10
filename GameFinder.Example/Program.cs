@@ -3,6 +3,7 @@ using CommandLine;
 using GameFinder.StoreHandlers.BethNet;
 using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
+using GameFinder.StoreHandlers.Origin;
 using GameFinder.StoreHandlers.Steam;
 using GameFinder.StoreHandlers.Xbox;
 using Microsoft.Extensions.Logging;
@@ -79,6 +80,13 @@ namespace GameFinder.Example
             {
                 RunHandler<XboxHandler, XboxGame>("Xbox", logger,
                     () => new XboxHandler(logger),
+                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
+            }
+
+            if (options.Origin)
+            {
+                RunHandler<OriginHandler, OriginGame>("Origin", logger,
+                    () => new OriginHandler(true, false, logger),
                     x => logger.LogInformation("{Game}: {Path}", x, x.Path));
             }
         }
