@@ -40,7 +40,7 @@ namespace GameFinder.StoreHandlers.Origin.DTO
 		public double OsMinVersion { get; set; } 
 
 		[XmlAttribute(AttributeName="osReqs64Bit")] 
-		public bool OsReqs64Bit { get; set; } 
+		public string? OsReqs64Bit { get; set; } 
 	}
 
 	[XmlRoot(ElementName="minimumRequiredVersionForOnlineUse")]
