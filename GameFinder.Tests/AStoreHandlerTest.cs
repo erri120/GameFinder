@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 namespace GameFinder.Tests
 {
     public abstract class AStoreHandlerTest<TStoreHandler, TGame>
-        where TStoreHandler : AStoreHandler<TGame>, new()
+        where TStoreHandler : AStoreHandler<TGame>
         where TGame : AStoreGame
     {
         [Fact]
@@ -20,10 +20,7 @@ namespace GameFinder.Tests
             DoCleanup();
         }
 
-        protected virtual TStoreHandler DoSetup()
-        {
-            return new TStoreHandler();
-        }
+        protected abstract TStoreHandler DoSetup();
         
         protected virtual void ChecksBeforeFindingGames(TStoreHandler storeHandler) { }
 

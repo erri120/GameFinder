@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Web;
 using Microsoft.Win32;
 using Xunit;
 
@@ -119,10 +120,21 @@ namespace GameFinder.Tests
             uninstallKey?.DeleteSubKeyTree("Fallout Shelter", true);
         }
         
-        public static void SetupOrigin()
+        public static string SetupOrigin()
         {
-            if (!IsCI) return;
-            throw new NotImplementedException();
+            var originFolder = Path.Combine(GetCurrentDir(), "files", "origin");
+            var localContentPath = Path.Combine(originFolder, "LocalContent");
+            Directory.CreateDirectory(localContentPath);
+
+            var file = Path.Combine(localContentPath, "Origin.OFR.50.0001131.mfst");
+            var installPath = Path.Combine(originFolder, "Dragon Age Inquisition");
+
+            var installerPath = Path.Combine(installPath, "__Installer");
+            var installerManifest = Path.Combine(installerPath, "installerdata.xml");
+            Assert.True(File.Exists(installerManifest));
+            
+            File.WriteAllText(file, $"?id=Origin.OFR.50.0001131&dipinstallpath={HttpUtility.UrlEncode(installPath)}", Encoding.UTF8);
+            return localContentPath;
         }
         
         public static string SetupEpicGamesStore()
@@ -146,7 +158,7 @@ namespace GameFinder.Tests
             return manifestDir;
         }
 
-        private static string GetCurrentDir()
+        public static string GetCurrentDir()
         {
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.NotNull(currentDir);
@@ -154,7 +166,7 @@ namespace GameFinder.Tests
             return currentDir!;
         }
         
-        private static string GetFile(string name)
+        public static string GetFile(string name)
         {
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.NotNull(currentDir);
