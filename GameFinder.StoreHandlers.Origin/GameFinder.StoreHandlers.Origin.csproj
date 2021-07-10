@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
     <ProjectReference Include="..\GameFinder\GameFinder.csproj" />
   </ItemGroup>
   

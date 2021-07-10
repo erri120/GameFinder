@@ -5,3 +5,4 @@
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.EGS")]
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.GOG")]
 [assembly:InternalsVisibleTo("GameFinder.StoreHandlers.Steam")]
+[assembly:InternalsVisibleTo("GameFinder.StoreHandlers.Origin")]

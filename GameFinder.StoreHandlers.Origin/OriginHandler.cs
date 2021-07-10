@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.Origin.DTO;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Win32;
 
 namespace GameFinder.StoreHandlers.Origin
 {
@@ -73,6 +76,9 @@ namespace GameFinder.StoreHandlers.Origin
                     .Where(x => !string.IsNullOrEmpty(x.Item1) && !string.IsNullOrEmpty(x.Item2))
                     .ToList();
 
+                if (tuples.Count == 0)
+                    Logger.LogInformation("Found no Ids and Paths in the MFST files");
+                
                 foreach (var (id, installPath) in tuples)
                 {
                     if (!Directory.Exists(installPath))
@@ -116,8 +122,17 @@ namespace GameFinder.StoreHandlers.Origin
                     })
                     .Where(x => x != null)
                     .Select(x => x!)
+                    .Select(x =>
+                    {
+                        var index = x.IndexOf("@", StringComparison.OrdinalIgnoreCase);
+                        return index == -1 ? x : x[..index];
+                    })
+                    .Distinct()
                     .ToList();
 
+                if (!ids.Any())
+                    Logger.LogError("Found no Ids for use with the Api");
+                
                 foreach (var id in ids)
                 {
                     var game = GetGameFromAPI(id, Logger);
@@ -134,6 +149,13 @@ namespace GameFinder.StoreHandlers.Origin
                     {
                         CopyValues(existingGame, game);
                     }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(game.Path))
+                            Logger.LogWarning("Game {Id} was found using the Api but has no Path", game.Id);
+                        
+                        Games.Add(game);
+                    }
                 }
             }
 
@@ -147,7 +169,12 @@ namespace GameFinder.StoreHandlers.Origin
 
             foreach (var prop in properties)
             {
-                if (prop.Name == nameof(OriginGame.Path)) continue;
+                if (prop.Name == nameof(OriginGame.Path))
+                {
+                    // override path if it's null or white space
+                    var path = (string?)prop.GetValue(target, null);
+                    if (!string.IsNullOrWhiteSpace(path)) continue;
+                }
                 
                 var value = prop.GetValue(source, null);
                 if (value != null)
@@ -162,8 +189,69 @@ namespace GameFinder.StoreHandlers.Origin
             if (apiResponse == null) return null;
 
             game.Name = apiResponse.ItemName ?? string.Empty;
+            var installDir = GetInstallDir(id, apiResponse, logger);
+            if (installDir != null)
+                game.Path = installDir;
             
             return game;
+        }
+
+        private static string? GetInstallDir(string id, ApiResponse apiResponse, ILogger logger)
+        {
+            var software = apiResponse.Publishing?.SoftwareList?.Software?.FirstOrDefault(x => x.SoftwarePlatform == "PCWIN");
+            if (software == null)
+            {
+                logger.LogWarning("Found no PCWIN supported Software for Game {Id}", id);
+                return null;
+            }
+            
+            var path = software.FulfillmentAttributes?.InstallCheckOverride ?? software.FulfillmentAttributes?.ExecutePathOverride;
+            if (path == null) return null;
+
+            var pathSpan = path.AsSpan();
+            
+            //[HKEY_LOCAL_MACHINE\\SOFTWARE\\BioWare\\Dragon Age Inquisition\\Install Dir]\\DragonAgeInquisition.exe
+            var startIndex = pathSpan.IndexOf("[", StringComparison.OrdinalIgnoreCase);
+            var endIndex = pathSpan.IndexOf("]", StringComparison.OrdinalIgnoreCase);
+
+            if (startIndex == -1 || endIndex == -1)
+            {
+                logger.LogError("Unable to correctly slice string \"{Path}\" for Game {Id}", path, id);
+                return null;
+            }
+                
+            //HKEY_LOCAL_MACHINE\\SOFTWARE\\BioWare\\Dragon Age Inquisition\\Install Dir
+            var span = pathSpan.Slice(startIndex + 1, endIndex - 1);
+
+            var splitCharIndex = span.IndexOf("\\", StringComparison.OrdinalIgnoreCase);
+            var registryHiveType = span[..splitCharIndex];
+
+            using var rootKey = registryHiveType.ToString() switch
+            {
+                "HKEY_LOCAL_MACHINE" => RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
+                "HKEY_CURRENT_USER" => RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64),
+                _ => null
+            };
+
+            if (rootKey == null)
+            {
+                logger.LogError("Unknown Registry Hive: {Hive}", registryHiveType.ToString());
+                return null;
+            }
+
+            var lastIndex = span.LastIndexOf('\\');
+            var subKeyString = span.Slice(splitCharIndex + 1, lastIndex - splitCharIndex - 1);
+            
+            using var subKey = rootKey.OpenSubKey(subKeyString.ToString(), RegistryRights.ReadKey);
+            if (subKey == null)
+            {
+                logger.LogError("Unable to open subkey {Key} for Game {Id}", subKey, id);
+                return null;
+            }
+            
+            var valueName = span.Slice(lastIndex + 1, span.Length - lastIndex - 1);
+            var value = RegistryHelper.GetStringValueFromRegistry(subKey, valueName.ToString(), logger);
+            return value;
         }
         
         internal static OriginGame? GetGameFromManifest(string file, ILogger logger)
@@ -185,10 +273,18 @@ namespace GameFinder.StoreHandlers.Origin
             var endpoint = random.Next(1, 5);
 
             var url = $"https://api{endpoint}.origin.com/ecommerce2/public/{id}/en_US";
-            var res = await Utils.FromJsonAsync<ApiResponse>(url);
+            try
+            {
+                var res = await Utils.FromJsonAsync<ApiResponse>(url);
+                if (res != null) return res;
+                logger.LogError("Unable to fetch or deserialize response from Api for Game {Id} at {Url}", id, url);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Exception while fetching or deserializing response from Api for Game {Id} at {Url}", id, url);
+                return null;
+            }
             
-            if (res != null) return res;
-            logger.LogError("Unable to fetch or deserialize response from Api for Game {Id} at {Url}", id, url);
             return null;
         }
         
@@ -205,10 +301,19 @@ namespace GameFinder.StoreHandlers.Origin
                 LineNumberOffset = 1
             });
 
-            var xmlSerializer = new XmlSerializer(typeof(DiPManifest));
-            var deserializedObject = xmlSerializer.Deserialize(xmlReader);
+            try
+            {
+                var xmlSerializer = new XmlSerializer(typeof(DiPManifest));
+                var deserializedObject = xmlSerializer.Deserialize(xmlReader);
 
-            if (deserializedObject is DiPManifest manifest) return manifest;
+                if (deserializedObject is DiPManifest manifest) return manifest;
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Exception while deserializing Manifest at {Path}", file);
+                return null;
+            }
+            
             logger.LogError("Unable to deserialize Installer Data at {Path}", file);
             return null;
         }
