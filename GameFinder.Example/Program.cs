@@ -86,7 +86,7 @@ namespace GameFinder.Example
             if (options.Origin)
             {
                 RunHandler<OriginHandler, OriginGame>("Origin", logger,
-                    () => new OriginHandler(true, false, logger),
+                    () => new OriginHandler(true, true, logger),
                     x => logger.LogInformation("{Game}: {Path}", x, x.Path));
             }
         }
