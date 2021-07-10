@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CommandLine;
 using GameFinder.StoreHandlers.BethNet;
 using GameFinder.StoreHandlers.EGS;
@@ -48,6 +49,9 @@ namespace GameFinder.Example
         
         private static void Run(Options options, ILogger logger)
         {
+            if (File.Exists("log.log"))
+                File.Delete("log.log");
+            
             if (options.BethNet)
             {
                 RunHandler<BethNetHandler, BethNetGame>("BethNet", logger,
