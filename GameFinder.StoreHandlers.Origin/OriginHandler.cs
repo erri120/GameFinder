@@ -189,10 +189,18 @@ namespace GameFinder.StoreHandlers.Origin
             if (apiResponse == null) return null;
 
             game.Name = apiResponse.ItemName ?? string.Empty;
-            var installDir = GetInstallDir(id, apiResponse, logger);
-            if (installDir != null)
-                game.Path = installDir;
             
+            try
+            {
+                var installDir = GetInstallDir(id, apiResponse, logger);
+                if (installDir != null)
+                    game.Path = installDir;
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Exception while trying to find Installation Path of Game {Id}", id);
+            }
+
             return game;
         }
 
@@ -224,9 +232,9 @@ namespace GameFinder.StoreHandlers.Origin
             var span = pathSpan.Slice(startIndex + 1, endIndex - 1);
 
             var splitCharIndex = span.IndexOf("\\", StringComparison.OrdinalIgnoreCase);
-            var registryHiveType = span[..splitCharIndex];
+            var registryHiveType = span[..splitCharIndex].ToString();
 
-            using var rootKey = registryHiveType.ToString() switch
+            using var rootKey = registryHiveType switch
             {
                 "HKEY_LOCAL_MACHINE" => RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
                 "HKEY_CURRENT_USER" => RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64),
@@ -235,22 +243,22 @@ namespace GameFinder.StoreHandlers.Origin
 
             if (rootKey == null)
             {
-                logger.LogError("Unknown Registry Hive: {Hive}", registryHiveType.ToString());
+                logger.LogError("Unknown Registry Hive: {Hive}", registryHiveType);
                 return null;
             }
 
             var lastIndex = span.LastIndexOf('\\');
-            var subKeyString = span.Slice(splitCharIndex + 1, lastIndex - splitCharIndex - 1);
+            var subKeyString = span.Slice(splitCharIndex + 1, lastIndex - splitCharIndex - 1).ToString();
             
-            using var subKey = rootKey.OpenSubKey(subKeyString.ToString(), RegistryRights.ReadKey);
+            using var subKey = rootKey.OpenSubKey(subKeyString, RegistryRights.ReadKey);
             if (subKey == null)
             {
-                logger.LogError("Unable to open subkey {Key} for Game {Id}", subKey, id);
+                logger.LogError("Unable to open subkey {Key} for Game {Id}", subKeyString, id);
                 return null;
             }
             
-            var valueName = span.Slice(lastIndex + 1, span.Length - lastIndex - 1);
-            var value = RegistryHelper.GetStringValueFromRegistry(subKey, valueName.ToString(), logger);
+            var valueName = span.Slice(lastIndex + 1, span.Length - lastIndex - 1).ToString();
+            var value = RegistryHelper.GetStringValueFromRegistry(subKey, valueName, logger);
             return value;
         }
         
