@@ -165,7 +165,7 @@ namespace GameFinder.StoreHandlers.BethNet
             }
             catch (Exception e)
             {
-                logger.LogWarning(e, "Exception while looking for a Bethesda.net Launcher Game at {@RegistryKey}", subKey);
+                logger.LogWarning(e, "Exception while looking for a Bethesda.net Launcher Game at {RegistryKey}", subKey);
             }
 
             return null;

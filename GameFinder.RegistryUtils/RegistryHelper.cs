@@ -10,7 +10,7 @@ namespace GameFinder.RegistryUtils
         {
             var value = key.GetValue(valueName);
             if (value == null)
-                logger.LogWarning("RegistryKey {@Key} does not have a value {ValueName}", key, valueName);
+                logger.LogWarning("RegistryKey {Key} does not have a value {ValueName}", key, valueName);
             return value;
         }
         
@@ -28,7 +28,7 @@ namespace GameFinder.RegistryUtils
             var sValue = res.ToString() ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(sValue)) return sValue;
             
-            logger.LogError("Value {ValueName} in RegistryKey {@Key} is null or white space", valueName, key);
+            logger.LogError("Value {ValueName} in RegistryKey {Key} is null or white space", valueName, key);
             return null;
 
         }

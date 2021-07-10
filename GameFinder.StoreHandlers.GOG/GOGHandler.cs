@@ -54,7 +54,7 @@ namespace GameFinder.StoreHandlers.GOG
             using var gogKey = Registry.LocalMachine.OpenSubKey(_regKey);
             if (gogKey == null)
             {
-                Logger.LogError("Unable to open Registry Key {@Key}", _regKey);
+                Logger.LogError("Unable to open Registry Key {Key}", _regKey);
                 return false;
             }
 
@@ -63,14 +63,14 @@ namespace GameFinder.StoreHandlers.GOG
             {
                 if (!int.TryParse(key, out var gameId))
                 {
-                    Logger.LogError("Unable to parse subkey name \"{Value}\" of {@RegistryKey} as int", key, gogKey);
+                    Logger.LogError("Unable to parse subkey name \"{Value}\" of {RegistryKey} as int", key, gogKey);
                     continue;
                 }
 
                 using var subKey = gogKey.OpenSubKey(key);
                 if (subKey == null)
                 {
-                    Logger.LogError("Unable to open subkey \"{Name}\" of {@RegistryKey}", key, gogKey);
+                    Logger.LogError("Unable to open subkey \"{Name}\" of {RegistryKey}", key, gogKey);
                     continue;
                 }
                 
@@ -79,14 +79,14 @@ namespace GameFinder.StoreHandlers.GOG
                 
                 if (!int.TryParse(sActualGameId, out var actualGameId))
                 {
-                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {@RegistryKey} as {Type}",
+                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
                         sActualGameId, "gameID", subKey, "int");
                     continue;
                 }
 
                 if (gameId != actualGameId)
                 {
-                    Logger.LogError("Name of subkey does not match gameID value in {@RegistryKey}: {GameId} != {ActualGameId}",
+                    Logger.LogError("Name of subkey does not match gameID value in {RegistryKey}: {GameId} != {ActualGameId}",
                         subKey, gameId, actualGameId);
                     continue;
                 }
@@ -96,7 +96,7 @@ namespace GameFinder.StoreHandlers.GOG
                 
                 if (!long.TryParse(sBuildId, out var buildId))
                 {
-                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {@RegistryKey} as {Type}",
+                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
                         sBuildId, "BUILDID", subKey, "int");
                     continue;
                 }
@@ -112,7 +112,7 @@ namespace GameFinder.StoreHandlers.GOG
                 
                 if (!DateTime.TryParse(sInstallDate, out var installationDate))
                 {
-                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {@RegistryKey} as {Type}",
+                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
                         sInstallDate, "INSTALLDATE", subKey, "DateTime");
                     continue;
                 }
@@ -122,7 +122,7 @@ namespace GameFinder.StoreHandlers.GOG
                 
                 if (!int.TryParse(sProductId, out var productId))
                 {
-                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {@RegistryKey} as {Type}",
+                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
                         sProductId, "productID", subKey, "int");
                     continue;
                 }
