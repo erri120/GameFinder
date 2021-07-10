@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+#pragma warning disable 1591
 
 namespace GameFinder.StoreHandlers.Origin.DTO
 {

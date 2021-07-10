@@ -21,6 +21,7 @@ namespace GameFinder.StoreHandlers.Origin
     [PublicAPI]
     public class OriginHandler : AStoreHandler<OriginGame>
     {
+        /// <inheritdoc/>
         public override StoreType StoreType => StoreType.Origin;
 
         private readonly bool _useLocalFiles;
@@ -28,6 +29,13 @@ namespace GameFinder.StoreHandlers.Origin
 
         private readonly string? _localContentPath;
         
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="useLocalFiles">Whether to use the local file method.</param>
+        /// <param name="useApi">Whether to use the Origin Api.</param>
+        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
+        /// <exception cref="ArgumentException">Thrown when both <paramref name="useLocalFiles"/> and <paramref name="useApi"/> are false.</exception>
         public OriginHandler(bool useLocalFiles, bool useApi, ILogger? logger)
             : base(logger ?? NullLogger.Instance)
         {
@@ -41,12 +49,20 @@ namespace GameFinder.StoreHandlers.Origin
                 "Origin", "LocalContent");
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="localContentPath">Path to the LocalContent folder.</param>
+        /// <param name="useLocalFiles">Whether to use the local file method.</param>
+        /// <param name="useApi">Whether to use the Origin Api.</param>
+        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
         public OriginHandler(string localContentPath, bool useLocalFiles, bool useApi, ILogger? logger)
             : this(useLocalFiles, useApi, logger)
         {
             _localContentPath = localContentPath;
         }
         
+        /// <inheritdoc/>
         public override bool FindAllGames()
         {
             if (_localContentPath == null || !Directory.Exists(_localContentPath))

@@ -7,10 +7,17 @@ namespace GameFinder.StoreHandlers.Origin
     [PublicAPI]
     public class OriginGame : AStoreGame
     {
+        /// <inheritdoc/>
         public override StoreType StoreType => StoreType.Origin;
         
+        /// <summary>
+        /// Origin ID of the Game.
+        /// </summary>
         public string? Id { get; set; }
         
+        /// <summary>
+        /// (Manifest only) Available Game Titles in different languages.
+        /// </summary>
         public List<LocalizedString>? GameTitles { get; set; }
 
         #region Overrides
