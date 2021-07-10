@@ -6,15 +6,21 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
-## [1.6.0] - 2021-07-XX
+## [Released]
+
+## [1.6.0] - 2021-07-10
 
 This update reverted the change from [v1.5.0](#150---2021-05-29) because it did not perform very well, made the code worse and harder to read and felt like a quick and dirty fix. The reason why I even added `Result<T>` was to let the consumer of this library, which should be an application, know what went wrong by returning something akin to Rust's error propagation. Instead of having an exception whenever something went wrong, it would just add another error as a `string` to a `List<string>` inside the `Result<T>` which the consumer can access and print out. I have removed all of this code and replaced it with simple logging using `ILogger` from `Microsoft.Extensions.Logging`. This way you can simply pass a `ILogger` to the constructor of a Store Handler and it will log to it. Since the consumer of this library is an application which likely has some form of logging going on, this should be very easy to implement.
+
+Additionally I finally went ahead and added Origin Support, see the [README](README.md) for more information.
 
 ### Changed
 
 - Using `ILogger` from `Microsoft.Extensions.Logging` instead of custom `Result<T>` to let the user know what went wrong
 
-## [Released]
+### Added
+
+- Added Origin Support, see [README](README.md) for more information
 
 ## [1.5.3] - 2021-06-13
 
@@ -105,8 +111,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.5.3...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.6.0...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.6.0]: https://github.com/erri120/GameFinder/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/erri120/GameFinder/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/erri120/GameFinder/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/erri120/GameFinder/compare/v1.5.0...v1.5.1
