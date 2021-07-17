@@ -12,7 +12,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ### Fixed
 
-- Origin: Fixed registry lookup with 64bit view 
+- Steam: Fixed Regex for parsing old `libraryfolders.vdf` files
+- Origin: Fixed returning invalid Paths
+- Origin: Fixed looking for Games with an empty ID
+- Origin: Fixed registry lookup with 64bit view
 
 ## [1.6.1] - 2021-07-10
 
