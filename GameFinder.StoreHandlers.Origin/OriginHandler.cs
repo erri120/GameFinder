@@ -143,6 +143,7 @@ namespace GameFinder.StoreHandlers.Origin
                         var index = x.IndexOf("@", StringComparison.OrdinalIgnoreCase);
                         return index == -1 ? x : x[..index];
                     })
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
                     .Distinct()
                     .ToList();
 
