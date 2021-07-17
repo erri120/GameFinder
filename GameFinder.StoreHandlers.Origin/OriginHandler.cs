@@ -233,8 +233,15 @@ namespace GameFinder.StoreHandlers.Origin
             var path = software.FulfillmentAttributes?.InstallCheckOverride ?? software.FulfillmentAttributes?.ExecutePathOverride;
             if (path == null) return null;
 
-            var res32 = GetInstallValueFromRegistry(id, path, RegistryView.Registry32, logger);
-            return res32 ?? GetInstallValueFromRegistry(id, path, RegistryView.Registry64, logger);
+            var res = GetInstallValueFromRegistry(id, path, RegistryView.Registry32, logger) ??
+                      GetInstallValueFromRegistry(id, path, RegistryView.Registry64, logger);
+            
+            if (res == null) return null;
+
+            if (res.EndsWith('\\') || res.EndsWith('/'))
+                res = res[..^1];
+
+            return res;
         }
 
         internal static string? GetInstallValueFromRegistry(string id, string path, RegistryView registryView, ILogger logger)
