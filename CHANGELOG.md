@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.6.2] - 2021-07-17
+
+### Fixed
+
+- Origin: Fixed registry lookup with 64bit view 
+
 ## [1.6.1] - 2021-07-10
 
 ### Added
