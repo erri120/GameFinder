@@ -254,7 +254,7 @@ namespace GameFinder.StoreHandlers.Steam
             {
                 var text = File.ReadAllText(file, Encoding.UTF8);
                 
-                var regex = new Regex(@"\s+""\d+\""\s+""(?<path>.+)""");
+                var regex = new Regex(@"^\s+\""\d+\""\s+\""(?<path>.+)\""", RegexOptions.Multiline);
                 var matches = regex.Matches(text);
 
                 if (matches.Count == 0)
