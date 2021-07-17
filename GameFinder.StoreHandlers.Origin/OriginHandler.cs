@@ -232,6 +232,12 @@ namespace GameFinder.StoreHandlers.Origin
             var path = software.FulfillmentAttributes?.InstallCheckOverride ?? software.FulfillmentAttributes?.ExecutePathOverride;
             if (path == null) return null;
 
+            var res32 = GetInstallValueFromRegistry(id, path, RegistryView.Registry32, logger);
+            return res32 ?? GetInstallValueFromRegistry(id, path, RegistryView.Registry64, logger);
+        }
+
+        internal static string? GetInstallValueFromRegistry(string id, string path, RegistryView registryView, ILogger logger)
+        {
             var pathSpan = path.AsSpan();
             
             //[HKEY_LOCAL_MACHINE\\SOFTWARE\\BioWare\\Dragon Age Inquisition\\Install Dir]\\DragonAgeInquisition.exe
@@ -252,8 +258,8 @@ namespace GameFinder.StoreHandlers.Origin
 
             using var rootKey = registryHiveType switch
             {
-                "HKEY_LOCAL_MACHINE" => RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
-                "HKEY_CURRENT_USER" => RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64),
+                "HKEY_LOCAL_MACHINE" => RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView),
+                "HKEY_CURRENT_USER" => RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, registryView),
                 _ => null
             };
 
@@ -269,7 +275,8 @@ namespace GameFinder.StoreHandlers.Origin
             using var subKey = rootKey.OpenSubKey(subKeyString, RegistryRights.ReadKey);
             if (subKey == null)
             {
-                logger.LogError("Unable to open subkey {Key} for Game {Id}", subKeyString, id);
+                logger.LogError("Unable to open subkey {Hive}@{View}\\{Key} for Game {Id}",
+                    registryHiveType, registryView, subKeyString, id);
                 return null;
             }
             
