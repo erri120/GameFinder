@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-#if NET5_0
-using System.Text.Json.Serialization;
-#endif
 using JetBrains.Annotations;
 
 #pragma warning disable 1591
