@@ -210,6 +210,11 @@ namespace GameFinder.StoreHandlers.Steam
             game = Games.FirstOrDefault(x => x.ID == id);
             return game != null;
         }
+
+        private static readonly Regex SteamConfigRegex = new Regex(@"\""BaseInstallFolder_\d*\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
+        private static readonly Regex OldLibraryFoldersRegex = new Regex(@"^\s+\""\d+\""\s+\""(?<path>.+)\""", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static readonly Regex NewLibraryFoldersPathRegex = new Regex(@"\""path\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
+        private static readonly Regex NewLibraryFoldersMountedRegex = new Regex(@"\""mounted\""\s*\""(?<mounted>[^\""]*)\""", RegexOptions.Compiled);
         
         internal static List<string> ParseSteamConfig(string file, ILogger logger)
         {
@@ -222,9 +227,7 @@ namespace GameFinder.StoreHandlers.Steam
             }
 
             var text = File.ReadAllText(file, Encoding.UTF8);
-            
-            var regex = new Regex(@"\""BaseInstallFolder_\d*\""\s*\""(?<path>[^\""]*)\""");
-            var matches = regex.Matches(text);
+            var matches = SteamConfigRegex.Matches(text);
 
             if (matches.Count == 0)
             {
@@ -253,9 +256,7 @@ namespace GameFinder.StoreHandlers.Steam
             if (firstLine.Contains("LibraryFolders", StringComparison.Ordinal))
             {
                 var text = File.ReadAllText(file, Encoding.UTF8);
-                
-                var regex = new Regex(@"^\s+\""\d+\""\s+\""(?<path>.+)\""", RegexOptions.Multiline);
-                var matches = regex.Matches(text);
+                var matches = OldLibraryFoldersRegex.Matches(text);
 
                 if (matches.Count == 0)
                 {
@@ -272,11 +273,8 @@ namespace GameFinder.StoreHandlers.Steam
             {
                 var text = File.ReadAllText(file, Encoding.UTF8);
 
-                var pathRegex = new Regex(@"\""path\""\s*\""(?<path>[^\""]*)\""");
-                var mountedRegex = new Regex(@"\""mounted\""\s*\""(?<mounted>[^\""]*)\""");
-
-                var pathMatches = pathRegex.Matches(text);
-                var mountedMatches = mountedRegex.Matches(text);
+                var pathMatches = NewLibraryFoldersPathRegex.Matches(text);
+                var mountedMatches = NewLibraryFoldersMountedRegex.Matches(text);
 
                 if (pathMatches.Count == 0)
                 {
