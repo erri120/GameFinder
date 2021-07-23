@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
+## [1.6.3] - 2021-XX-XX
+
+### Changes
+
+- Improved Regex performance by making it `static readonly` and using `RegexOptions.Compiled`
+
 ## [Released]
 
 ## [1.6.2] - 2021-07-17
