@@ -214,7 +214,6 @@ namespace GameFinder.StoreHandlers.Steam
         private static readonly Regex SteamConfigRegex = new Regex(@"\""BaseInstallFolder_\d*\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
         private static readonly Regex OldLibraryFoldersRegex = new Regex(@"^\s+\""\d+\""\s+\""(?<path>.+)\""", RegexOptions.Multiline | RegexOptions.Compiled);
         private static readonly Regex NewLibraryFoldersPathRegex = new Regex(@"\""path\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
-        private static readonly Regex NewLibraryFoldersMountedRegex = new Regex(@"\""mounted\""\s*\""(?<mounted>[^\""]*)\""", RegexOptions.Compiled);
         
         internal static List<string> ParseSteamConfig(string file, ILogger logger)
         {
@@ -274,7 +273,6 @@ namespace GameFinder.StoreHandlers.Steam
                 var text = File.ReadAllText(file, Encoding.UTF8);
 
                 var pathMatches = NewLibraryFoldersPathRegex.Matches(text);
-                var mountedMatches = NewLibraryFoldersMountedRegex.Matches(text);
 
                 if (pathMatches.Count == 0)
                 {
@@ -282,39 +280,10 @@ namespace GameFinder.StoreHandlers.Steam
                     return res;
                 }
 
-                if (mountedMatches.Count == 0)
-                {
-                    logger.LogWarning("Found no mounted-matches in Library Folders file at {Path}", file);
-                    return res;
-                }
-
-                if (pathMatches.Count != mountedMatches.Count)
-                {
-                    logger.LogError("Number of path matches does not equal number of mounted matches in Library Folders file at {Path}", file);
-                    return res;
-                }
-
                 var pathValues = new List<string>();
-                var mountedValues = new List<string>();
-                
                 GetAllMatches("path", pathMatches, path => pathValues.Add(path));
-                GetAllMatches("mounted", mountedMatches, mounted => mountedValues.Add(mounted));
 
-                if (pathValues.Count != mountedValues.Count)
-                {
-                    logger.LogError("Number of path values does not equal number of mounted values in Library Folders file at {Path}", file);
-                    return res;
-                }
-                
-                for (var i = 0; i < pathValues.Count; i++)
-                {
-                    var path = pathValues[i];
-                    var sMounted = mountedValues[i];
-                    if (sMounted != "1") continue;
-                    
-                    res.Add(MakeValidPath(path));
-                }
-                
+                res.AddRange(pathValues.Select(MakeValidPath));
                 return res;
             }
 
