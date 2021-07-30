@@ -6,14 +6,14 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
+## [Released]
+
 ## [1.6.3] - 2021-07-30
 
 ### Changes
 
 - Improved Regex performance by making it `static readonly` and using `RegexOptions.Compiled`
 - Steam: Removed parsing the `mounted` value in `libraryfolders.vdf` files
-
-## [Released]
 
 ## [1.6.2] - 2021-07-17
 
@@ -137,8 +137,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.6.2...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.6.3...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.6.3]: https://github.com/erri120/GameFinder/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/erri120/GameFinder/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/erri120/GameFinder/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/erri120/GameFinder/compare/v1.5.3...v1.6.0
