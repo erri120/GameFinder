@@ -6,11 +6,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
-## [1.6.3] - 2021-XX-XX
+## [1.6.3] - 2021-07-30
 
 ### Changes
 
 - Improved Regex performance by making it `static readonly` and using `RegexOptions.Compiled`
+- Steam: Removed parsing the `mounted` value in `libraryfolders.vdf` files
 
 ## [Released]
 

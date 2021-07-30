@@ -100,7 +100,45 @@ In the new format only `steamapps/libraryfolders.vdf` contains the Universe loca
 }
 ```
 
-They now store an array of objects instead of strings which contain additional information like `label` and `mounted`.
+They now store an array of objects instead of strings which contain additional information like `label`.
+
+##### Steam Versions after 1627607186 (2021-07-29)
+
+Once again Steam changes the format but this time they include a list of all installed games in a library as well as their size on disk.
+
+```vdf
+"libraryfolders"
+{
+	"contentstatsid"		"1616900521946793171"
+	"1"
+	{
+		"path"		"M:\\SteamLibrary"
+		"label"		""
+		"contentid"		"5393764431939341339"
+		"totalsize"		"3000590397440"
+		"apps"
+		{
+			"8930"		"9235434479"
+			"11020"		"763147768"
+		}
+	}
+	"2"
+	{
+		"path"		"E:\\SteamLibrary"
+		"label"		""
+		"contentid"		"6734528685854492248"
+		"totalsize"		"500090007552"
+		"apps"
+		{
+			"72850"		"9255977546"
+			"335300"		"19306237690"
+			"374320"		"26662618586"
+			"377160"		"37409240201"
+			"489830"		"13628807699"
+		}
+	}
+}
+```
 
 ##### Parsing Steam's appmanifest files
 
