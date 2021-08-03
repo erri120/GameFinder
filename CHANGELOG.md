@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.6.4] - 2021-08-03
+
+### Changes
+
+- Steam: Added support for Unix systems
+
 ## [1.6.3] - 2021-07-30
 
 ### Changes
@@ -137,8 +143,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.6.3...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.6.4...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.6.4]: https://github.com/erri120/GameFinder/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/erri120/GameFinder/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/erri120/GameFinder/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/erri120/GameFinder/compare/v1.6.0...v1.6.1
