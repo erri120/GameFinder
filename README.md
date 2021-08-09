@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/erri120/GameFinder/actions/workflows/ci.yml/badge.svg)](https://github.com/erri120/GameFinder/actions/workflows/ci.yml) [![Nuget](https://img.shields.io/nuget/v/GameFinder)](https://www.nuget.org/packages/GameFinder/)
 
-.NET 5 library for finding games on Windows. The following stores are support:
+.NET library for finding games on Windows (and Linux, see [this](#linux-support) section for more info). The following stores are support:
 
 - [Steam](#steam)
 - [GOG](#gog)
@@ -25,6 +25,10 @@ foreach (var steamGame in steamHandler.Games)
     Console.WriteLine($"{steamGame} is located at {steamGame.Path}");
 }
 ```
+
+## Linux Support
+
+Gaming on Linux is not yet fully a thing and many stores don't have support for Linux. Steam is the only store with Linux support at the moment and you can get this by targeting `net5.0` instead of `net5.0-windows`. Using `net5.0-windows` is only required for accessing the Windows registry using `Microsoft.Win32.Registry` for finding Steam. If you do not need to find Steam and already know where it is located (eg in a CI environment) you can simply target `net5.0` and use the constructor where you can provide the path to the Steam installation. If you do not provide a path to Steam and target `net5.0`, the Steam Handler will go and look for Steam in the default Linux path at `~/steam`.
 
 ## Supported Stores
 
