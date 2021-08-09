@@ -9,7 +9,7 @@ namespace GameFinder.StoreHandlers.Xbox.DTO
     {
         public string RelyingParty { get; set; } = "http://xboxlive.com";
         public string TokenType { get; set; } = "JWT";
-        public AuthorizationRequestProperties Properties { get; set; } = new AuthorizationRequestProperties();
+        public AuthorizationRequestProperties Properties { get; set; } = new();
         
         [PublicAPI]
         public class AuthorizationRequestProperties

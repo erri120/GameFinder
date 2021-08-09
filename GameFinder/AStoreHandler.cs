@@ -14,7 +14,7 @@ namespace GameFinder
         /// <summary>
         /// List of all found Games
         /// </summary>
-        public List<TGame> Games { get; } = new List<TGame>();
+        public List<TGame> Games { get; } = new();
         
         /// <summary>
         /// Store Type

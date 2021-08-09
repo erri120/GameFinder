@@ -13,10 +13,10 @@ namespace GameFinder
 {
     internal static class Utils
     {
-        internal static readonly JsonSerializerOptions DefaultSerializerOptions = new JsonSerializerOptions
+        // ReSharper disable once MemberCanBePrivate.Global
+        internal static readonly JsonSerializerOptions DefaultSerializerOptions = new()
         {
-            IgnoreNullValues = true,
-            ReadCommentHandling = JsonCommentHandling.Skip
+            ReadCommentHandling = JsonCommentHandling.Skip,
         };
         
         internal static bool ContainsCaseInsensitive(this string s, string value)

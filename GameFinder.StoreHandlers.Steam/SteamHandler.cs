@@ -32,7 +32,7 @@ namespace GameFinder.StoreHandlers.Steam
         /// <summary>
         /// List of all found Steam Universes
         /// </summary>
-        public List<string> SteamUniverses { get; internal set; } = new List<string>();
+        public List<string> SteamUniverses { get; internal set; } = new();
 
         /// <summary>
         /// True if steam was found.
@@ -219,9 +219,9 @@ namespace GameFinder.StoreHandlers.Steam
             return game != null;
         }
 
-        private static readonly Regex SteamConfigRegex = new Regex(@"\""BaseInstallFolder_\d*\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
-        private static readonly Regex OldLibraryFoldersRegex = new Regex(@"^\s+\""\d+\""\s+\""(?<path>.+)\""", RegexOptions.Multiline | RegexOptions.Compiled);
-        private static readonly Regex NewLibraryFoldersPathRegex = new Regex(@"\""path\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
+        private static readonly Regex SteamConfigRegex = new(@"\""BaseInstallFolder_\d*\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
+        private static readonly Regex OldLibraryFoldersRegex = new(@"^\s+\""\d+\""\s+\""(?<path>.+)\""", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static readonly Regex NewLibraryFoldersPathRegex = new(@"\""path\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
         
         internal static List<string> ParseSteamConfig(string file, ILogger logger)
         {
@@ -417,7 +417,7 @@ namespace GameFinder.StoreHandlers.Steam
             foreach (Match match in matches)
             {
                 var groups = match.Groups;
-#if NET5_0
+#if NET5_0_OR_GREATER
                 if (!groups.TryGetValue(group, out var currentGroup)) continue;
                 if (!currentGroup.Success) continue;
 #elif NETSTANDARD2_1

@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-#if NET5_0
+#if NET5_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
 
@@ -117,7 +117,7 @@ namespace GameFinder.StoreHandlers.Xbox
             using var response = await client.GetAsync(url).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
-#if NET5_0
+#if NET5_0_OR_GREATER
             var content = await response.Content.ReadFromJsonAsync<TitleHistoryResponse>(Utils.DefaultSerializerOptions)
                 .ConfigureAwait(false);
 #else

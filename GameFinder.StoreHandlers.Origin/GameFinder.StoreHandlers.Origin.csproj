@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Title>GameFinder.StoreHandlers.Steam</Title>
-    <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
+    <Title>GameFinder.StoreHandlers.Origin</Title>
+    <TargetFrameworks>netstandard2.1;net5.0-windows;net6.0-windows</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
