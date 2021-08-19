@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
-## [1.7.0] - 2021-09-08
+## [1.7.1] - 2021-08-19
+
+### Changes
+
+- GOG: `productId` from registry is no longer required
+
+## [1.7.0] - 2021-08-09
 
 ### Changes
 
@@ -149,8 +155,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.7.0...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.7.1...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.7.1]: https://github.com/erri120/GameFinder/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/erri120/GameFinder/compare/v1.6.4...v1.7.0
 [1.6.4]: https://github.com/erri120/GameFinder/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/erri120/GameFinder/compare/v1.6.2...v1.6.3
