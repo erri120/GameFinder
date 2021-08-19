@@ -117,16 +117,18 @@ namespace GameFinder.StoreHandlers.GOG
                     continue;
                 }
                 
-                var sProductId = RegistryHelper.GetStringValueFromRegistry(subKey, "productID", Logger);
-                if (sProductId == null) continue;
-                
-                if (!int.TryParse(sProductId, out var productId))
+                var sProductId = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "productID");
+                var productId = -1;
+                if (sProductId != null)
                 {
-                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
-                        sProductId, "productID", subKey, "int");
-                    continue;
+                    if (!int.TryParse(sProductId, out productId))
+                    {
+                        Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
+                            sProductId, "productID", subKey, "int");
+                        continue;
+                    }
                 }
-                
+
                 var exe = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "exe");
                 var exeFile = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "exeFile");
                 var installerLanguage = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "installer_language");
