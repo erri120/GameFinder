@@ -83,12 +83,18 @@ namespace GameFinder.StoreHandlers.Steam
                 Logger.LogError("Unable to find config.vdf at {SteamConfigPath}", steamConfig);
                 return;
             }
-
-            var steamLibraries = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
+            
+            var steamLibraries = Path.Combine(steamPath, "config", "libraryfolders.vdf");
             if (!File.Exists(steamLibraries))
             {
-                Logger.LogError("Unable to find libraryfolders.vdf at {SteamLibrariesPath}", steamLibraries);
-                return;
+                Logger.LogWarning("Unable to find libraryfolders.vdf at {Path}", steamLibraries);
+                
+                steamLibraries = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
+                if (!File.Exists(steamLibraries))
+                {
+                    Logger.LogError("Unable to find libraryfolders.vdf at {SteamLibrariesPath}", steamLibraries);
+                    return;
+                }
             }
 
             FoundSteam = true;
@@ -116,11 +122,17 @@ namespace GameFinder.StoreHandlers.Steam
                 return;
             }
 
-            var steamLibraries = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
+            var steamLibraries = Path.Combine(steamPath, "config", "libraryfolders.vdf");
             if (!File.Exists(steamLibraries))
             {
-                Logger.LogError("Unable to find libraryfolders.vdf at {SteamLibrariesPath}", steamLibraries);
-                return;
+                Logger.LogWarning("Unable to find libraryfolders.vdf at {Path}", steamLibraries);
+                
+                steamLibraries = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
+                if (!File.Exists(steamLibraries))
+                {
+                    Logger.LogError("Unable to find libraryfolders.vdf at {SteamLibrariesPath}", steamLibraries);
+                    return;
+                }
             }
 
             FoundSteam = true;
