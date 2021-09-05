@@ -486,4 +486,4 @@ See [CONTRIBUTING](CONTRIBUTING.md) for more information.
 
 ## License
 
-GPLv3.0, see [LICENSE](LICENSE) for more information.
+See [LICENSE](LICENSE) for more information.
