@@ -91,41 +91,55 @@ namespace GameFinder.StoreHandlers.GOG
                     continue;
                 }
 
-                var sBuildId = RegistryHelper.GetStringValueFromRegistry(subKey, "BUILDID", Logger);
-                if (sBuildId == null) continue;
-                
-                if (!long.TryParse(sBuildId, out var buildId))
+                var sBuildId = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "BUILDID");
+                var buildId = -1L;
+                if (sBuildId != null)
                 {
-                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
-                        sBuildId, "BUILDID", subKey, "int");
-                    continue;
+                    if (!long.TryParse(sBuildId, out var parsedLong))
+                    {
+                        Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
+                            sBuildId, "BUILDID", subKey, "long");
+                    }
+                    else
+                    {
+                        buildId = parsedLong;
+                    }
                 }
-                
+
                 var gameName = RegistryHelper.GetStringValueFromRegistry(subKey, "gameName", Logger);
                 if (gameName == null) continue;
                 
                 var path = RegistryHelper.GetStringValueFromRegistry(subKey, "path", Logger);
                 if (path == null) continue;
 
-                var sInstallDate = RegistryHelper.GetStringValueFromRegistry(subKey, "INSTALLDATE", Logger);
-                if (sInstallDate == null) continue;
-                
-                if (!DateTime.TryParse(sInstallDate, out var installationDate))
+                var sInstallDate = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "INSTALLDATE");
+                var installationDate = DateTime.UnixEpoch;
+                if (sInstallDate != null)
                 {
-                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
-                        sInstallDate, "INSTALLDATE", subKey, "DateTime");
-                    continue;
+                    if (!DateTime.TryParse(sInstallDate, out var parsedDate))
+                    {
+                        Logger.LogError(
+                            "Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
+                            sInstallDate, "INSTALLDATE", subKey, "DateTime");
+                    }
+                    else
+                    {
+                        installationDate = parsedDate;
+                    }
                 }
-                
+
                 var sProductId = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "productID");
                 var productId = -1;
                 if (sProductId != null)
                 {
-                    if (!int.TryParse(sProductId, out productId))
+                    if (!int.TryParse(sProductId, out var parsedInt))
                     {
                         Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
                             sProductId, "productID", subKey, "int");
-                        continue;
+                    }
+                    else
+                    {
+                        productId = parsedInt;
                     }
                 }
 

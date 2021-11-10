@@ -8,11 +8,18 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.7.2] - 2021-11-10
+
+### Changes
+
+- GOG: most stuff is no longer required from the registry, the only values that actually matter are `gameID`, `gameName`, `path`
+- Xbox: updated Windows SDK to 10.0.20348.0
+
 ## [1.7.1] - 2021-08-19
 
 ### Changes
 
-- GOG: `productId` from registry is no longer required
+- GOG: `productID` from registry is no longer required
 
 ## [1.7.0] - 2021-08-09
 
@@ -155,8 +162,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.7.1...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v1.7.2...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[1.7.2]: https://github.com/erri120/GameFinder/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/erri120/GameFinder/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/erri120/GameFinder/compare/v1.6.4...v1.7.0
 [1.6.4]: https://github.com/erri120/GameFinder/compare/v1.6.3...v1.6.4
