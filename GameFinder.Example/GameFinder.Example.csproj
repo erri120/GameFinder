@@ -21,10 +21,4 @@
       <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="nlog.config">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>

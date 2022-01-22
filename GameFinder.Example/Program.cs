@@ -8,7 +8,10 @@ using GameFinder.StoreHandlers.Origin;
 using GameFinder.StoreHandlers.Steam;
 using GameFinder.StoreHandlers.Xbox;
 using Microsoft.Extensions.Logging;
+using NLog;
+using NLog.Config;
 using NLog.Extensions.Logging;
+using NLog.Targets;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace GameFinder.Example
@@ -17,6 +20,19 @@ namespace GameFinder.Example
     {
         public static void Main(string[] args)
         {
+            var config = new LoggingConfiguration();
+
+            var consoleTarget = new ConsoleTarget("console");
+            var fileTarget = new FileTarget("file")
+            {
+                FileName = "log.log"
+            };
+
+            config.AddRuleForAllLevels(consoleTarget);
+            config.AddRuleForAllLevels(fileTarget);
+
+            LogManager.Configuration = config;
+
             var logger = new NLogLoggerProvider().CreateLogger("");
             
             Parser.Default.ParseArguments<Options>(args)
