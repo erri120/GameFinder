@@ -311,11 +311,15 @@ namespace GameFinder.StoreHandlers.Steam
             return res;
         }
 
-        private static readonly IReadOnlyList<string> AcfKeys = new[]
+        private static readonly IReadOnlyList<string> RequiredKeys = new[]
         {
             "appid",
             "name",
-            "installdir",
+            "installdir"
+        };
+
+        private static readonly IReadOnlyList<string> OtherKeys = new[]
+        {
             "LastUpdated",
             "SizeOnDisk",
             "BytesToDownload",
@@ -323,9 +327,12 @@ namespace GameFinder.StoreHandlers.Steam
             "BytesToStage",
             "BytesStaged"
         };
-        
+
+        private static IEnumerable<string> AllKeys => RequiredKeys.Concat(OtherKeys);
+
         internal static SteamGame? ParseAcfFile(string file, ILogger logger)
         {
+            
             if (!File.Exists(file))
             {
                 logger.LogError("ACF Manifest at {Path} does not exist", file);
@@ -337,7 +344,7 @@ namespace GameFinder.StoreHandlers.Steam
             var lines = File.ReadLines(file, Encoding.UTF8);
             foreach (var line in lines)
             {
-                var first = AcfKeys.FirstOrDefault(x => line.ContainsCaseInsensitive($"\"{x}\""));
+                var first = AllKeys.FirstOrDefault(x => line.ContainsCaseInsensitive($"\"{x}\""));
                 if (first == null) continue;
                 if (dict.ContainsKey(first)) continue;
 
@@ -347,28 +354,32 @@ namespace GameFinder.StoreHandlers.Steam
                 dict.Add(first, value);
             }
 
-            if (dict.Count != AcfKeys.Count)
+            foreach (var requiredKey in RequiredKeys)
             {
-                foreach (var acfKey in AcfKeys)
-                {
-                    if (dict.TryGetValue(acfKey, out _)) continue;
-                    logger.LogError("ACF Manifest at {Path} does not contain a value with key {Key}", file, acfKey);
-                }
-                
+                if (dict.ContainsKey(requiredKey)) continue;
+                logger.LogError("ACF Manifest at {Path} does not contain a value for the required key {Key}", file, requiredKey);
                 return null;
             }
-            
-            var game = new SteamGame();
 
+            var game = new SteamGame();
+            
+            string? GetFromDict(IDictionary<string, string> dictionary, string key)
+            {
+                return dictionary.TryGetValue(key, out var value) ? value : null;
+            }
+            
+            // required
             var sAppId = dict["appid"];
             var name = dict["name"];
             var installDir = dict["installdir"];
-            var sLastUpdated = dict["LastUpdated"];
-            var sSizeOnDisk = dict["SizeOnDisk"];
-            var sBytesToDownload = dict["BytesToDownload"];
-            var sBytesDownloaded = dict["BytesDownloaded"];
-            var sBytesToStage = dict["BytesToStage"];
-            var sBytesStaged = dict["BytesStaged"];
+            
+            // optional
+            var sLastUpdated = GetFromDict(dict, "LastUpdated");
+            var sSizeOnDisk = GetFromDict(dict, "SizeOnDisk");
+            var sBytesToDownload = GetFromDict(dict, "BytesToDownload");
+            var sBytesDownloaded = GetFromDict(dict, "BytesDownloaded");
+            var sBytesToStage = GetFromDict(dict, "BytesToStage");
+            var sBytesStaged = GetFromDict(dict, "BytesStaged");
 
             if (!int.TryParse(sAppId, out var appId))
             {
@@ -379,8 +390,11 @@ namespace GameFinder.StoreHandlers.Steam
 
             game.ID = appId;
 
-            bool ParseAndSet(string value, string key, Action<long> action)
+            bool ParseAndSet(string? value, string key, Action<long> action)
             {
+                // optionals are null so we can skip those
+                if (value is null) return true;
+                
                 if (!long.TryParse(value, out var lValue))
                 {
                     logger.LogError("Unable to parse value \"{Value}\" (\"{ValueName}\") as {Type} in ACF Manifest {Path}", 

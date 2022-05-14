@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.7.3] - 2022-05-14
+
+### Changes
+
+- Steam: parsing is now more relaxed, only required values are `appid`, `installdir` and `name`
+
 ## [1.7.2] - 2021-11-10
 
 ### Changes
