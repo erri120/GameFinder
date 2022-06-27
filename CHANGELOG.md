@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [1.8.0] - 2022-06-27
+
+- Fix SteamHandler not finding any Libraries when there are no external libs
+- Remove .NET 5 target
+- Upgrade dependencies
+
 ## [1.7.3] - 2022-05-14
 
 ### Changes
