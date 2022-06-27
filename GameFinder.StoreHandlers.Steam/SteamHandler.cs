@@ -248,11 +248,7 @@ namespace GameFinder.StoreHandlers.Steam
             var text = File.ReadAllText(file, Encoding.UTF8);
             var matches = SteamConfigRegex.Matches(text);
 
-            if (matches.Count == 0)
-            {
-                logger.LogError("Found no Regex matches in Steam Config at {Path}", file);
-                return res;
-            }
+            if (matches.Count == 0) return res;
             
             GetAllMatches("path", matches, path => res.Add(MakeValidPath(path)));
             return res;
