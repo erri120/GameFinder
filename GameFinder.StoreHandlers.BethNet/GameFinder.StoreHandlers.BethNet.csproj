@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Title>GameFinder.StoreHandlers.BethNet</Title>
-        <TargetFrameworks>netstandard2.1;net5.0-windows;net6.0-windows</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net6.0-windows</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
