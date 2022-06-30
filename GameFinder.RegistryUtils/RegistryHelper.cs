@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 
@@ -8,6 +8,10 @@ namespace GameFinder.RegistryUtils
     {
         private static object? GetObjectFromRegistry(RegistryKey key, string valueName, ILogger logger)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return null;
+            }
             var value = key.GetValue(valueName);
             if (value == null)
                 logger.LogWarning("RegistryKey {Key} does not have a value {ValueName}", key, valueName);
@@ -35,6 +39,10 @@ namespace GameFinder.RegistryUtils
         
         internal static string? GetNullableStringValueFromRegistry(RegistryKey key, string valueName)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return null;
+            }
             var value = key.GetValue(valueName);
             var sValue = value?.ToString();
             return sValue;
