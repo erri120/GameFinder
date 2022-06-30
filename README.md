@@ -28,7 +28,7 @@ foreach (var steamGame in steamHandler.Games)
 
 ## Linux Support
 
-Gaming on Linux is not yet fully a thing and many stores don't have support for Linux. Steam is the only store with Linux support at the moment and you can get this by targeting `net5.0` instead of `net5.0-windows`. Using `net5.0-windows` is only required for accessing the Windows registry using `Microsoft.Win32.Registry` for finding Steam. If you do not need to find Steam and already know where it is located (eg in a CI environment) you can simply target `net5.0` and use the constructor where you can provide the path to the Steam installation. If you do not provide a path to Steam and target `net5.0`, the Steam Handler will go and look for Steam in the default Linux path at `~/steam`.
+Gaming on Linux is not yet fully a thing and many stores don't have support for Linux. Steam is the only store with Linux support at the moment. On Windows, the Steam Handler accesses the Windows registry using `Microsoft.Win32.Registry` for finding Steam. On other platforms, the Steam Handler will go and look for Steam in the default Linux path at `~/steam`.
 
 ## Supported Stores
 

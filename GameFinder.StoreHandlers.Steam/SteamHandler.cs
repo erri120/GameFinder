@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
@@ -51,31 +52,35 @@ namespace GameFinder.StoreHandlers.Steam
         /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
         public SteamHandler(ILogger? logger = null) : base(logger ?? NullLogger.Instance)
         {
-#if Windows
-            using var steamKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SteamRegKey);
-            if (steamKey == null)
+            string? steamPath;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Logger.LogError("Unable to open registry key {SteamKey}", steamKey);
-                return;
+                using var steamKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SteamRegKey);
+                if (steamKey == null)
+                {
+                    Logger.LogError("Unable to open registry key {SteamKey}", steamKey);
+                    return;
+                }
+
+                steamPath = RegistryUtils.RegistryHelper.GetStringValueFromRegistry(steamKey, "SteamPath", Logger);
+                if (steamPath == null) return;
+
+                if (!Directory.Exists(steamPath))
+                {
+                    Logger.LogError("Path to Steam from Registry does not exist: {SteamPath}", steamPath);
+                    return;
+                }
             }
-            
-            var steamPath = RegistryUtils.RegistryHelper.GetStringValueFromRegistry(steamKey, "SteamPath", Logger);
-            if (steamPath == null) return;
-            
-            if (!Directory.Exists(steamPath))
+            else
             {
-                Logger.LogError("Path to Steam from Registry does not exist: {SteamPath}", steamPath);
-                return;
+                steamPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    ".steam", "steam");
+                if (!Directory.Exists(steamPath))
+                {
+                    Logger.LogError("Default Steam path for Unix systems does not exist: {SteamPath}", steamPath);
+                    return;
+                }
             }
-#else
-            var steamPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                ".steam", "steam");
-            if (!Directory.Exists(steamPath))
-            {
-                Logger.LogError("Default Steam path for Unix systems does not exist: {SteamPath}", steamPath);
-                return;
-            }
-#endif
             
             var steamConfig = Path.Combine(steamPath, "config", "config.vdf");
             if (!File.Exists(steamConfig))

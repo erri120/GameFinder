@@ -2,12 +2,8 @@
 
     <PropertyGroup>
         <Title>GameFinder.StoreHandlers.Steam</Title>
-        <TargetFrameworks>netstandard2.1;net6.0;net6.0-windows</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows'">
-        <DefineConstants>Windows</DefineConstants>
     </PropertyGroup>
     
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -21,14 +17,12 @@
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\GameFinder\GameFinder.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows'">
-        <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
+      <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
     </ItemGroup>
     
 </Project>

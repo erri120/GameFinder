@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Title>GameFinder.RegistryUtils</Title>
-        <TargetFrameworks>netstandard2.1;net6.0-windows</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
