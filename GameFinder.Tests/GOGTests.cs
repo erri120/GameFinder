@@ -1,46 +1,49 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.GOG;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace GameFinder.Tests
+namespace GameFinder.Tests;
+
+public class GOGTests
 {
-    public class GOGTests : AStoreHandlerTest<GOGHandler, GOGGame>
+    private static (IRegistry registry, List<GOGGame> expectedGames) SetupTest()
     {
-        protected override GOGHandler DoSetup()
+        var registry = new InMemoryRegistry();
+
+        var expectedGames = new List<GOGGame>
         {
-            Setup.SetupGOG();
-            return new GOGHandler(Logger);
+            new(1971477531, "Gwent", "C:\\Games\\Gwent"),
+            new(1207666073, "Akalabeth: World of Doom", "C:\\Games\\Akalabeth")
+        };
+
+        foreach (var expectedGame in expectedGames)
+        {
+            var key = registry.AddKey(RegistryHive.LocalMachine, $"SOFTWARE\\GOG.com\\Games\\{expectedGame.Id}");
+            key.AddValue("gameID", $"{expectedGame.Id}");
+            key.AddValue("gameName", expectedGame.Name);
+            key.AddValue("path", expectedGame.Path);
         }
 
-        protected override void ChecksAfterFindingGames(GOGHandler storeHandler)
-        {
-            base.ChecksAfterFindingGames(storeHandler);
-            var game = storeHandler.Games.FirstOrDefault(x => x.GameID.Equals(1971477531));
-            Assert.NotNull(game);
-            Assert.Equal(1971477531, game!.GameID);
-            Assert.Equal(1971477531, game!.ProductID);
-            Assert.Equal(54099623651166556, game!.BuildID);
-            Assert.Equal("Gwent", game!.Name);
-            Assert.Equal("english", game!.InstallerLanguage);
-            Assert.Equal("english", game!.Language);
-            Assert.Equal("en-US", game!.LangCode);
-            Assert.NotNull(game.EXE);
-            Assert.NotNull(game.LaunchCommand);
-            Assert.Equal("Gwent", game!.StartMenu);
-            Assert.NotNull(game.StartMenuLink);
-            Assert.NotNull(game.UninstallCommand);
-            Assert.Equal("8.2", game!.Version);
-            Assert.NotNull(game.WorkingDir);
-        }
+        return (registry, expectedGames);
+    }
+    
+    [Fact]
+    public void TestFindAllGames()
+    {
+        var (registry, expectedGames) = SetupTest();
 
-        protected override void DoCleanup()
+        var results = GOGHandler.FindAllGames(registry).ToList();
+        
+        var actualGames = results.Select(tuple =>
         {
-            Setup.CleanupGOG();
-        }
-
-        public GOGTests(ITestOutputHelper output) : base(output)
-        {
-        }
+            var (game, error) = tuple;
+            Assert.True(game is not null, error);
+            return game;
+        }).ToList();
+        
+        Assert.Equal(expectedGames.Count, actualGames.Count);
+        Assert.Equal(expectedGames, actualGames);
     }
 }
