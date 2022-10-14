@@ -1,28 +1,61 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
+using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace GameFinder.Tests
+namespace GameFinder.Tests;
+
+public class EGSTests
 {
-    public class EGSTests : AStoreHandlerTest<EGSHandler, EGSGame>
+    private static (InMemoryRegistry registry, MockFileSystem fileSystem, List<EGSGame> expectedGames) SetupTest()
     {
-        protected override EGSHandler DoSetup()
+        var expectedGames = new List<EGSGame>
         {
-            var manifestDir = Setup.SetupEpicGamesStore();
-            return new EGSHandler(manifestDir, Logger);
+            new("b8538c739273426aa35a98220e258d55", "Unreal Tournament", "C:\\Games\\UnrealTournament"),
+            new("3257e06c28764231acd93049f3774ed6", "Subnautica", "C:\\Games\\Subnautica")
+        };
+        
+        var registry = new InMemoryRegistry();
+
+        var regKey = registry.AddKey(RegistryHive.CurrentUser, @"Software\Epic Games\EOS");
+        regKey.AddValue("ModSdkMetadataDir", "C:\\ModSdkMetadataDir");
+        
+        var fileSystem = new MockFileSystem();
+
+        foreach (var expectedGame in expectedGames)
+        {
+            var mockData = @$"{{
+    ""CatalogItemId"": ""{expectedGame.CatalogItemId}"",
+    ""DisplayName"": ""{expectedGame.DisplayName}"",
+    ""InstallLocation"": ""{expectedGame.InstallLocation.Replace("\\", "\\\\")}""
+}}";
+
+            fileSystem.AddFile($"C:\\ModSdkMetadataDir\\{expectedGame.CatalogItemId}.item", new MockFileData(mockData));
         }
 
-        protected override void ChecksAfterFindingGames(EGSHandler storeHandler)
-        {
-            base.ChecksAfterFindingGames(storeHandler);
-            var game = storeHandler.Games.FirstOrDefault(x =>
-                x.InstallationGuid is "8AAFB83044E76B812D3D8C9652E8C13C");
-            Assert.NotNull(game);
-        }
+        return (registry, fileSystem, expectedGames);
+    }
 
-        public EGSTests(ITestOutputHelper output) : base(output)
+    [Fact]
+    private void TestFindAllGames()
+    {
+        var (registry, fileSystem, expectedGames) = SetupTest();
+
+        var handler = new EGSHandler(registry, fileSystem);
+        
+        var results = handler.FindAllGames().ToList();
+        
+        var actualGames = results.Select(tuple =>
         {
-        }
+            var (game, error) = tuple;
+            Assert.True(game is not null, error);
+            return game;
+        }).ToList();
+        
+        Assert.Equal(expectedGames.Count, actualGames.Count);
+        Assert.Equal(expectedGames, actualGames);
     }
 }
+

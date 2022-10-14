@@ -1,134 +1,83 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
+using System.IO.Abstractions;
+using System.Runtime.Versioning;
+using System.Text.Json;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Win32;
 
-namespace GameFinder.StoreHandlers.EGS
+namespace GameFinder.StoreHandlers.EGS;
+
+[PublicAPI]
+public record EGSGame(string CatalogItemId, string DisplayName, string InstallLocation);
+
+[PublicAPI]
+public class EGSHandler
 {
-    [PublicAPI]
-    public class EGSHandler : AStoreHandler<EGSGame>
+    private const string RegKey = @"Software\Epic Games\EOS";
+    
+    private readonly IRegistry _registry;
+    private readonly IFileSystem _fileSystem;
+    
+    [SupportedOSPlatform("windows")]
+    public EGSHandler() : this(new WindowsRegistry(), new FileSystem()) { }
+    
+    public EGSHandler(IRegistry registry) : this(registry, new FileSystem()) { }
+    
+    public EGSHandler(IRegistry registry, IFileSystem fileSystem)
     {
-        /// <inheritdoc/>
-        public override StoreType StoreType => StoreType.EpicGamesStore;
-
-        private const string RegKey = @"SOFTWARE\Epic Games\EOS";
-        
-        private readonly string? _metadataPath;
-
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public EGSHandler() : this(NullLogger.Instance) { }
-        
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
-        public EGSHandler(ILogger? logger = null) : base(logger ?? NullLogger.Instance)
+        _registry = registry;
+        _fileSystem = fileSystem;
+    }
+    
+    public IEnumerable<(EGSGame? game, string? error)> FindAllGames()
+    {
+        var manifestDir = _fileSystem.DirectoryInfo.FromDirectoryName(GetManifestDir());
+        if (!manifestDir.Exists)
         {
-            using var regKey = Registry.CurrentUser.OpenSubKey(RegKey);
-            if (regKey == null)
-            {
-                Logger.LogError("Unable to open Registry Key {RegKey}", RegKey);
-                return;
-            }
-
-            var modSdkMetadataDir = RegistryHelper.GetStringValueFromRegistry(regKey, "ModSdkMetadataDir", Logger);
-            if (modSdkMetadataDir == null) return;
-            
-            if (!Directory.Exists(modSdkMetadataDir))
-            {
-                Logger.LogError("ModSdkMetadataDir from Registry does not exist at {Path}", modSdkMetadataDir);
-                return;
-            }
-
-            _metadataPath = modSdkMetadataDir;
+            yield return (null, $"The manifest directory {manifestDir.FullName} does not exist!");
+            yield break;
         }
 
-        /// <summary>
-        /// Constructor for providing the path of the metadata directory.
-        /// </summary>
-        /// <param name="metadataPath"></param>
-        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
-        /// <exception cref="ArgumentException">Provided path to the directory does not exist</exception>
-        public EGSHandler(string metadataPath, ILogger? logger = null) : base(logger ?? NullLogger.Instance)
+        var itemFiles = manifestDir.EnumerateFiles("*.item", SearchOption.TopDirectoryOnly);
+        foreach (var itemFile in itemFiles)
         {
-            if (!Directory.Exists(metadataPath))
-                throw new ArgumentException($"Metadata directory at {metadataPath} does not exist!", nameof(metadataPath));
+            using var stream = itemFile.OpenRead();
 
-            _metadataPath = metadataPath;
-        }
-
-        /// <inheritdoc />
-        public override bool FindAllGames()
-        {
-            if (_metadataPath == null) return false;
-
-            var itemFiles = Directory.EnumerateFiles(_metadataPath, "*.item", SearchOption.TopDirectoryOnly);
-            foreach (var itemFilePath in itemFiles)
+            var game = JsonSerializer.Deserialize<EGSGame>(stream);
+            if (game is null)
             {
-                //var id = Path.GetFileNameWithoutExtension(itemFilePath);
-                EGSManifestFile? manifestFile;
-                
-                try
-                {
-                    manifestFile = Utils.FromJson<EGSManifestFile>(itemFilePath);
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-                
-                if (manifestFile == null)
-                {
-                    Logger.LogError("Unable to parse file {Path} as Json", itemFilePath);
-                    continue;
-                }
-
-                if (manifestFile.FormatVersion != 0)
-                {
-                    Logger.LogError("FormatVersion in file {Path} is not supported: \"{Version}\"",
-                        itemFilePath, manifestFile.FormatVersion);
-                    continue;
-                }
-                
-                var game = new EGSGame
-                {
-                    Name = manifestFile.DisplayName ?? manifestFile.FullAppName ?? manifestFile.AppName ?? throw new NotImplementedException(),
-                    Path = manifestFile.InstallLocation!
-                };
-                CopyProperties(game, manifestFile);
-                
-                Games.Add(game);
+                yield return (null, $"Unable to deserialize file {itemFile.FullName}");
             }
-
-            return true;
-        }
-
-        private static void CopyProperties(EGSGame game, EGSManifestFile manifestFile)
-        {
-            var manifestProperties = manifestFile.GetType().GetProperties();
-            var gameProperties = game.GetType().GetProperties();
-
-            foreach (var manifestProperty in manifestProperties)
+            else
             {
-                if (manifestProperty == null) continue;
-                var gameProperty = gameProperties.FirstOrDefault(x => x.Name.Equals(manifestProperty.Name));
-                if (gameProperty == null) continue;
-                
-                gameProperty.SetValue(game, manifestProperty.GetValue(manifestFile));
+                yield return (game, null);
             }
-        }
-        
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return "EGSHandler";
         }
     }
+
+    private string GetManifestDir()
+    {
+        return TryGetManifestDirFromRegistry(out var manifestDir) 
+            ? manifestDir 
+            : Path.Combine(
+                Environment.ExpandEnvironmentVariables("%PROGRAMDATA%"),
+                "Epic",
+                "EpicGamesLauncher",
+                "Data",
+                "Manifests");
+    }
+
+    private bool TryGetManifestDirFromRegistry([MaybeNullWhen(false)] out string manifestDir)
+    {
+        manifestDir = default;
+        
+        var currentUser = _registry.OpenBaseKey(RegistryHive.CurrentUser);
+        using var regKey = currentUser.OpenSubKey(RegKey);
+
+        return regKey is not null && regKey.TryGetString("ModSdkMetadataDir", out manifestDir);
+    }
 }
+
