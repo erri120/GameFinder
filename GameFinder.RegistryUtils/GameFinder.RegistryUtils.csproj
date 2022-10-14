@@ -2,17 +2,13 @@
 
     <PropertyGroup>
         <Title>GameFinder.RegistryUtils</Title>
-        <TargetFrameworks>netstandard2.1;net6.0-windows</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" PrivateAssets="all" />
-      <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\GameFinder\GameFinder.csproj" />
+        <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     </ItemGroup>
 
 </Project>
