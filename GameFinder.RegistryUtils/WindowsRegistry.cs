@@ -50,6 +50,9 @@ internal static class InteropHelpers
     }
 }
 
+/// <summary>
+/// Implementation of <see cref="IRegistry"/> that uses the Windows registry.
+/// </summary>
 [PublicAPI]
 [SupportedOSPlatform("windows")]
 public sealed class WindowsRegistry : IRegistry
@@ -61,6 +64,9 @@ public sealed class WindowsRegistry : IRegistry
     }
 }
 
+/// <summary>
+/// Implementation of <see cref="IRegistryKey"/> that uses <see cref="Microsoft.Win32.RegistryKey"/>.
+/// </summary>
 [PublicAPI]
 [SupportedOSPlatform("windows")]
 public sealed class WindowsRegistryKey : IRegistryKey

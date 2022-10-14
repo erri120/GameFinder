@@ -5,11 +5,17 @@ using JetBrains.Annotations;
 
 namespace GameFinder.RegistryUtils;
 
+/// <summary>
+/// Implementation of <see cref="IRegistry"/> that is entirely in-memory for use in tests.
+/// </summary>
 [PublicAPI]
 public sealed class InMemoryRegistry : IRegistry
 {
     private readonly Dictionary<RegistryHive, InMemoryRegistryKey> _baseKeys;
 
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
     public InMemoryRegistry()
     {
         _baseKeys = new Dictionary<RegistryHive, InMemoryRegistryKey>
@@ -23,6 +29,12 @@ public sealed class InMemoryRegistry : IRegistry
         };
     }
     
+    /// <summary>
+    /// Adds a key to the registry.
+    /// </summary>
+    /// <param name="hive"></param>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public InMemoryRegistryKey AddKey(RegistryHive hive, string key)
     {
         // normalize
@@ -47,6 +59,9 @@ public sealed class InMemoryRegistry : IRegistry
     }
 }
 
+/// <summary>
+/// Implementation of <see cref="IRegistryKey"/> that is entirely in-memory for use in tests.
+/// </summary>
 [PublicAPI]
 public sealed class InMemoryRegistryKey : IRegistryKey
 {
@@ -72,16 +87,25 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     
     internal InMemoryRegistryKey AddSubKey(RegistryHive hive, string key)
     {
-        var child = new InMemoryRegistryKey(hive, this, key);
+        if (_children.TryGetValue(key, out var child)) return child;
+        
+        child = new InMemoryRegistryKey(hive, this, key);
         _children.Add(key, child);
+        
         return child;
     }
 
+    /// <summary>
+    /// Adds a value to the key.
+    /// </summary>
+    /// <param name="valueName"></param>
+    /// <param name="value"></param>
     public void AddValue(string valueName, object value)
     {
         _values.Add(valueName, value);
     }
 
+    /// <inheritdoc/>
     public IRegistryKey? OpenSubKey(string name)
     {
         // normalize
@@ -97,21 +121,25 @@ public sealed class InMemoryRegistryKey : IRegistryKey
         return null;
     }
 
+    /// <inheritdoc/>
     public IEnumerable<string> GetSubKeyNames()
     {
         return _children.Keys;
     }
 
+    /// <inheritdoc/>
     public IEnumerable<string> GetValueNames()
     {
         return _values.Keys;
     }
 
+    /// <inheritdoc/>
     public RegistryValueKind GetValueKind(string? valueName)
     {
         throw new NotImplementedException();
     }
 
+    /// <inheritdoc/>
     public object? GetValue(string? valueName)
     {
         _values.TryGetValue(valueName ?? string.Empty, out var value);
