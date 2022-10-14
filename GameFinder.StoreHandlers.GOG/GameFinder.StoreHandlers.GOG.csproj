@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Title>GameFinder.StoreHandlers.GOG</Title>
-        <TargetFrameworks>netstandard2.1;net6.0-windows</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
@@ -16,12 +16,10 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
-      <ProjectReference Include="..\GameFinder\GameFinder.csproj" />
     </ItemGroup>
     
 </Project>

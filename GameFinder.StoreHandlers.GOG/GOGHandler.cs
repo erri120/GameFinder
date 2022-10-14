@@ -1,198 +1,81 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Win32;
 
-namespace GameFinder.StoreHandlers.GOG
+namespace GameFinder.StoreHandlers.GOG;
+
+/// <summary>
+/// Represents a game installed with GOG Galaxy.
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Name"></param>
+/// <param name="Path"></param>
+[PublicAPI]
+public record GOGGame(long Id, string Name, string Path);
+
+/// <summary>
+/// Handler for finding games installed with GOG Galaxy.
+/// </summary>
+[PublicAPI]
+public static class GOGHandler
 {
-    [PublicAPI]
-    public class GOGHandler : AStoreHandler<GOGGame>
+    private const string GOGRegKey = @"Software\GOG.com\Games";
+
+    /// <summary>
+    /// Searches for all games installed with GOG Galaxy. This functions returns either
+    /// a non-null <see cref="GOGGame"/> or a non-null error message.
+    /// </summary>
+    /// <param name="registry">Use either <see cref="WindowsRegistry"/> or <see cref="InMemoryRegistry"/>.</param>
+    /// <returns></returns>
+    public static IEnumerable<(GOGGame? game, string? error)> FindAllGames(IRegistry registry)
     {
-        /// <inheritdoc/>
-        public override StoreType StoreType => StoreType.GOG;
+        var localMachine = registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
 
-        private const string GOGRegKey = @"Software\GOG.com\Games";
-        private const string GOG64RegKey = @"Software\WOW6432Node\GOG.com\Games";
-
-        private readonly string? _regKey;
-        
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public GOGHandler() : this(NullLogger.Instance) { }
-        
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
-        public GOGHandler(ILogger? logger = null) : base(logger ?? NullLogger.Instance)
+        using var gogKey = localMachine.OpenSubKey(GOGRegKey);
+        if (gogKey is null)
         {
-            using var regKey = Registry.LocalMachine.OpenSubKey(GOGRegKey);
-            if (regKey != null)
-            {
-                _regKey = GOGRegKey;
-                return;
-            }
-            
-            using var reg64Key = Registry.LocalMachine.OpenSubKey(GOG64RegKey);
-            if (reg64Key == null)
-            {
-                Logger.LogError("GOG was not found in the registry");
-                return;
-            }
-            
-            _regKey = GOG64RegKey;
+            yield return (null, $"Unable to open HKEY_LOCAL_MACHINE\\{GOGRegKey}");
+            yield break;
         }
 
-        /// <inheritdoc />
-        public override bool FindAllGames()
+        var subKeyNames = gogKey.GetSubKeyNames();
+        foreach (var subKeyName in subKeyNames)
         {
-            if (_regKey == null) return false;
+            var fullKey = $"HKEY_LOCAL_MACHINE\\{GOGRegKey}\\{subKeyName}";
             
-            using var gogKey = Registry.LocalMachine.OpenSubKey(_regKey);
-            if (gogKey == null)
+            using var subKey = gogKey.OpenSubKey(subKeyName);
+            if (subKey is null)
             {
-                Logger.LogError("Unable to open Registry Key {Key}", _regKey);
-                return false;
+                yield return (null, $"Unable to open {fullKey}");
+                continue;
             }
 
-            var keys = gogKey.GetSubKeyNames();
-            foreach (var key in keys)
+            if (!subKey.TryGetString("gameID", out var sId))
             {
-                if (!int.TryParse(key, out var gameId))
-                {
-                    Logger.LogError("Unable to parse subkey name \"{Value}\" of {RegistryKey} as int", key, gogKey);
-                    continue;
-                }
-
-                using var subKey = gogKey.OpenSubKey(key);
-                if (subKey == null)
-                {
-                    Logger.LogError("Unable to open subkey \"{Name}\" of {RegistryKey}", key, gogKey);
-                    continue;
-                }
-                
-                var sActualGameId = RegistryHelper.GetStringValueFromRegistry(subKey, "gameID", Logger);
-                if (sActualGameId == null) continue;
-                
-                if (!int.TryParse(sActualGameId, out var actualGameId))
-                {
-                    Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
-                        sActualGameId, "gameID", subKey, "int");
-                    continue;
-                }
-
-                if (gameId != actualGameId)
-                {
-                    Logger.LogError("Name of subkey does not match gameID value in {RegistryKey}: {GameId} != {ActualGameId}",
-                        subKey, gameId, actualGameId);
-                    continue;
-                }
-
-                var sBuildId = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "BUILDID");
-                var buildId = -1L;
-                if (sBuildId != null)
-                {
-                    if (!long.TryParse(sBuildId, out var parsedLong))
-                    {
-                        Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
-                            sBuildId, "BUILDID", subKey, "long");
-                    }
-                    else
-                    {
-                        buildId = parsedLong;
-                    }
-                }
-
-                var gameName = RegistryHelper.GetStringValueFromRegistry(subKey, "gameName", Logger);
-                if (gameName == null) continue;
-                
-                var path = RegistryHelper.GetStringValueFromRegistry(subKey, "path", Logger);
-                if (path == null) continue;
-
-                var sInstallDate = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "INSTALLDATE");
-                var installationDate = DateTime.UnixEpoch;
-                if (sInstallDate != null)
-                {
-                    if (!DateTime.TryParse(sInstallDate, out var parsedDate))
-                    {
-                        Logger.LogError(
-                            "Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
-                            sInstallDate, "INSTALLDATE", subKey, "DateTime");
-                    }
-                    else
-                    {
-                        installationDate = parsedDate;
-                    }
-                }
-
-                var sProductId = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "productID");
-                var productId = -1;
-                if (sProductId != null)
-                {
-                    if (!int.TryParse(sProductId, out var parsedInt))
-                    {
-                        Logger.LogError("Unable to parse \"{Value}\" (\"{Name}\") of Registry Key {RegistryKey} as {Type}",
-                            sProductId, "productID", subKey, "int");
-                    }
-                    else
-                    {
-                        productId = parsedInt;
-                    }
-                }
-
-                var exe = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "exe");
-                var exeFile = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "exeFile");
-                var installerLanguage = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "installer_language");
-                var langCode = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "lang_code");
-                var language = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "language");
-                var launchCommand = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "launchCommand");
-                var launchParam = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "launchParam");
-                var saveGameFolder = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "savegamefolder");
-                var startMenu = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "startMenu");
-                var startMenuLink = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "startMenuLink");
-                var supportLink = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "supportLink");
-                var uninstallCommand = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "uninstallCommand");
-                var version = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "ver");
-                var workingDir = RegistryHelper.GetNullableStringValueFromRegistry(subKey, "workingDir");
-
-                var game = new GOGGame
-                {
-                    Name = gameName,
-                    Path = path,
-                    
-                    GameID = gameId,
-                    ProductID = productId,
-                    BuildID = buildId,
-                    EXE = exe,
-                    EXEFile = exeFile,
-                    InstallationDate = installationDate,
-                    InstallerLanguage = installerLanguage,
-                    LangCode = langCode,
-                    Language = language,
-                    LaunchCommand = launchCommand,
-                    LaunchParam = launchParam,
-                    SaveGameFolder = saveGameFolder,
-                    StartMenu = startMenu,
-                    StartMenuLink = startMenuLink,
-                    SupportLink = supportLink,
-                    UninstallCommand = uninstallCommand,
-                    Version = version,
-                    WorkingDir = workingDir
-                };
-                
-                Games.Add(game);
+                yield return (null, $"{fullKey} doesn't have a string value \"gameID\"");
+                continue;
             }
 
-            return true;
-        }
-        
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return "GOGHandler";
+            if (!long.TryParse(sId, out var id))
+            {
+                yield return (null, $"The value \"gameID\" of {fullKey} is not a number: \"{sId}\"");
+                continue;
+            }
+
+            if (!subKey.TryGetString("gameName", out var name))
+            {
+                yield return (null, $"{fullKey} doesn't have a string value \"gameName\"");
+                continue;
+            }
+            
+            if (!subKey.TryGetString("path", out var path))
+            {
+                yield return (null, $"{fullKey} doesn't have a string value \"path\"");
+                continue;
+            }
+
+            var game = new GOGGame(id, name, path);
+            yield return (game, null);
         }
     }
 }
