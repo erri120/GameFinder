@@ -1,12 +1,9 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using CommandLine;
-using GameFinder.StoreHandlers.BethNet;
 using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
-using GameFinder.StoreHandlers.Origin;
-using GameFinder.StoreHandlers.Steam;
-using GameFinder.StoreHandlers.Xbox;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Config;
@@ -14,100 +11,77 @@ using NLog.Extensions.Logging;
 using NLog.Targets;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace GameFinder.Example
+namespace GameFinder.Example;
+
+public static class Program
 {
-    public static class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var config = new LoggingConfiguration();
+
+        var consoleTarget = new ConsoleTarget("console");
+        var fileTarget = new FileTarget("file")
         {
-            var config = new LoggingConfiguration();
+            FileName = "log.log"
+        };
 
-            var consoleTarget = new ConsoleTarget("console");
-            var fileTarget = new FileTarget("file")
-            {
-                FileName = "log.log"
-            };
+        config.AddRuleForAllLevels(consoleTarget);
+        config.AddRuleForAllLevels(fileTarget);
 
-            config.AddRuleForAllLevels(consoleTarget);
-            config.AddRuleForAllLevels(fileTarget);
+        LogManager.Configuration = config;
 
-            LogManager.Configuration = config;
-
-            var logger = new NLogLoggerProvider().CreateLogger("");
-            
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(x => Run(x, logger));
-        }
-
-        private static void RunHandler<THandler, TGame>(string handlerName, ILogger logger,
-            Func<THandler> createHandler, Action<TGame> logGame) 
-            where THandler : AStoreHandler<TGame> where TGame : AStoreGame
-        {
-            logger.LogInformation("Finding games for {HandlerName}", handlerName);
-            try
-            {
-                var handler = createHandler();
-                var res = handler.FindAllGames();
-                if (!res)
-                {
-                    logger.LogError("Unable to find games for {HandlerName}", handlerName);
-                    return;
-                }
-
-                logger.LogInformation("Found {Count} games for {HandlerName}", handler.Games.Count, handlerName);
-                handler.Games.ForEach(logGame);
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Exception trying to find games for {HandlerName}", handlerName);
-            }
-        }
+        var logger = new NLogLoggerProvider().CreateLogger("");
         
-        private static void Run(Options options, ILogger logger)
+        Parser.Default.ParseArguments<Options>(args)
+            .WithParsed(x => Run(x, logger));
+    }
+    
+    private static void Run(Options options, ILogger logger)
+    {
+        if (File.Exists("log.log"))
+            File.Delete("log.log");
+        
+        if (options.GOG)
         {
-            if (File.Exists("log.log"))
-                File.Delete("log.log");
-            
-            if (options.BethNet)
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                RunHandler<BethNetHandler, BethNetGame>("BethNet", logger,
-                    () => new BethNetHandler(logger),
-                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
+                logger.LogError("GOG Galaxy is only supported on Windows!");
             }
-
-            if (options.EGS)
+            else
             {
-                RunHandler<EGSHandler, EGSGame>("EGS", logger,
-                    () => new EGSHandler(logger),
-                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
+                var handler = new GOGHandler();
+                var results = handler.FindAllGames();
+                LogGamesAndErrors(results, logger);
             }
+        }
 
-            if (options.GOG)
+        if (options.EGS)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                RunHandler<GOGHandler, GOGGame>("GOG", logger,
-                    () => new GOGHandler(logger),
-                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
+                logger.LogError("Epic Games Store is only supported on Windows!");
             }
-
-            if (options.Steam)
+            else
             {
-                RunHandler<SteamHandler, SteamGame>("Steam", logger,
-                    () => new SteamHandler(logger),
-                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
+                var handler = new EGSHandler();
+                var results = handler.FindAllGames();
+                LogGamesAndErrors(results, logger);
             }
+        }
+    }
 
-            if (options.Xbox)
+    private static void LogGamesAndErrors<T>(IEnumerable<(T?, string?)> results, ILogger logger)
+        where T: class
+    {
+        foreach (var (game, error) in results)
+        {
+            if (game is not null)
             {
-                RunHandler<XboxHandler, XboxGame>("Xbox", logger,
-                    () => new XboxHandler(logger),
-                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
+                logger.LogInformation("Found {}", game);
             }
-
-            if (options.Origin)
+            else
             {
-                RunHandler<OriginHandler, OriginGame>("Origin", logger,
-                    () => new OriginHandler(true, true, logger),
-                    x => logger.LogInformation("{Game}: {Path}", x, x.Path));
+                logger.LogError("{}", error);
             }
         }
     }
