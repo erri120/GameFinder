@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Versioning;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 
@@ -17,19 +18,36 @@ public record GOGGame(long Id, string Name, string Path);
 /// Handler for finding games installed with GOG Galaxy.
 /// </summary>
 [PublicAPI]
-public static class GOGHandler
+public class GOGHandler
 {
     private const string GOGRegKey = @"Software\GOG.com\Games";
+
+    private readonly IRegistry _registry;
+
+    /// <summary>
+    /// Default constructor. This uses the <see cref="WindowsRegistry"/> implementation
+    /// of <see cref="IRegistry"/>.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public GOGHandler() : this(new WindowsRegistry()) { }
+
+    /// <summary>
+    /// Constructor for specifying the implementation of <see cref="IRegistry"/>.
+    /// </summary>
+    /// <param name="registry"></param>
+    public GOGHandler(IRegistry registry)
+    {
+        _registry = registry;
+    }
 
     /// <summary>
     /// Searches for all games installed with GOG Galaxy. This functions returns either
     /// a non-null <see cref="GOGGame"/> or a non-null error message.
     /// </summary>
-    /// <param name="registry">Use either <see cref="WindowsRegistry"/> or <see cref="InMemoryRegistry"/>.</param>
     /// <returns></returns>
-    public static IEnumerable<(GOGGame? game, string? error)> FindAllGames(IRegistry registry)
+    public IEnumerable<(GOGGame? game, string? error)> FindAllGames()
     {
-        var localMachine = registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+        var localMachine = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
 
         using var gogKey = localMachine.OpenSubKey(GOGRegKey);
         if (gogKey is null)

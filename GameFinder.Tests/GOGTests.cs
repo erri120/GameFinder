@@ -33,8 +33,9 @@ public class GOGTests
     public void TestFindAllGames()
     {
         var (registry, expectedGames) = SetupTest();
+        var handler = new GOGHandler(registry);
 
-        var results = GOGHandler.FindAllGames(registry).ToList();
+        var results = handler.FindAllGames().ToList();
         
         var actualGames = results.Select(tuple =>
         {
