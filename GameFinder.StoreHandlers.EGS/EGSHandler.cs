@@ -92,7 +92,7 @@ public class EGSHandler
         return TryGetManifestDirFromRegistry(out var manifestDir) 
             ? manifestDir 
             : _fileSystem.Path.Combine(
-                Environment.ExpandEnvironmentVariables("%PROGRAMDATA%"),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "Epic",
                 "EpicGamesLauncher",
                 "Data",
