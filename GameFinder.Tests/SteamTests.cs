@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
@@ -13,11 +14,16 @@ public class SteamTests
     private static (List<SteamGame> expectedGames, SteamHandler handler) SetupTest()
     {
         var fileSystem = new MockFileSystem();
-        
-        var basePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? @"C:\Program Files (x86)\Steam\steamapps"
-            : "~/.local/share/Steam/steamapps";
 
+        var steamPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                "Steam")
+            : Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Steam");
+
+        var basePath = Path.Combine(steamPath, "steamapps");
         var commonPath = Path.Combine(basePath, "common");
         
         var steamGames = new List<SteamGame>
@@ -28,20 +34,17 @@ public class SteamTests
 
         var libraryFoldersPath = Path.Combine(basePath, "libraryfolders.vdf");
 
-        const string libraryFoldersContent = @"
+        var libraryFoldersContent = @$"
 ""libraryfolders""
-{
+{{
     ""0""
-    {
-        ""path""        ""C:\\Program Files (x86)\\Steam""
-    }
-}
+    {{
+        ""path""        ""{steamPath.Replace("\\", "\\\\")}""
+    }}
+}}
 ";
-        
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            fileSystem.AddFile(libraryFoldersPath, new MockFileData(libraryFoldersContent));
-        }
+
+        fileSystem.AddFile(libraryFoldersPath, new MockFileData(libraryFoldersContent));
 
         foreach (var steamGame in steamGames)
         {

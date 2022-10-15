@@ -18,6 +18,7 @@ namespace GameFinder.StoreHandlers.Steam;
 /// <param name="AppId"></param>
 /// <param name="Name"></param>
 /// <param name="Path"></param>
+[PublicAPI]
 public record SteamGame(int AppId, string Name, string Path);
 
 /// <summary>
