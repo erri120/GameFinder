@@ -189,6 +189,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 
 [Unreleased]: https://github.com/erri120/GameFinder/compare/v1.7.2...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[2.0.0]: https://github.com/erri120/GameFinder/compare/v1.8.0...v2.0.0
+[1.8.0]: https://github.com/erri120/GameFinder/compare/v1.7.3...v1.8.0
+[1.7.3]: https://github.com/erri120/GameFinder/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/erri120/GameFinder/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/erri120/GameFinder/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/erri120/GameFinder/compare/v1.6.4...v1.7.0
