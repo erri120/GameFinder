@@ -57,7 +57,7 @@ public class EGSHandler
     }
     
     /// <summary>
-    /// Finds all games installed with the Epic Games Store. This generator function will always return
+    /// Finds all games installed with the Epic Games Store. This function will always return
     /// either a non-null <see cref="EGSGame"/> or a non-null error message.
     /// </summary>
     /// <returns></returns>

@@ -41,7 +41,7 @@ public class GOGHandler
     }
 
     /// <summary>
-    /// Searches for all games installed with GOG Galaxy. This generator functions returns either
+    /// Searches for all games installed with GOG Galaxy. This functions returns either
     /// a non-null <see cref="GOGGame"/> or a non-null error message.
     /// </summary>
     /// <returns></returns>

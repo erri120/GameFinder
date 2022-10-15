@@ -8,21 +8,41 @@ using JetBrains.Annotations;
 
 namespace GameFinder.StoreHandlers.Origin;
 
+/// <summary>
+/// Represents a game installed with Origin.
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="InstallPath"></param>
 [PublicAPI]
 public record OriginGame(string Id, string InstallPath);
 
+/// <summary>
+/// Handler for finding games install with Origin.
+/// </summary>
 [PublicAPI]
 public class OriginHandler
 {
     private readonly IFileSystem _fileSystem;
     
+    /// <summary>
+    /// Default constructor that uses the real filesystem <see cref="FileSystem"/>.
+    /// </summary>
     public OriginHandler() : this(new FileSystem()) { }
     
+    /// <summary>
+    /// Constructor for specifying the <see cref="IFileSystem"/> implementation to use.
+    /// </summary>
+    /// <param name="fileSystem"></param>
     public OriginHandler(IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
     }
 
+    /// <summary>
+    /// Finds all games installed with Origin. This function will either return a non-null
+    /// <see cref="OriginGame"/> or a non-null error.
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<(OriginGame? game, string? error)> FindAllGames()
     {
         var manifestDir = _fileSystem.DirectoryInfo.FromDirectoryName(_fileSystem.Path.Combine(
