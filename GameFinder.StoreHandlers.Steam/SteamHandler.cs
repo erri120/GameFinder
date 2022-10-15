@@ -5,20 +5,51 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using ValveKeyValue;
 
 namespace GameFinder.StoreHandlers.Steam;
 
+/// <summary>
+/// Represents a game installed with Steam.
+/// </summary>
+/// <param name="AppId"></param>
+/// <param name="Name"></param>
+/// <param name="Path"></param>
 public record SteamGame(int AppId, string Name, string Path);
 
+/// <summary>
+/// Handler for finding games installed with Steam.
+/// </summary>
 [PublicAPI]
 public class SteamHandler
 {
     private readonly IRegistry? _registry;
     private readonly IFileSystem _fileSystem;
+
+    /// <summary>
+    /// Default constructor that uses the real filesystem <see cref="FileSystem"/> and
+    /// the Windows registry <see cref="WindowsRegistry"/>.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public SteamHandler() : this(new WindowsRegistry()) { }
     
+    /// <summary>
+    /// Constructor for specifying the registry. This uses the real filesystem <see cref="FileSystem"/>.
+    /// If you are on Windows you should use <see cref="WindowsRegistry"/>, if you want to run tests
+    /// use <see cref="InMemoryRegistry"/>.
+    /// </summary>
+    /// <param name="registry"></param>
+    public SteamHandler(IRegistry? registry) : this(new FileSystem(), registry) { }
+    
+    /// <summary>
+    /// Constructor for specifying the <see cref="IFileSystem"/> and <see cref="IRegistry"/> implementations.
+    /// Use this constructor if you want to run tests.
+    /// </summary>
+    /// <param name="fileSystem"></param>
+    /// <param name="registry"></param>
     public SteamHandler(IFileSystem fileSystem, IRegistry? registry)
     {
         _fileSystem = fileSystem;
@@ -33,6 +64,11 @@ public class SteamHandler
         }
     }
 
+    /// <summary>
+    /// Finds all games installed with Steam. This function will either return a
+    /// non-null <see cref="SteamGame"/> or a non-null error.
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<(SteamGame? game, string? error)> FindAllGames()
     {
         var steamDir = FindSteam();
