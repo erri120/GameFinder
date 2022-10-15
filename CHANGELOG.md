@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [2.0.0] - 2022-10-15
+
+Major rework of all packages:
+
+- removed `netstandard2.1` target
+- added `net7.0` target
+- added `IRegistry` interface with `WindowsRegistry` and `InMemoryRegistry` implementations
+- added runtime platform check in all packages
+- deprecated the Bethesda.net and Xbox packages (see [README](./README.md) for more information)
+- removed logging from all packages
+- removed the `GameFinder` package (it's not needed anymore)
+- simplified the public APIs
+
 ## [1.8.0] - 2022-06-27
 
 - Fix SteamHandler not finding any Libraries when there are no external libs
