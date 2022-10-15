@@ -2,6 +2,9 @@
 
     <PropertyGroup>
         <Title>GameFinder.StoreHandlers.Steam</Title>
+        <Description>Library for finding games installed with Steam.</Description>
+        <PackageTags>valve steam games</PackageTags>
+
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>

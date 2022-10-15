@@ -1,7 +1,6 @@
 <Project>
     <PropertyGroup>
         <Authors>erri120</Authors>
-        <Description>.NET library for finding games on Windows.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/erri120/GameFinder</PackageProjectUrl>
         <RepositoryUrl>https://github.com/erri120/GameFinder.git</RepositoryUrl>
