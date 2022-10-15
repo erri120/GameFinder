@@ -35,13 +35,13 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
   
-    - name: Publish Example Project
-      run: dotnet publish GameFinder.Example/GameFinder.Example.csproj --no-restore -o "out" -p:PublishSingleFile=true -p:PublishTrimmed=true -c Release -f net6.0 -r win-x64
-
-    - name: Zip Example Project
-      run: |
-        cd out/
-        7z a -tzip GameFinder.Example.zip *.exe *.dll *.pdb *.xml
+#    - name: Publish Example Project
+#      run: dotnet publish GameFinder.Example/GameFinder.Example.csproj --no-restore -o "out" -p:PublishSingleFile=true -p:PublishTrimmed=true -c Release -f net6.0 -r win-x64
+#
+#    - name: Zip Example Project
+#      run: |
+#        cd out/
+#        7z a -tzip GameFinder.Example.zip *.exe *.dll *.pdb *.xml
 
     - name: Get Changelog Entry
       id: changelog_reader
@@ -77,4 +77,4 @@ jobs:
         files: |
           **/*.nupkg
           **/*.snupkg
-          out/GameFinder.Example.zip
+#          out/GameFinder.Example.zip
