@@ -1,476 +1,226 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
+using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using ValveKeyValue;
 
-namespace GameFinder.StoreHandlers.Steam
+namespace GameFinder.StoreHandlers.Steam;
+
+public record SteamGame(int AppId, string Name, string Path);
+
+[PublicAPI]
+public class SteamHandler
 {
-    /// <summary>
-    /// Store Handler for Steam Games
-    /// </summary>
-    [PublicAPI]
-    public class SteamHandler : AStoreHandler<SteamGame>
+    private readonly IRegistry? _registry;
+    private readonly IFileSystem _fileSystem;
+    
+    public SteamHandler(IFileSystem fileSystem, IRegistry? registry)
     {
-        /// <inheritdoc cref="AStoreHandler{TGame}.StoreType"/>
-        public override StoreType StoreType => StoreType.Steam;
-
-        private const string SteamRegKey = @"Software\Valve\Steam";
-
-        /// <summary>
-        /// Path to the Steam Installation Directory
-        /// </summary>
-        public readonly string? SteamPath;
-        private string? SteamConfig { get; set; }
-        private string? SteamLibraries { get; set; }
-
-        /// <summary>
-        /// List of all found Steam Universes
-        /// </summary>
-        public List<string> SteamUniverses { get; internal set; } = new();
-
-        /// <summary>
-        /// True if steam was found.
-        /// </summary>
-        public readonly bool FoundSteam;
+        _fileSystem = fileSystem;
         
+        if (registry is null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            _registry = new WindowsRegistry();
+        }
+        else
+        {
+            _registry = registry;
+        }
+    }
+
+    public IEnumerable<(SteamGame? game, string? error)> FindAllGames()
+    {
+        var steamDir = FindSteam();
+        if (steamDir is null)
+        {
+            yield return (null, "Unable to find Steam!");
+            yield break;
+        }
+
+        var libraryFoldersFile = GetLibraryFoldersFile(steamDir);
+        if (!libraryFoldersFile.Exists)
+        {
+            yield return (null, $"File {libraryFoldersFile.FullName} does not exist!");
+            yield break;
+        }
+
+        var libraryFolderPaths = ParseLibraryFoldersFile(libraryFoldersFile);
+        if (libraryFolderPaths is null)
+        {
+            yield return (null, $"Found no Steam Libraries in {libraryFoldersFile.FullName}");
+            yield break;
+        }
+
+        foreach (var libraryFolderPath in libraryFolderPaths)
+        {
+            var libraryFolder = _fileSystem.DirectoryInfo.FromDirectoryName(libraryFolderPath);
+            if (!libraryFolder.Exists)
+            {
+                yield return (null, $"Steam Library {libraryFolder.FullName} does not exist!");
+                continue;
+            }
+
+            var acfFiles = libraryFolder.EnumerateFiles("*.acf", SearchOption.TopDirectoryOnly);
+            foreach (var acfFile in acfFiles)
+            {
+                yield return ParseAppManifestFile(acfFile, libraryFolder);
+            }
+        }
+    }
+
+    private IDirectoryInfo? FindSteam()
+    {
+        var defaultSteamDir = FindSteamInDefaultPath();
+        if (defaultSteamDir is not null) return defaultSteamDir;
         
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public SteamHandler(): this(NullLogger.Instance) { }
+        if (_registry is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            var steamDir = FindSteamInRegistry(_registry);
+            return steamDir;
+        }
+
+        return null;
+    }
+    
+    private IDirectoryInfo? FindSteamInRegistry(IRegistry registry)
+    {
+        var currentUser = registry.OpenBaseKey(RegistryHive.CurrentUser);
+
+        using var regKey = currentUser.OpenSubKey(@"SOFTWARE\Valve\Steam");
+        if (regKey is null) return null;
         
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
-        public SteamHandler(ILogger? logger = null) : base(logger ?? NullLogger.Instance)
-        {
-#if Windows
-            using var steamKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SteamRegKey);
-            if (steamKey == null)
-            {
-                Logger.LogError("Unable to open registry key {SteamKey}", steamKey);
-                return;
-            }
-            
-            var steamPath = RegistryUtils.RegistryHelper.GetStringValueFromRegistry(steamKey, "SteamPath", Logger);
-            if (steamPath == null) return;
-            
-            if (!Directory.Exists(steamPath))
-            {
-                Logger.LogError("Path to Steam from Registry does not exist: {SteamPath}", steamPath);
-                return;
-            }
-#else
-            var steamPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                ".steam", "steam");
-            if (!Directory.Exists(steamPath))
-            {
-                Logger.LogError("Default Steam path for Unix systems does not exist: {SteamPath}", steamPath);
-                return;
-            }
-#endif
-            
-            var steamConfig = Path.Combine(steamPath, "config", "config.vdf");
-            if (!File.Exists(steamConfig))
-            {
-                Logger.LogError("Unable to find config.vdf at {SteamConfigPath}", steamConfig);
-                return;
-            }
-            
-            var steamLibraries = Path.Combine(steamPath, "config", "libraryfolders.vdf");
-            if (!File.Exists(steamLibraries))
-            {
-                Logger.LogWarning("Unable to find libraryfolders.vdf at {Path}", steamLibraries);
-                
-                steamLibraries = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
-                if (!File.Exists(steamLibraries))
-                {
-                    Logger.LogError("Unable to find libraryfolders.vdf at {SteamLibrariesPath}", steamLibraries);
-                    return;
-                }
-            }
-
-            FoundSteam = true;
-            SteamPath = steamPath;
-            SteamConfig = steamConfig;
-            SteamLibraries = steamLibraries;
-        }
-
-        /// <summary>
-        /// SteamHandler constructor with <paramref name="steamPath"/> argument, will not use the registry to find
-        /// the Steam path.
-        /// </summary>
-        /// <param name="steamPath">Path to the directory containing <c>Steam.exe</c></param>
-        /// <param name="logger">Logger instance to use, will default to <see cref="NullLogger"/></param>
-        /// <exception cref="ArgumentException"><paramref name="steamPath"/> is not a directory or does not exist</exception>
-        public SteamHandler(string steamPath, ILogger? logger = null) : base(logger ?? NullLogger.Instance)
-        {
-            if (!Directory.Exists(steamPath))
-                throw new ArgumentException($"Directory does not exist: {steamPath}", nameof(steamPath));
-            
-            var steamConfig = Path.Combine(steamPath, "config", "config.vdf");
-            if (!File.Exists(steamConfig))
-            {
-                Logger.LogError("Unable to find config.vdf at {SteamConfigPath}", steamConfig);
-                return;
-            }
-
-            var steamLibraries = Path.Combine(steamPath, "config", "libraryfolders.vdf");
-            if (!File.Exists(steamLibraries))
-            {
-                Logger.LogWarning("Unable to find libraryfolders.vdf at {Path}", steamLibraries);
-                
-                steamLibraries = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
-                if (!File.Exists(steamLibraries))
-                {
-                    Logger.LogError("Unable to find libraryfolders.vdf at {SteamLibrariesPath}", steamLibraries);
-                    return;
-                }
-            }
-
-            FoundSteam = true;
-            SteamPath = steamPath;
-            SteamConfig = steamConfig;
-            SteamLibraries = steamLibraries;
-        }
-
-        private bool FindAllUniverses()
-        {
-            if (!FoundSteam) return false;
-            if (SteamConfig == null) return false;
-            if (SteamLibraries == null) return false;
-
-            var configRes = ParseSteamConfig(SteamConfig, Logger);
-            var libraryFolders = ParseLibraryFolders(SteamLibraries, Logger);
-            
-            var allPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            allPaths.UnionWith(configRes);
-            allPaths.UnionWith(libraryFolders);
-
-            foreach (var path in allPaths)
-            {
-                var universePath = Path.Combine(path, "steamapps");
-                if (!Directory.Exists(universePath))
-                {
-                    Logger.LogWarning("Steam Universe at {Path} does not exist", universePath);
-                    continue;
-                }
-                
-                SteamUniverses.Add(universePath);
-            }
-            
-            if (SteamPath == null)
-            {
-                if (SteamUniverses.Count != 0) return true;
-                Logger.LogError("Found 0 Steam Universes");
-                return false;
-
-            }
-            
-            var defaultPath = Path.Combine(SteamPath, "steamapps");
-            if (Directory.Exists(defaultPath))
-                SteamUniverses.Add(defaultPath);
-
-            if (SteamUniverses.Count != 0) return true;
-            Logger.LogError("Found 0 Steam Universes");
-            return false;
-        }
-
-        /// <inheritdoc />
-        public override bool FindAllGames()
-        {
-            if (!FoundSteam) return false;
-            if (SteamConfig == null) return false;
-            if (SteamLibraries == null) return false;
-            
-            var universeRes = FindAllUniverses();
-            if (!universeRes) return false;
-            
-            foreach (var universe in SteamUniverses)
-            {
-                var acfFiles = Directory.EnumerateFiles(universe, "*.acf", SearchOption.TopDirectoryOnly);
-                foreach (var acfFile in acfFiles)
-                {
-                    var game = ParseAcfFile(acfFile, Logger);
-                    if (game == null) continue;
-
-                    game.Path = Path.Combine(universe, "common", game.Path);
-                    Games.Add(game);
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Get Game by Steam ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public SteamGame GetByID(int id)
-        {
-            return Games.First(x => x.ID == id);
-        }
-
-        /// <summary>
-        /// Try get Game by Steam ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="game"></param>
-        /// <returns></returns>
-        public bool TryGetByID(int id, [MaybeNullWhen(false)] out SteamGame? game)
-        {
-            game = Games.FirstOrDefault(x => x.ID == id);
-            return game != null;
-        }
-
-        private static readonly Regex SteamConfigRegex = new(@"\""BaseInstallFolder_\d*\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
-        private static readonly Regex OldLibraryFoldersRegex = new(@"^\s+\""\d+\""\s+\""(?<path>.+)\""", RegexOptions.Multiline | RegexOptions.Compiled);
-        private static readonly Regex NewLibraryFoldersPathRegex = new(@"\""path\""\s*\""(?<path>[^\""]*)\""", RegexOptions.Compiled);
+        if (!regKey.TryGetString("SteamPath", out var steamPath)) return null;
         
-        internal static List<string> ParseSteamConfig(string file, ILogger logger)
+        var directoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(steamPath);
+        return IsValidSteamDirectory(directoryInfo) ? directoryInfo : null;
+    }
+
+    private IDirectoryInfo? FindSteamInDefaultPath()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            var res = new List<string>();
-
-            if (!File.Exists(file))
-            {
-                logger.LogError("Steam Config file at {Path} does not exist", file);
-                return res;
-            }
-
-            var text = File.ReadAllText(file, Encoding.UTF8);
-            var matches = SteamConfigRegex.Matches(text);
-
-            if (matches.Count == 0) return res;
+            var directoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(_fileSystem.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                "Steam"
+            ));
             
-            GetAllMatches("path", matches, path => res.Add(MakeValidPath(path)));
-            return res;
+            return IsValidSteamDirectory(directoryInfo) ? directoryInfo : null; 
         }
 
-        internal static List<string> ParseLibraryFolders(string file, ILogger logger)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            var res = new List<string>();
-
-            if (!File.Exists(file))
-            {
-                logger.LogError("Config file at {Path} does not exist", file);
-                return res;
-            }
-
-            var lines = File.ReadLines(file, Encoding.UTF8);
-            var firstLine = lines.First();
-
-            // old format (before 1623193086 2021-06-08)
-            if (firstLine.Contains("LibraryFolders", StringComparison.Ordinal))
-            {
-                var text = File.ReadAllText(file, Encoding.UTF8);
-                var matches = OldLibraryFoldersRegex.Matches(text);
-
-                if (matches.Count == 0)
-                {
-                    logger.LogWarning("Found no matches in Library Folders file at {Path}", file);
-                    return res;
-                }
+            // steam on linux can be found in ~/.local/share/Steam
+            // https://github.com/dotnet/runtime/blob/3b1df9396e2a7cc6797e76793e8547f8a7771953/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs#L124
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             
-                GetAllMatches("path", matches, path => res.Add(MakeValidPath(path)));
-                return res;
-            }
-
-            // new format (after 1623193086 2021-06-08)
-            if (firstLine.Contains("libraryfolders", StringComparison.Ordinal))
-            {
-                var text = File.ReadAllText(file, Encoding.UTF8);
-
-                var pathMatches = NewLibraryFoldersPathRegex.Matches(text);
-
-                if (pathMatches.Count == 0)
-                {
-                    logger.LogWarning("Found no path-matches in Library Folders file at {Path}", file);
-                    return res;
-                }
-
-                var pathValues = new List<string>();
-                GetAllMatches("path", pathMatches, path => pathValues.Add(path));
-
-                res.AddRange(pathValues.Select(MakeValidPath));
-                return res;
-            }
-
-            logger.LogError("Unknown format for Library Folders file at {Path}: {FirstLine}", file, firstLine);
-            return res;
+            var directoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(_fileSystem.Path.Combine(
+                path,
+                "Steam"
+            ));
+            
+            return IsValidSteamDirectory(directoryInfo) ? directoryInfo : null;
         }
 
-        private static readonly IReadOnlyList<string> RequiredKeys = new[]
+        return null;
+    }
+    
+    private IFileInfo GetLibraryFoldersFile(IDirectoryInfo steamDirectory)
+    {
+        var fileInfo =_fileSystem.FileInfo.FromFileName(_fileSystem.Path.Combine(
+            steamDirectory.FullName,
+            "steamapps",
+            "libraryfolders.vdf"));
+
+        return fileInfo;
+    }
+    
+    private bool IsValidSteamDirectory(IDirectoryInfo? directoryInfo)
+    {
+        if (directoryInfo is null) return false;
+        var fileInfo = GetLibraryFoldersFile(directoryInfo);
+        return fileInfo.Exists;
+    }
+
+    private List<string>? ParseLibraryFoldersFile(IFileInfo fileInfo)
+    {
+        using var stream = fileInfo.OpenRead();
+
+        var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
+        var data = kv.Deserialize(stream, new KVSerializerOptions
         {
-            "appid",
-            "name",
-            "installdir"
-        };
+            HasEscapeSequences = true,
+            EnableValveNullByteBugBehavior = true
+        });
 
-        private static readonly IReadOnlyList<string> OtherKeys = new[]
+        if (data is null) return null;
+        if (!data.Name.Equals("libraryfolders", StringComparison.OrdinalIgnoreCase)) return null;
+
+        var paths = data.Children
+            .Where(child => int.TryParse(child.Name, out _))
+            .Select(child => child["path"])
+            .Where(pathValue => pathValue is not null && pathValue.ValueType == KVValueType.String)
+            .Select(pathValue => pathValue.ToString(CultureInfo.InvariantCulture))
+            .Select(path => _fileSystem.Path.Combine(path, "steamapps"))
+            .ToList();
+        
+        return paths.Any() ? paths : null;
+    }
+
+    private (SteamGame? game, string? error) ParseAppManifestFile(IFileInfo manifestFile, IDirectoryInfo libraryFolder)
+    {
+        using var stream = manifestFile.OpenRead();
+        
+        var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
+        var data = kv.Deserialize(stream, new KVSerializerOptions
         {
-            "LastUpdated",
-            "SizeOnDisk",
-            "BytesToDownload",
-            "BytesDownloaded",
-            "BytesToStage",
-            "BytesStaged"
-        };
+            HasEscapeSequences = true,
+            EnableValveNullByteBugBehavior = true
+        });
 
-        private static IEnumerable<string> AllKeys => RequiredKeys.Concat(OtherKeys);
-
-        internal static SteamGame? ParseAcfFile(string file, ILogger logger)
+        if (data is null)
         {
-            
-            if (!File.Exists(file))
-            {
-                logger.LogError("ACF Manifest at {Path} does not exist", file);
-                return null;
-            }
+            return (null, $"Unable to parse {manifestFile.FullName}");
+        }
 
-            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            
-            var lines = File.ReadLines(file, Encoding.UTF8);
-            foreach (var line in lines)
-            {
-                var first = AllKeys.FirstOrDefault(x => line.ContainsCaseInsensitive($"\"{x}\""));
-                if (first == null) continue;
-                if (dict.ContainsKey(first)) continue;
+        if (!data.Name.Equals("AppState", StringComparison.OrdinalIgnoreCase))
+        {
+            return (null, $"Manifest {manifestFile.FullName} is not a valid format!");
+        }
 
-                var value = GetVdfValue(line, logger);
-                if (value == null) continue;
-                
-                dict.Add(first, value);
-            }
-
-            foreach (var requiredKey in RequiredKeys)
-            {
-                if (dict.ContainsKey(requiredKey)) continue;
-                logger.LogError("ACF Manifest at {Path} does not contain a value for the required key {Key}", file, requiredKey);
-                return null;
-            }
-
-            var game = new SteamGame();
-            
-            string? GetFromDict(IDictionary<string, string> dictionary, string key)
-            {
-                return dictionary.TryGetValue(key, out var value) ? value : null;
-            }
-            
-            // required
-            var sAppId = dict["appid"];
-            var name = dict["name"];
-            var installDir = dict["installdir"];
-            
-            // optional
-            var sLastUpdated = GetFromDict(dict, "LastUpdated");
-            var sSizeOnDisk = GetFromDict(dict, "SizeOnDisk");
-            var sBytesToDownload = GetFromDict(dict, "BytesToDownload");
-            var sBytesDownloaded = GetFromDict(dict, "BytesDownloaded");
-            var sBytesToStage = GetFromDict(dict, "BytesToStage");
-            var sBytesStaged = GetFromDict(dict, "BytesStaged");
-
-            if (!int.TryParse(sAppId, out var appId))
-            {
-                logger.LogError("Unable to parse value \"{Value}\" (\"{ValueName}\") as {Type} in ACF Manifest {Path}", 
-                    sAppId, "appid", "int", file);
-                return null;
-            }
-
-            game.ID = appId;
-
-            bool ParseAndSet(string? value, string key, Action<long> action)
-            {
-                // optionals are null so we can skip those
-                if (value is null) return true;
-                
-                if (!long.TryParse(value, out var lValue))
-                {
-                    logger.LogError("Unable to parse value \"{Value}\" (\"{ValueName}\") as {Type} in ACF Manifest {Path}", 
-                        value, key, "long", file);
-                    return false;
-                }
-
-                action(lValue);
-                return true;
-            }
-
-            if (!ParseAndSet(sLastUpdated, "LastUpdated", timeStamp =>
-            {
-                var dateTime = timeStamp.ToDateTime();
-                game.LastUpdated = dateTime;
-            }))
-            {
-                return null;
-            }
-
-            if (!ParseAndSet(sSizeOnDisk, "SizeOnDisk", sizeOnDisk => game.SizeOnDisk = sizeOnDisk))
-                return null;
-
-            if (!ParseAndSet(sBytesToDownload, "BytesToDownload",
-                bytesToDownload => game.BytesToDownload = bytesToDownload))
-                return null;
-
-            if (!ParseAndSet(sBytesDownloaded, "BytesDownloaded",
-                bytesDownloaded => game.BytesDownloaded = bytesDownloaded))
-                return null;
-
-            if (!ParseAndSet(sBytesToStage, "BytesToStage", bytesToStage => game.BytesToStage = bytesToStage))
-                return null;
-
-            if (!ParseAndSet(sBytesStaged, "BytesStaged", bytesStaged => game.BytesStaged = bytesStaged))
-                return null;
-
-            game.Name = name;
-            game.Path = installDir;
-
-            return game;
+        var appIdValue = data["appid"];
+        if (appIdValue is null)
+        {
+            return (null, $"Manifest {manifestFile.FullName} does not have the value \"appid\"");
         }
         
-        private static void GetAllMatches(string group, MatchCollection matches, Action<string> action)
+        var nameValue = data["name"];
+        if (nameValue is null)
         {
-            foreach (Match match in matches)
-            {
-                var groups = match.Groups;
-#if NET5_0_OR_GREATER
-                if (!groups.TryGetValue(group, out var currentGroup)) continue;
-                if (!currentGroup.Success) continue;
-#elif NETSTANDARD2_1
-                var currentGroup = groups.FirstOrDefault(x => x.Success && x.Name.Equals(group, StringComparison.OrdinalIgnoreCase));
-                if (currentGroup == null) continue;
-#endif
-
-                action(currentGroup.Value);
-            }
+            return (null, $"Manifest {manifestFile.FullName} does not have the value \"name\"");
         }
         
-        private static string MakeValidPath(string input)
+        var installDirValue = data["installdir"];
+        if (installDirValue is null)
         {
-            var sb = new StringBuilder(input);
-            sb.Replace("\\\\", "\\");
-            return sb.ToString();
+            return (null, $"Manifest {manifestFile.FullName} does not have the value \"installdir\"");
         }
         
-        private static string? GetVdfValue(string line, ILogger logger)
-        {
-            var split = line.Split("\"");
-            if (split.Length == 5) return split[3];
+        var appId = appIdValue.ToInt32(NumberFormatInfo.InvariantInfo);
+        var name = nameValue.ToString(CultureInfo.InvariantCulture);
+        var installDir = installDirValue.ToString(CultureInfo.InvariantCulture);
+        
+        var gamePath = _fileSystem.Path.Combine(
+            libraryFolder.FullName,
+            "common",
+            installDir
+        );
 
-            logger.LogError("Unable to split line correctly in VDF file: {Line}", line);
-            return null;
-        }
-
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return "SteamHandler";
-        }
+        var game = new SteamGame(appId, name, gamePath);
+        return (game, null);
     }
 }

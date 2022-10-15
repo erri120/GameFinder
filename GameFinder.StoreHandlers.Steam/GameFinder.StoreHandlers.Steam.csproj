@@ -2,32 +2,32 @@
 
     <PropertyGroup>
         <Title>GameFinder.StoreHandlers.Steam</Title>
-        <TargetFrameworks>netstandard2.1;net6.0;net6.0-windows</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows'">
-        <DefineConstants>Windows</DefineConstants>
     </PropertyGroup>
     
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.Steam.xml</DocumentationFile>
+        <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.Steam.xml</DocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DocumentationFile>bin\Release\GameFinder.StoreHandlers.Steam.xml</DocumentationFile>
+        <DocumentationFile>bin\Release\GameFinder.StoreHandlers.Steam.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+        <PackageReference Include="ValveKeyValue" Version="0.8.2.162" />
+        <PackageReference Include="System.IO.Abstractions" Version="17.2.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GameFinder\GameFinder.csproj" />
+        <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" PrivateAssets="all" />
+        <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="12.2.19">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows'">
+    <ItemGroup>
         <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
     </ItemGroup>
     

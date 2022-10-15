@@ -1,86 +1,86 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
+using System.Runtime.InteropServices;
 using GameFinder.StoreHandlers.Steam;
-using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace GameFinder.Tests
+namespace GameFinder.Tests;
+
+public class SteamTests
 {
-    public class SteamTests : AStoreHandlerTest<SteamHandler, SteamGame>
+    private static (List<SteamGame> expectedGames, SteamHandler handler) SetupTest()
     {
-        protected override SteamHandler DoSetup()
-        {
-            var steamDir = Setup.SetupSteam();
-            return new SteamHandler(steamDir, Logger);
-        }
-
-        protected override void ChecksAfterFindingGames(SteamHandler storeHandler)
-        {
-            base.ChecksAfterFindingGames(storeHandler);
-            Assert.True(storeHandler.TryGetByID(72850, out var skyrim));
-            Assert.NotNull(skyrim);
-            Assert.Equal(72850, skyrim!.ID);
-            Assert.Equal("The Elder Scrolls V: Skyrim", skyrim!.Name);
-            Assert.Equal(9255977546, skyrim!.SizeOnDisk);
-            Assert.Equal(7315266464, skyrim!.BytesDownloaded);
-            Assert.Equal(7315266464, skyrim!.BytesToDownload);
-            Assert.Equal(9255977546, skyrim!.BytesStaged);
-            Assert.Equal(9255977546, skyrim!.BytesToStage);
-
-            var lastUpdated = Utils.ToDateTime(1611048743);
-            Assert.Equal(lastUpdated, skyrim!.LastUpdated);
-        }
-
-        [Fact]
-        public void TestConfigParsing()
-        {
-            const string file = "files\\steam\\config.vdf";
-            Assert.True(File.Exists(file));
-
-            var paths = SteamHandler.ParseSteamConfig(file, Logger);
-            
-            Assert.Equal(3, paths.Count);
-            Assert.Contains(paths, x => x.Equals("F:\\SteamLibrary"));
-            Assert.Contains(paths, x => x.Equals("M:\\SteamLibrary"));
-            Assert.Contains(paths, x => x.Equals("E:\\SteamLibrary"));
-        }
-
-        [Theory]
-        [InlineData("files\\steam\\libraryfolders-old.vdf")]
-        [InlineData("files\\steam\\libraryfolders-new.vdf")]
-        public void TestLibraryFoldersParsing(string file)
-        {
-            Assert.True(File.Exists(file));
-
-            var paths = SteamHandler.ParseLibraryFolders(file, Logger);
-            
-            Assert.Equal(2, paths.Count);
-            Assert.Contains(paths, x => x.Equals("F:\\SteamLibrary"));
-            Assert.Contains(paths, x => x.Equals("E:\\SteamLibrary"));
-        }
+        var fileSystem = new MockFileSystem();
         
-        [Fact]
-        public void TestAcfFileParsing()
-        {
-            const string file = "files\\steam\\appmanifest_8930.acf";
-            Assert.True(File.Exists(file));
+        var basePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? @"C:\Program Files (x86)\Steam\steamapps"
+            : "~/.local/share/Steam/steamapps";
 
-            var game = SteamHandler.ParseAcfFile(file, Logger);
-            Assert.NotNull(game);
-            
-            Assert.Equal(8930, game!.ID);
-            Assert.Equal("Sid Meier's Civilization V", game.Name);
-            Assert.Equal("Sid Meier's Civilization V", game.Path);
-            Assert.Equal(9235434479, game.SizeOnDisk);
-            Assert.Equal(86404, game.BytesDownloaded);
-            Assert.Equal(86403, game.BytesToDownload);
-            Assert.Equal(11499, game.BytesToStage);
-            Assert.Equal(114992, game.BytesStaged);
-            Assert.Equal(((long) 1600350073).ToDateTime(), game.LastUpdated);
-        }
-
-        public SteamTests(ITestOutputHelper output) : base(output)
+        var commonPath = Path.Combine(basePath, "common");
+        
+        var steamGames = new List<SteamGame>
         {
-        }
+            new(431960, "Wallpaper Engine", Path.Combine(commonPath, "wallpaper_engine")),
+            new(570940, "DARK SOULS™: REMASTERED", Path.Combine(commonPath, "DARK SOULS REMASTERED"))
+        };
+
+        var libraryFoldersPath = Path.Combine(basePath, "libraryfolders.vdf");
+
+        const string libraryFoldersContent = @"
+""libraryfolders""
+{
+    ""0""
+    {
+        ""path""        ""C:\\Program Files (x86)\\Steam""
     }
 }
+";
+        
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            fileSystem.AddFile(libraryFoldersPath, new MockFileData(libraryFoldersContent));
+        }
+
+        foreach (var steamGame in steamGames)
+        {
+            var manifestPath = Path.Combine(basePath, $"appmanifest_{steamGame.AppId}.acf");
+
+            var installDir = Path.GetFileName(steamGame.Path);
+            
+            var manifestContent = $@"
+""AppState""
+{{
+    ""appid""       ""{steamGame.AppId}""
+    ""name""        ""{steamGame.Name}""
+    ""installdir""      ""{installDir}""
+}}
+";
+            
+            fileSystem.AddFile(manifestPath, new MockFileData(manifestContent));
+        }
+
+        var handler = new SteamHandler(fileSystem, null);
+        return (steamGames, handler);
+    }
+    
+    [Fact]
+    public void TestFindAllGames()
+    {
+        var (expectedGames, handler) = SetupTest();
+
+        var results = handler.FindAllGames().ToList();
+        
+        var actualGames = results.Select(tuple =>
+        {
+            var (game, error) = tuple;
+            Assert.True(game is not null, error);
+            return game;
+        }).ToList();
+        
+        Assert.Equal(expectedGames.Count, actualGames.Count);
+        Assert.Equal(expectedGames, actualGames);
+    }
+}
+
