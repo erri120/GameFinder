@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Get version from input
@@ -21,46 +21,35 @@ jobs:
         echo ::set-output name=current_version::${INPUT_VERSION}
     
     - uses: actions/checkout@v2
-    
-    - name: Setup .NET Core 3.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.x
-    - name: Setup .NET 6.0.x
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 6.0.x
 
-    - name: Verify .NET Core
-      run: dotnet --info
-
-    - name: Clear local NuGet cache (workaround for failed restores on windows-latest)
-      run: dotnet clean && dotnet nuget locals all --clear
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          6.0.x
+          7.0.x
 
     - name: Restore dependencies
       run: dotnet restore
-  
+
     - name: Build
       run: dotnet build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
-    
-    - name: Test
-      run: dotnet test --no-build --no-restore --verbosity normal
-    
+  
     - name: Publish Example Project
-      run: dotnet publish GameFinder.Example/GameFinder.Example.csproj --no-restore -o "out" -p:PublishSingleFile=true -p:PublishTrimmed=true -c Release
-    
+      run: dotnet publish GameFinder.Example/GameFinder.Example.csproj --no-restore -o "out" -p:PublishSingleFile=true -p:PublishTrimmed=true -c Release -f net6.0 -r win-x64
+
     - name: Zip Example Project
       run: |
         cd out/
-        7z a -tzip GameFinder.Example.zip *.exe *.dll
-    
+        7z a -tzip GameFinder.Example.zip *.exe *.dll *.pdb *.xml
+
     - name: Get Changelog Entry
       id: changelog_reader
       uses: mindsers/changelog-reader-action@v2
       with:
         version: ${{ steps.tag_name.outputs.current_version }}
         path: ./CHANGELOG.md
-    
+
     #- name: Pack
     #  run: dotnet pack ${{ env.PROJECT_FILE }} --no-build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
     
