@@ -5,6 +5,7 @@ using CommandLine;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
+using GameFinder.StoreHandlers.Origin;
 using GameFinder.StoreHandlers.Steam;
 using Microsoft.Extensions.Logging;
 using NLog;
@@ -79,6 +80,20 @@ public static class Program
 
             var results = handler.FindAllGames();
             LogGamesAndErrors(results, logger);
+        }
+
+        if (options.Origin)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                logger.LogError("Origin is only supported on Windows!");
+            }
+            else
+            {
+                var handler = new OriginHandler();
+                var results = handler.FindAllGames();
+                LogGamesAndErrors(results, logger);
+            }
         }
     }
 

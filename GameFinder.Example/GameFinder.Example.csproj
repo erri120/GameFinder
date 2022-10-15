@@ -8,6 +8,7 @@
     <ItemGroup>
         <ProjectReference Include="..\GameFinder.StoreHandlers.EGS\GameFinder.StoreHandlers.EGS.csproj" />
         <ProjectReference Include="..\GameFinder.StoreHandlers.GOG\GameFinder.StoreHandlers.GOG.csproj" />
+        <ProjectReference Include="..\GameFinder.StoreHandlers.Origin\GameFinder.StoreHandlers.Origin.csproj" />
         <ProjectReference Include="..\GameFinder.StoreHandlers.Steam\GameFinder.StoreHandlers.Steam.csproj" />
     </ItemGroup>
 

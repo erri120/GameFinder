@@ -73,20 +73,30 @@ public class EGSHandler
         var itemFiles = manifestDir.EnumerateFiles("*.item", SearchOption.TopDirectoryOnly);
         foreach (var itemFile in itemFiles)
         {
-            using var stream = itemFile.OpenRead();
-
-            var game = JsonSerializer.Deserialize<EGSGame>(stream);
-            if (game is null)
-            {
-                yield return (null, $"Unable to deserialize file {itemFile.FullName}");
-            }
-            else
-            {
-                yield return (game, null);
-            }
+            yield return DeserializeGame(itemFile);
         }
     }
 
+    private (EGSGame? game, string? error) DeserializeGame(IFileInfo itemFile)
+    {
+        using var stream = itemFile.OpenRead();
+
+        try
+        {
+            var game = JsonSerializer.Deserialize<EGSGame>(stream);
+            if (game is null)
+            {
+                return (null, $"Unable to deserialize file {itemFile.FullName}");
+            }
+
+            return (game, null);
+        }
+        catch (Exception e)
+        {
+            return (null, $"Unable to deserialize file {itemFile.FullName}:\n{e}");
+        }
+    }
+    
     private string GetManifestDir()
     {
         return TryGetManifestDirFromRegistry(out var manifestDir) 
