@@ -2,8 +2,10 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using CommandLine;
+using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
+using GameFinder.StoreHandlers.Steam;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Config;
@@ -67,6 +69,16 @@ public static class Program
                 var results = handler.FindAllGames();
                 LogGamesAndErrors(results, logger);
             }
+        }
+
+        if (options.Steam)
+        {
+            var handler = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? new SteamHandler(new WindowsRegistry())
+                : new SteamHandler(null);
+
+            var results = handler.FindAllGames();
+            LogGamesAndErrors(results, logger);
         }
     }
 
