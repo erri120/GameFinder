@@ -15,7 +15,7 @@ public class TestRegistry
         baz.AddValue("age", (long)40);
 
         var baseKey = registry.OpenBaseKey(RegistryHive.LocalMachine);
-        var subKey = baseKey.OpenSubKey("foo/bar/baz");
+        using var subKey = baseKey.OpenSubKey("foo/bar/baz");
         Assert.NotNull(subKey);        
         Assert.Equal("Peter Griffin", subKey.GetString("name"));
         Assert.Equal(40, subKey.GetQWord("age"));
