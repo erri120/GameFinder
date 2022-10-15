@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Runtime.InteropServices;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS;
 using Xunit;
@@ -20,7 +22,12 @@ public class EGSTests
         var registry = new InMemoryRegistry();
 
         var regKey = registry.AddKey(RegistryHive.CurrentUser, @"Software\Epic Games\EOS");
-        regKey.AddValue("ModSdkMetadataDir", "C:\\ModSdkMetadataDir");
+
+        var baseDir = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? "C:\\ModSdkMetadataDir"
+            : "/ModSdkMetadataDir";
+        
+        regKey.AddValue("ModSdkMetadataDir", baseDir);
         
         var fileSystem = new MockFileSystem();
 
@@ -32,7 +39,7 @@ public class EGSTests
     ""InstallLocation"": ""{expectedGame.InstallLocation.Replace("\\", "\\\\")}""
 }}";
 
-            fileSystem.AddFile($"C:\\ModSdkMetadataDir\\{expectedGame.CatalogItemId}.item", new MockFileData(mockData));
+            fileSystem.AddFile($"{Path.Combine(baseDir, $"{expectedGame.CatalogItemId}.item")}", new MockFileData(mockData));
         }
 
         return (registry, fileSystem, expectedGames);
