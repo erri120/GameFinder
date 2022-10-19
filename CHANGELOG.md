@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [2.0.1] - 2022-10-19
+
+- Origin: fix parsing manifests with duplicate key-value entries
+
 ## [2.0.0] - 2022-10-15
 
 Major rework of all packages:

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Text;
 using System.Web;
 using JetBrains.Annotations;
@@ -79,20 +80,22 @@ public class OriginHandler
         var contents = fileInfo.OpenText().ReadToEnd();
         var query = HttpUtility.ParseQueryString(contents, Encoding.UTF8);
 
-        var id = query.Get("id");
-        if (id is null || string.IsNullOrWhiteSpace(id))
+        // using GetValues because some manifest have duplicate key-value entries for whatever reason
+        var ids = query.GetValues("id");
+        if (ids is null || ids.Length == 0)
         {
             return (null, $"Manifest {fileInfo.FullName} does not have a value \"id\"");
         }
 
+        var id = ids.First();
         if (id.EndsWith("@steam", StringComparison.OrdinalIgnoreCase)) return (null, null);
-        
-        var installPath = query.Get("dipinstallpath");
-        if (installPath is null || string.IsNullOrWhiteSpace(installPath))
-        {
-            return (null, $"Manifest {fileInfo.FullName} does not have a value \"dipinstallpath\"");
-        }
 
-        return (new OriginGame(id, installPath), null);
+        var installPaths = query.GetValues("dipInstallPath");
+        if (installPaths is null || installPaths.Length == 0)
+        {
+            return (null, $"Manifest {fileInfo.FullName} does not have a value \"dipInstallPath\"");
+        }
+        
+        return (new OriginGame(id, installPaths.First()), null);
     }
 }

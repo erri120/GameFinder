@@ -23,14 +23,15 @@ public class OriginTests
 
         var games = new Dictionary<string, OriginGame>
         {
-            {"Origin.OFR.50.0001456.mfst", new OriginGame("Origin.OFR.50.0001456", "C:\\Games\\Titanfall2")}
+            {"Origin.OFR.50.0001456.mfst", new OriginGame("Origin.OFR.50.0001456", "C:\\Games\\Titanfall2")},
+            {"Origin.OFR.50.0003803.mfst", new OriginGame("Origin.OFR.50.0003803", "C:\\Games\\Slay the Spire")}
         };
 
         foreach (var (fileName, game) in games)
         {
             var manifestPath = Path.Combine(manifestDirPath, fileName);
 
-            var manifestContents = $"?id={HttpUtility.UrlEncode(game.Id)}&dipinstallpath={HttpUtility.UrlEncode(game.InstallPath)}";
+            var manifestContents = $"?id={HttpUtility.UrlEncode(game.Id)}&ID={HttpUtility.UrlEncode(game.Id)}&dipInstallPath={HttpUtility.UrlEncode(game.InstallPath)}&dipinstallpath={HttpUtility.UrlEncode(game.InstallPath)}";
 
             fileSystem.AddFile(manifestPath, manifestContents);
         }
