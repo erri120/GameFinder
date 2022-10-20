@@ -2,9 +2,10 @@
 charset = utf-8
 end_of_line = crlf
 insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 90
 
 [*.cs]
-
 # levels: error, warning, suggestion, silent, none, default
 
 # CS1591: // Missing XML comment for publicly visible type or member
