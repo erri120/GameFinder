@@ -16,8 +16,17 @@ public class TestRegistry
 
         var baseKey = registry.OpenBaseKey(RegistryHive.LocalMachine);
         using var subKey = baseKey.OpenSubKey("foo/bar/baz");
-        Assert.NotNull(subKey);        
+        Assert.NotNull(subKey);
         Assert.Equal("Peter Griffin", subKey.GetString("name"));
         Assert.Equal(40, subKey.GetQWord("age"));
+    }
+
+    [Fact]
+    public void Test_GetName()
+    {
+        var registry = new InMemoryRegistry();
+
+        var key = registry.AddKey(RegistryHive.LocalMachine, "foo/bar/baz");
+        Assert.Equal("HKEY_LOCAL_MACHINE\\foo\\bar\\baz", key.GetName());
     }
 }

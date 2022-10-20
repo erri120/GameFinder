@@ -104,7 +104,9 @@ public interface IRegistryKey : IDisposable
     /// <param name="valueName"></param>
     /// <returns></returns>
     RegistryValueKind GetValueKind(string? valueName);
-    
+
+    string GetName();
+
     /// <summary>
     /// Returns a value.
     /// </summary>
@@ -173,10 +175,10 @@ public interface IRegistryKey : IDisposable
     public bool TryGetString(string? valueName, [MaybeNullWhen(false)] out string value)
     {
         value = null;
-        
+
         var obj = GetValue(valueName);
         if (obj is not string s) return false;
-        
+
         value = s;
         return true;
     }

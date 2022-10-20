@@ -82,7 +82,7 @@ public sealed class WindowsRegistryKey : IRegistryKey
     {
         _registryKey = key;
     }
-    
+
     /// <inheritdoc/>
     public IRegistryKey? OpenSubKey(string name)
     {
@@ -106,6 +106,12 @@ public sealed class WindowsRegistryKey : IRegistryKey
     public RegistryValueKind GetValueKind(string? valueName)
     {
         return InteropHelpers.Convert(_registryKey.GetValueKind(valueName));
+    }
+
+    /// <inheritdoc/>
+    public string GetName()
+    {
+        return _registryKey.Name;
     }
 
     /// <inheritdoc/>

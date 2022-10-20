@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Versioning;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
@@ -20,7 +22,16 @@ public record GOGGame(long Id, string Name, string Path);
 [PublicAPI]
 public class GOGHandler
 {
-    private const string GOGRegKey = @"Software\GOG.com\Games";
+    /// <summary>
+    /// Represents the return values of <see cref="GOGHandler.FindAllGames"/>. This
+    /// record will either contain a non-null <see cref="GOGGame"/> or a non-null error
+    /// message.
+    /// </summary>
+    /// <param name="Game"></param>
+    /// <param name="Error"></param>
+    public readonly record struct Result(GOGGame? Game, string? Error);
+
+    internal const string GOGRegKey = @"Software\GOG.com\Games";
 
     private readonly IRegistry _registry;
 
@@ -45,55 +56,70 @@ public class GOGHandler
     /// a non-null <see cref="GOGGame"/> or a non-null error message.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<(GOGGame? game, string? error)> FindAllGames()
+    public IEnumerable<Result> FindAllGames()
     {
-        var localMachine = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-
-        using var gogKey = localMachine.OpenSubKey(GOGRegKey);
-        if (gogKey is null)
+        try
         {
-            yield return (null, $"Unable to open HKEY_LOCAL_MACHINE\\{GOGRegKey}");
-            yield break;
+            var localMachine =_registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+
+            using var gogKey = localMachine.OpenSubKey(GOGRegKey);
+            if (gogKey is null)
+            {
+                return new[]{new Result(null, $"Unable to open HKEY_LOCAL_MACHINE\\{GOGRegKey}")};
+            }
+
+            var subKeyNames = gogKey.GetSubKeyNames().ToArray();
+            if (subKeyNames.Length == 0)
+            {
+                return new[]{new Result(null, $"Registry key {gogKey.GetName()} has no sub-keys")};
+            }
+
+            return subKeyNames
+                .Select(subKeyName => ParseSubKey(gogKey, subKeyName))
+                .ToArray();
         }
-
-        var subKeyNames = gogKey.GetSubKeyNames();
-        foreach (var subKeyName in subKeyNames)
+        catch (Exception e)
         {
-            var fullKey = $"HKEY_LOCAL_MACHINE\\{GOGRegKey}\\{subKeyName}";
-            
+            return new[] { new Result(null, $"Exception looking for GOG games:\n{e}") };
+        }
+    }
+
+    private static Result ParseSubKey(IRegistryKey gogKey, string subKeyName)
+    {
+        try
+        {
             using var subKey = gogKey.OpenSubKey(subKeyName);
             if (subKey is null)
             {
-                yield return (null, $"Unable to open {fullKey}");
-                continue;
+                return new Result(null,$"Unable to open {gogKey}\\{subKeyName}");
             }
 
             if (!subKey.TryGetString("gameID", out var sId))
             {
-                yield return (null, $"{fullKey} doesn't have a string value \"gameID\"");
-                continue;
+                return new Result(null,$"{subKey.GetName()} doesn't have a string value \"gameID\"");
             }
 
             if (!long.TryParse(sId, out var id))
             {
-                yield return (null, $"The value \"gameID\" of {fullKey} is not a number: \"{sId}\"");
-                continue;
+                return new Result(null,$"The value \"gameID\" of {subKey.GetName()} is not a number: \"{sId}\"");
             }
 
             if (!subKey.TryGetString("gameName", out var name))
             {
-                yield return (null, $"{fullKey} doesn't have a string value \"gameName\"");
-                continue;
+                return new Result(null, $"{subKey.GetName()} doesn't have a string value \"gameName\"");
             }
-            
+
             if (!subKey.TryGetString("path", out var path))
             {
-                yield return (null, $"{fullKey} doesn't have a string value \"path\"");
-                continue;
+                return new Result(null,$"{subKey.GetName()} doesn't have a string value \"path\"");
             }
 
             var game = new GOGGame(id, name, path);
-            yield return (game, null);
+            return new Result(game, null);
+        }
+        catch (Exception e)
+        {
+            return new Result(null,$"Exception while parsing registry key {gogKey}\\{subKeyName}:\n{e}");
         }
     }
 }

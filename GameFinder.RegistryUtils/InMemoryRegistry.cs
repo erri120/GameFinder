@@ -28,7 +28,7 @@ public sealed class InMemoryRegistry : IRegistry
             {RegistryHive.PerformanceData, new InMemoryRegistryKey(RegistryHive.PerformanceData, "HKEY_PERFORMANCE_DATA")}
         };
     }
-    
+
     /// <summary>
     /// Adds a key to the registry.
     /// </summary>
@@ -51,7 +51,7 @@ public sealed class InMemoryRegistry : IRegistry
 
         return parent;
     }
-    
+
     /// <inheritdoc/>
     public IRegistryKey OpenBaseKey(RegistryHive hive, RegistryView view = RegistryView.Default)
     {
@@ -67,6 +67,7 @@ public sealed class InMemoryRegistryKey : IRegistryKey
 {
     private readonly RegistryHive _hive;
     private readonly string _key;
+    private readonly string _name;
     private readonly InMemoryRegistryKey _parent;
     private readonly Dictionary<string, InMemoryRegistryKey> _children = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, object> _values = new(StringComparer.OrdinalIgnoreCase);
@@ -75,6 +76,7 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     {
         _hive = hive;
         _key = key;
+        _name = _key;
         _parent = this;
     }
 
@@ -83,15 +85,16 @@ public sealed class InMemoryRegistryKey : IRegistryKey
         _hive = hive;
         _parent = parent;
         _key = key;
+        _name = $"{parent._name}\\{_key}";
     }
-    
+
     internal InMemoryRegistryKey AddSubKey(RegistryHive hive, string key)
     {
         if (_children.TryGetValue(key, out var child)) return child;
-        
+
         child = new InMemoryRegistryKey(hive, this, key);
         _children.Add(key, child);
-        
+
         return child;
     }
 
@@ -137,6 +140,12 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     public RegistryValueKind GetValueKind(string? valueName)
     {
         throw new NotImplementedException();
+    }
+
+    /// <inheritdoc/>
+    public string GetName()
+    {
+        return _name;
     }
 
     /// <inheritdoc/>
