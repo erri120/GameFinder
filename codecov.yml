@@ -1,0 +1,6 @@
+ignore:
+  - "GameFinder.Example"
+  - "GameFinder.Tests"
+
+github_checks:
+  annotations: true
