@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using CommandLine;
@@ -34,16 +35,16 @@ public static class Program
         LogManager.Configuration = config;
 
         var logger = new NLogLoggerProvider().CreateLogger("");
-        
+
         Parser.Default.ParseArguments<Options>(args)
             .WithParsed(x => Run(x, logger));
     }
-    
+
     private static void Run(Options options, ILogger logger)
     {
         if (File.Exists("log.log"))
             File.Delete("log.log");
-        
+
         if (options.GOG)
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -54,7 +55,7 @@ public static class Program
             {
                 var handler = new GOGHandler();
                 var results = handler.FindAllGames();
-                LogGamesAndErrors(results, logger);
+                LogGamesAndErrors(results, result => result.Game, result => result.Error, logger);
             }
         }
 
@@ -68,7 +69,7 @@ public static class Program
             {
                 var handler = new EGSHandler();
                 var results = handler.FindAllGames();
-                LogGamesAndErrors(results, logger);
+                LogGamesAndErrors(results, result => result.Game, result => result.Error, logger);
             }
         }
 
@@ -79,7 +80,7 @@ public static class Program
                 : new SteamHandler(null);
 
             var results = handler.FindAllGames();
-            LogGamesAndErrors(results, logger);
+            LogGamesAndErrors(results, result => result.Game, result => result.Error, logger);
         }
 
         if (options.Origin)
@@ -92,16 +93,20 @@ public static class Program
             {
                 var handler = new OriginHandler();
                 var results = handler.FindAllGames();
-                LogGamesAndErrors(results, logger);
+                LogGamesAndErrors(results, result => result.Game, result => result.Error, logger);
             }
         }
     }
 
-    private static void LogGamesAndErrors<T>(IEnumerable<(T?, string?)> results, ILogger logger)
-        where T: class
+    private static void LogGamesAndErrors<TResult, TGame>(IEnumerable<TResult> results, Func<TResult,TGame?> getGame, Func<TResult, string?> getError, ILogger logger)
+        where TResult: struct
+        where TGame: class
     {
-        foreach (var (game, error) in results)
+        foreach (var result in results)
         {
+            var game = getGame(result);
+            var error = getError(result);
+
             if (game is not null)
             {
                 logger.LogInformation("Found {}", game);

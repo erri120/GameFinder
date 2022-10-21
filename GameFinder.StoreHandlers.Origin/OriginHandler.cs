@@ -30,7 +30,6 @@ public class OriginHandler
     /// </summary>
     /// <param name="Game"></param>
     /// <param name="Error"></param>
-    [PublicAPI]
     public readonly record struct Result(OriginGame? Game, string? Error);
 
     private readonly IFileSystem _fileSystem;

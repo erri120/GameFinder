@@ -27,6 +27,17 @@ public record SteamGame(int AppId, string Name, string Path);
 [PublicAPI]
 public class SteamHandler
 {
+    /// <summary>
+    /// Represents the return values of <see cref="SteamHandler.FindAllGames"/>. This
+    /// record will either contain a non-null <see cref="SteamGame"/> or a non-null error
+    /// message.
+    /// </summary>
+    /// <param name="Game"></param>
+    /// <param name="Error"></param>
+    public readonly record struct Result(SteamGame? Game, string? Error);
+
+    internal const string RegKey = @"Software\Valve\Steam";
+
     private readonly IRegistry? _registry;
     private readonly IFileSystem _fileSystem;
 
@@ -36,7 +47,7 @@ public class SteamHandler
     /// </summary>
     [SupportedOSPlatform("windows")]
     public SteamHandler() : this(new WindowsRegistry()) { }
-    
+
     /// <summary>
     /// Constructor for specifying the registry. This uses the real filesystem <see cref="FileSystem"/>.
     /// If you are on Windows you should use <see cref="WindowsRegistry"/>, if you want to run tests
@@ -44,7 +55,7 @@ public class SteamHandler
     /// </summary>
     /// <param name="registry"></param>
     public SteamHandler(IRegistry? registry) : this(new FileSystem(), registry) { }
-    
+
     /// <summary>
     /// Constructor for specifying the <see cref="IFileSystem"/> and <see cref="IRegistry"/> implementations.
     /// Use this constructor if you want to run tests.
@@ -54,15 +65,7 @@ public class SteamHandler
     public SteamHandler(IFileSystem fileSystem, IRegistry? registry)
     {
         _fileSystem = fileSystem;
-        
-        if (registry is null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            _registry = new WindowsRegistry();
-        }
-        else
-        {
-            _registry = registry;
-        }
+        _registry = registry;
     }
 
     /// <summary>
@@ -70,26 +73,19 @@ public class SteamHandler
     /// non-null <see cref="SteamGame"/> or a non-null error.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<(SteamGame? game, string? error)> FindAllGames()
+    public IEnumerable<Result> FindAllGames()
     {
-        var steamDir = FindSteam();
-        if (steamDir is null)
+        var (libraryFoldersFile, steamSearchError) = FindSteam();
+        if (libraryFoldersFile is null)
         {
-            yield return (null, "Unable to find Steam!");
-            yield break;
-        }
-
-        var libraryFoldersFile = GetLibraryFoldersFile(steamDir);
-        if (!libraryFoldersFile.Exists)
-        {
-            yield return (null, $"File {libraryFoldersFile.FullName} does not exist!");
+            yield return new Result(null, steamSearchError ?? "Unable to find Steam!");
             yield break;
         }
 
         var libraryFolderPaths = ParseLibraryFoldersFile(libraryFoldersFile);
-        if (libraryFolderPaths is null)
+        if (libraryFolderPaths is null || libraryFolderPaths.Count == 0)
         {
-            yield return (null, $"Found no Steam Libraries in {libraryFoldersFile.FullName}");
+            yield return new Result(null, $"Found no Steam Libraries in {libraryFoldersFile.FullName}");
             yield break;
         }
 
@@ -98,11 +94,20 @@ public class SteamHandler
             var libraryFolder = _fileSystem.DirectoryInfo.FromDirectoryName(libraryFolderPath);
             if (!libraryFolder.Exists)
             {
-                yield return (null, $"Steam Library {libraryFolder.FullName} does not exist!");
+                yield return new Result(null, $"Steam Library {libraryFolder.FullName} does not exist!");
                 continue;
             }
 
-            var acfFiles = libraryFolder.EnumerateFiles("*.acf", SearchOption.TopDirectoryOnly);
+            var acfFiles = libraryFolder
+                .EnumerateFiles("*.acf", SearchOption.TopDirectoryOnly)
+                .ToArray();
+
+            if (acfFiles.Length == 0)
+            {
+                yield return new Result(null,$"Library folder {libraryFolder.FullName} does not contain any manifests");
+                continue;
+            }
+
             foreach (var acfFile in acfFiles)
             {
                 yield return ParseAppManifestFile(acfFile, libraryFolder);
@@ -110,154 +115,185 @@ public class SteamHandler
         }
     }
 
-    private IDirectoryInfo? FindSteam()
+    private (IFileInfo? libraryFoldersFile, string? error) FindSteam()
     {
-        var defaultSteamDir = FindSteamInDefaultPath();
-        if (defaultSteamDir is not null) return defaultSteamDir;
-        
-        if (_registry is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        try
         {
-            var steamDir = FindSteamInRegistry(_registry);
-            return steamDir;
-        }
+            var defaultSteamDir = GetDefaultSteamDirectory(_fileSystem);
+            var libraryFoldersFile = GetLibraryFoldersFile(defaultSteamDir);
 
-        return null;
+            if (libraryFoldersFile.Exists)
+            {
+                return (libraryFoldersFile, null);
+            }
+
+            if (_registry is null)
+            {
+                return (null, $"Unable to find Steam in the default path {defaultSteamDir.FullName}");
+            }
+
+            var steamDir = FindSteamInRegistry(_registry);
+            if (steamDir is null)
+            {
+                return (null, $"Unable to find Steam in the registry and the default path {defaultSteamDir.FullName}");
+            }
+
+            if (!steamDir.Exists)
+            {
+                return (null, $"Unable to find Steam in the default path {defaultSteamDir.FullName} and the path from the registry does not exist: {steamDir.FullName}");
+            }
+
+            libraryFoldersFile = GetLibraryFoldersFile(steamDir);
+            if (!libraryFoldersFile.Exists)
+            {
+                return (null, $"Unable to find Steam in the default path {defaultSteamDir.FullName} and the path from the registry is not a valid Steam installation because {libraryFoldersFile.FullName} does not exist");
+            }
+
+            return (libraryFoldersFile, null);
+        }
+        catch (Exception e)
+        {
+            return (null, $"Exception while searching for Steam:\n{e}");
+        }
     }
-    
+
     private IDirectoryInfo? FindSteamInRegistry(IRegistry registry)
     {
         var currentUser = registry.OpenBaseKey(RegistryHive.CurrentUser);
 
-        using var regKey = currentUser.OpenSubKey(@"SOFTWARE\Valve\Steam");
+        using var regKey = currentUser.OpenSubKey(RegKey);
         if (regKey is null) return null;
-        
+
         if (!regKey.TryGetString("SteamPath", out var steamPath)) return null;
-        
+
         var directoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(steamPath);
-        return IsValidSteamDirectory(directoryInfo) ? directoryInfo : null;
+        return directoryInfo;
     }
 
-    private IDirectoryInfo? FindSteamInDefaultPath()
+    internal static IDirectoryInfo GetDefaultSteamDirectory(IFileSystem fileSystem)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            var directoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(_fileSystem.Path.Combine(
+            return fileSystem.DirectoryInfo.FromDirectoryName(fileSystem.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
                 "Steam"
             ));
-            
-            return IsValidSteamDirectory(directoryInfo) ? directoryInfo : null; 
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             // steam on linux can be found in ~/.local/share/Steam
             // https://github.com/dotnet/runtime/blob/3b1df9396e2a7cc6797e76793e8547f8a7771953/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs#L124
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            
-            var directoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(_fileSystem.Path.Combine(
-                path,
+            return fileSystem.DirectoryInfo.FromDirectoryName(fileSystem.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Steam"
             ));
-            
-            return IsValidSteamDirectory(directoryInfo) ? directoryInfo : null;
         }
 
-        return null;
+        throw new PlatformNotSupportedException();
     }
-    
-    private IFileInfo GetLibraryFoldersFile(IDirectoryInfo steamDirectory)
+
+    internal static IFileInfo GetLibraryFoldersFile(IDirectoryInfo steamDirectory)
     {
-        var fileInfo =_fileSystem.FileInfo.FromFileName(_fileSystem.Path.Combine(
+        var fileSystem = steamDirectory.FileSystem;
+
+        var fileInfo = fileSystem.FileInfo.FromFileName(fileSystem.Path.Combine(
             steamDirectory.FullName,
             "steamapps",
             "libraryfolders.vdf"));
 
         return fileInfo;
     }
-    
-    private bool IsValidSteamDirectory(IDirectoryInfo? directoryInfo)
-    {
-        if (directoryInfo is null) return false;
-        var fileInfo = GetLibraryFoldersFile(directoryInfo);
-        return fileInfo.Exists;
-    }
 
     private List<string>? ParseLibraryFoldersFile(IFileInfo fileInfo)
     {
-        using var stream = fileInfo.OpenRead();
-
-        var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
-        var data = kv.Deserialize(stream, new KVSerializerOptions
+        try
         {
-            HasEscapeSequences = true,
-            EnableValveNullByteBugBehavior = true
-        });
+            using var stream = fileInfo.OpenRead();
 
-        if (data is null) return null;
-        if (!data.Name.Equals("libraryfolders", StringComparison.OrdinalIgnoreCase)) return null;
+            var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
+            var data = kv.Deserialize(stream, new KVSerializerOptions
+            {
+                HasEscapeSequences = true,
+                EnableValveNullByteBugBehavior = true
+            });
 
-        var paths = data.Children
-            .Where(child => int.TryParse(child.Name, out _))
-            .Select(child => child["path"])
-            .Where(pathValue => pathValue is not null && pathValue.ValueType == KVValueType.String)
-            .Select(pathValue => pathValue.ToString(CultureInfo.InvariantCulture))
-            .Select(path => _fileSystem.Path.Combine(path, "steamapps"))
-            .ToList();
-        
-        return paths.Any() ? paths : null;
+            if (data is null) return null;
+            if (!data.Name.Equals("libraryfolders", StringComparison.OrdinalIgnoreCase)) return null;
+
+            var paths = data.Children
+                .Where(child => int.TryParse(child.Name, out _))
+                .Select(child => child["path"])
+                .Where(pathValue => pathValue is not null && pathValue.ValueType == KVValueType.String)
+                .Select(pathValue => pathValue.ToString(CultureInfo.InvariantCulture))
+                .Select(path => _fileSystem.Path.Combine(path, "steamapps"))
+                .ToList();
+
+            return paths.Any() ? paths : null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
-    private (SteamGame? game, string? error) ParseAppManifestFile(IFileInfo manifestFile, IDirectoryInfo libraryFolder)
+    private Result ParseAppManifestFile(IFileInfo manifestFile, IDirectoryInfo libraryFolder)
     {
-        using var stream = manifestFile.OpenRead();
-        
-        var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
-        var data = kv.Deserialize(stream, new KVSerializerOptions
+        try
         {
-            HasEscapeSequences = true,
-            EnableValveNullByteBugBehavior = true
-        });
+            using var stream = manifestFile.OpenRead();
 
-        if (data is null)
-        {
-            return (null, $"Unable to parse {manifestFile.FullName}");
-        }
+            var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
+            var data = kv.Deserialize(stream, new KVSerializerOptions
+            {
+                HasEscapeSequences = true,
+                EnableValveNullByteBugBehavior = true
+            });
 
-        if (!data.Name.Equals("AppState", StringComparison.OrdinalIgnoreCase))
-        {
-            return (null, $"Manifest {manifestFile.FullName} is not a valid format!");
-        }
+            if (data is null)
+            {
+                return new Result(null, $"Unable to parse {manifestFile.FullName}");
+            }
 
-        var appIdValue = data["appid"];
-        if (appIdValue is null)
-        {
-            return (null, $"Manifest {manifestFile.FullName} does not have the value \"appid\"");
-        }
-        
-        var nameValue = data["name"];
-        if (nameValue is null)
-        {
-            return (null, $"Manifest {manifestFile.FullName} does not have the value \"name\"");
-        }
-        
-        var installDirValue = data["installdir"];
-        if (installDirValue is null)
-        {
-            return (null, $"Manifest {manifestFile.FullName} does not have the value \"installdir\"");
-        }
-        
-        var appId = appIdValue.ToInt32(NumberFormatInfo.InvariantInfo);
-        var name = nameValue.ToString(CultureInfo.InvariantCulture);
-        var installDir = installDirValue.ToString(CultureInfo.InvariantCulture);
-        
-        var gamePath = _fileSystem.Path.Combine(
-            libraryFolder.FullName,
-            "common",
-            installDir
-        );
+            if (!data.Name.Equals("AppState", StringComparison.OrdinalIgnoreCase))
+            {
+                return new Result(null, $"Manifest {manifestFile.FullName} is not a valid format!");
+            }
 
-        var game = new SteamGame(appId, name, gamePath);
-        return (game, null);
+            var appIdValue = data["appid"];
+            if (appIdValue is null)
+            {
+                return new Result(null, $"Manifest {manifestFile.FullName} does not have the value \"appid\"");
+            }
+
+            var nameValue = data["name"];
+            if (nameValue is null)
+            {
+                return new Result(null, $"Manifest {manifestFile.FullName} does not have the value \"name\"");
+            }
+
+            var installDirValue = data["installdir"];
+            if (installDirValue is null)
+            {
+                return new Result(null, $"Manifest {manifestFile.FullName} does not have the value \"installdir\"");
+            }
+
+            var appId = appIdValue.ToInt32(NumberFormatInfo.InvariantInfo);
+            var name = nameValue.ToString(CultureInfo.InvariantCulture);
+            var installDir = installDirValue.ToString(CultureInfo.InvariantCulture);
+
+            var gamePath = _fileSystem.Path.Combine(
+                libraryFolder.FullName,
+                "common",
+                installDir
+            );
+
+            var game = new SteamGame(appId, name, gamePath);
+            return new Result(game, null);
+        }
+        catch (Exception e)
+        {
+            return new Result(null, $"Exception while parsing file {manifestFile.FullName}:\n{e}");
+        }
     }
 }
