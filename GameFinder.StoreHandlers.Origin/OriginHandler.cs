@@ -5,7 +5,9 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using System.Web;
+using GameFinder.Common;
 using JetBrains.Annotations;
+using Result = GameFinder.Common.Result<GameFinder.StoreHandlers.Origin.OriginGame>;
 
 namespace GameFinder.StoreHandlers.Origin;
 
@@ -21,17 +23,8 @@ public record OriginGame(string Id, string InstallPath);
 /// Handler for finding games install with Origin.
 /// </summary>
 [PublicAPI]
-public class OriginHandler
+public class OriginHandler : IHandler<OriginGame, string>
 {
-    /// <summary>
-    /// Represents the return values of <see cref="OriginHandler.FindAllGames"/>. This
-    /// record will either contain a non-null <see cref="OriginGame"/> or a non-null error
-    /// message.
-    /// </summary>
-    /// <param name="Game"></param>
-    /// <param name="Error"></param>
-    public readonly record struct Result(OriginGame? Game, string? Error);
-
     private readonly IFileSystem _fileSystem;
 
     /// <summary>
@@ -57,10 +50,7 @@ public class OriginHandler
         ));
     }
 
-    /// <summary>
-    /// Finds all games installed with Origin.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<Result> FindAllGames()
     {
         var manifestDir = GetManifestDir(_fileSystem);
@@ -92,6 +82,15 @@ public class OriginHandler
 
             yield return new Result(game, null);
         }
+    }
+
+    /// <inheritdoc/>
+    public Dictionary<string, OriginGame> FindAllGamesById(out string[] errors)
+    {
+        var (games, allErrors) = FindAllGames().SplitResults();
+        errors = allErrors;
+
+        return games.ToDictionary(game => game.Id, game => game);
     }
 
     private static Result ParseMfstFile(IFileInfo fileInfo)

@@ -6,9 +6,11 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using ValveKeyValue;
+using Result = GameFinder.Common.Result<GameFinder.StoreHandlers.Steam.SteamGame>;
 
 namespace GameFinder.StoreHandlers.Steam;
 
@@ -25,17 +27,8 @@ public record SteamGame(int AppId, string Name, string Path);
 /// Handler for finding games installed with Steam.
 /// </summary>
 [PublicAPI]
-public class SteamHandler
+public class SteamHandler : IHandler<SteamGame, int>
 {
-    /// <summary>
-    /// Represents the return values of <see cref="SteamHandler.FindAllGames"/>. This
-    /// record will either contain a non-null <see cref="SteamGame"/> or a non-null error
-    /// message.
-    /// </summary>
-    /// <param name="Game"></param>
-    /// <param name="Error"></param>
-    public readonly record struct Result(SteamGame? Game, string? Error);
-
     internal const string RegKey = @"Software\Valve\Steam";
 
     private readonly IRegistry? _registry;
@@ -68,11 +61,7 @@ public class SteamHandler
         _registry = registry;
     }
 
-    /// <summary>
-    /// Finds all games installed with Steam. This function will either return a
-    /// non-null <see cref="SteamGame"/> or a non-null error.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<Result> FindAllGames()
     {
         var (libraryFoldersFile, steamSearchError) = FindSteam();
@@ -113,6 +102,15 @@ public class SteamHandler
                 yield return ParseAppManifestFile(acfFile, libraryFolder);
             }
         }
+    }
+
+    /// <inheritdoc/>
+    public Dictionary<int, SteamGame> FindAllGamesById(out string[] errors)
+    {
+        var (games, allErrors) = FindAllGames().SplitResults();
+        errors = allErrors;
+
+        return games.ToDictionary(game => game.AppId, game => game);
     }
 
     private (IFileInfo? libraryFoldersFile, string? error) FindSteam()

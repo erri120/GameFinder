@@ -6,8 +6,10 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Text.Json;
+using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
+using Result = GameFinder.Common.Result<GameFinder.StoreHandlers.EGS.EGSGame>;
 
 namespace GameFinder.StoreHandlers.EGS;
 
@@ -24,17 +26,8 @@ public record EGSGame(string CatalogItemId, string DisplayName, string InstallLo
 /// Handler for finding games installed with the Epic Games Store.
 /// </summary>
 [PublicAPI]
-public class EGSHandler
+public class EGSHandler : IHandler<EGSGame, string>
 {
-    /// <summary>
-    /// Represents the return values of <see cref="EGSHandler.FindAllGames"/>. This
-    /// record will either contain a non-null <see cref="EGSGame"/> or a non-null error
-    /// message.
-    /// </summary>
-    /// <param name="Game"></param>
-    /// <param name="Error"></param>
-    public readonly record struct Result(EGSGame? Game, string? Error);
-
     internal const string RegKey = @"Software\Epic Games\EOS";
 
     private readonly IRegistry _registry;
@@ -72,10 +65,7 @@ public class EGSHandler
         _fileSystem = fileSystem;
     }
 
-    /// <summary>
-    /// Finds all games installed with the Epic Games Store.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<Result> FindAllGames()
     {
         var manifestDir = _fileSystem.DirectoryInfo.FromDirectoryName(GetManifestDir());
@@ -99,6 +89,15 @@ public class EGSHandler
         {
             yield return DeserializeGame(itemFile);
         }
+    }
+
+    /// <inheritdoc/>
+    public Dictionary<string, EGSGame> FindAllGamesById(out string[] errors)
+    {
+        var (games, allErrors) = FindAllGames().SplitResults();
+        errors = allErrors;
+
+        return games.ToDictionary(game => game.CatalogItemId, game => game);
     }
 
     private Result DeserializeGame(IFileInfo itemFile)

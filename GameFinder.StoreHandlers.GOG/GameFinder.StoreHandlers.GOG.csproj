@@ -10,11 +10,11 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.GOG.xml</DocumentationFile>
+        <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.GOG.xml</DocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DocumentationFile>bin\Release\GameFinder.StoreHandlers.GOG.xml</DocumentationFile>
+        <DocumentationFile>bin\Release\GameFinder.StoreHandlers.GOG.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,7 +22,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
+        <ProjectReference Include="..\GameFinder.Common\GameFinder.Common.csproj" />
+        <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
     </ItemGroup>
-    
+
 </Project>

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using CommandLine;
+using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
@@ -55,7 +55,7 @@ public static class Program
             {
                 var handler = new GOGHandler();
                 var results = handler.FindAllGames();
-                LogGamesAndErrors(results, result => result.Game, result => result.Error, logger);
+                LogGamesAndErrors(results, logger);
             }
         }
 
@@ -69,7 +69,7 @@ public static class Program
             {
                 var handler = new EGSHandler();
                 var results = handler.FindAllGames();
-                LogGamesAndErrors(results, result => result.Game, result => result.Error, logger);
+                LogGamesAndErrors(results, logger);
             }
         }
 
@@ -80,7 +80,7 @@ public static class Program
                 : new SteamHandler(null);
 
             var results = handler.FindAllGames();
-            LogGamesAndErrors(results, result => result.Game, result => result.Error, logger);
+            LogGamesAndErrors(results, logger);
         }
 
         if (options.Origin)
@@ -93,20 +93,16 @@ public static class Program
             {
                 var handler = new OriginHandler();
                 var results = handler.FindAllGames();
-                LogGamesAndErrors(results, result => result.Game, result => result.Error, logger);
+                LogGamesAndErrors(results, logger);
             }
         }
     }
 
-    private static void LogGamesAndErrors<TResult, TGame>(IEnumerable<TResult> results, Func<TResult,TGame?> getGame, Func<TResult, string?> getError, ILogger logger)
-        where TResult: struct
+    private static void LogGamesAndErrors<TGame>(IEnumerable<Result<TGame>> results, ILogger logger)
         where TGame: class
     {
-        foreach (var result in results)
+        foreach (var (game, error) in results)
         {
-            var game = getGame(result);
-            var error = getError(result);
-
             if (game is not null)
             {
                 logger.LogInformation("Found {}", game);

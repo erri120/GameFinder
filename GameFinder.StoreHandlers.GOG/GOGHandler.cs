@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Versioning;
+using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
+using Result = GameFinder.Common.Result<GameFinder.StoreHandlers.GOG.GOGGame>;
 
 namespace GameFinder.StoreHandlers.GOG;
 
@@ -20,17 +22,8 @@ public record GOGGame(long Id, string Name, string Path);
 /// Handler for finding games installed with GOG Galaxy.
 /// </summary>
 [PublicAPI]
-public class GOGHandler
+public class GOGHandler : IHandler<GOGGame, long>
 {
-    /// <summary>
-    /// Represents the return values of <see cref="GOGHandler.FindAllGames"/>. This
-    /// record will either contain a non-null <see cref="GOGGame"/> or a non-null error
-    /// message.
-    /// </summary>
-    /// <param name="Game"></param>
-    /// <param name="Error"></param>
-    public readonly record struct Result(GOGGame? Game, string? Error);
-
     internal const string GOGRegKey = @"Software\GOG.com\Games";
 
     private readonly IRegistry _registry;
@@ -51,10 +44,7 @@ public class GOGHandler
         _registry = registry;
     }
 
-    /// <summary>
-    /// Searches for all games installed with GOG Galaxy.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<Result> FindAllGames()
     {
         try
@@ -81,6 +71,15 @@ public class GOGHandler
         {
             return new[] { new Result(null, $"Exception looking for GOG games:\n{e}") };
         }
+    }
+
+    /// <inheritdoc/>
+    public Dictionary<long, GOGGame> FindAllGamesById(out string[] errors)
+    {
+        var (games, allErrors) = FindAllGames().SplitResults();
+        errors = allErrors;
+
+        return games.ToDictionary(game => game.Id, game => game);
     }
 
     private static Result ParseSubKey(IRegistryKey gogKey, string subKeyName)
