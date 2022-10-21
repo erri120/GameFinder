@@ -21,25 +21,19 @@ If you are interested in understanding _how_ GameFinder finds these games, check
 
 ### Steam
 
-Steam is supported on Windows and Linux.
+Steam is supported on Windows and Linux. Visit [SteamDB](https://steamdb.info/) if you need to find the Id of a game.
 
 **Usage:**
 
 ```csharp
-using System;
-using System.Runtime.InteropServices;
-using GameFinder.RegistryUtils;
-using GameFinder.StoreHandlers.Steam;
-
 // use the Windows registry on Windows
 // Linux doesn't have a registry
 var handler = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
     ? new SteamHandler(new WindowsRegistry())
     : new SteamHandler(null);
 
-var results = handler.FindAllGames();
-
-foreach (var (game, error) in results)
+// method 1: iterate over the game-error result
+foreach (var (game, error) in handler.FindAllGames())
 {
     if (game is not null)
     {
@@ -50,22 +44,25 @@ foreach (var (game, error) in results)
         Console.WriteLine($"Error: {error}");
     }
 }
+
+// method 2: use the dictionary if you need to find games by id
+Dictionary<SteamGame, int> games = handler.FindAllGamesById(out string[] errors);
+
+// method 3: find a single game by id
+SteamGame? game = handler.FindOneGameById(570940, out string[] errors);
 ```
 
 ### GOG Galaxy
 
-GOG Galaxy is only supported on Windows.
+GOG Galaxy is only supported on Windows. Visit [GOG Database](https://www.gogdb.org/) if you need to find the Id of a game.
 
 **Usage:**
 
 ```csharp
-using System;
-using GameFinder.StoreHandlers.GOG;
-
 var handler = new GOGHandler();
-var results = handler.FindAllGames();
 
-foreach (var (game, error) in results)
+// method 1: iterate over the game-error result
+foreach (var (game, error) in handler.FindAllGames())
 {
     if (game is not null)
     {
@@ -76,6 +73,12 @@ foreach (var (game, error) in results)
         Console.WriteLine($"Error: {error}");
     }
 }
+
+// method 2: use the dictionary if you need to find games by id
+Dictionary<GOGGame, long> games = handler.FindAllGamesById(out string[] errors);
+
+// method 3: find a single game by id
+GOGGame? game = handler.FindOneGameById(1971477531, out string[] errors);
 ```
 
 ### Epic Games Store
@@ -85,13 +88,10 @@ Epic Games Store is only supported on Windows.
 **Usage:**
 
 ```csharp
-using System;
-using GameFinder.StoreHandlers.EGS;
-
 var handler = new EGSHandler();
-var results = handler.FindAllGames();
 
-foreach (var (game, error) in results)
+// method 1: iterate over the game-error result
+foreach (var (game, error) in handler.FindAllGames())
 {
     if (game is not null)
     {
@@ -102,6 +102,12 @@ foreach (var (game, error) in results)
         Console.WriteLine($"Error: {error}");
     }
 }
+
+// method 2: use the dictionary if you need to find games by id
+Dictionary<EGSGame, string> games = handler.FindAllGamesById(out string[] errors);
+
+// method 3: find a single game by id
+EGSGame? game = handler.FindOneGameById("3257e06c28764231acd93049f3774ed6", out string[] errors);
 ```
 
 ### Origin
@@ -111,13 +117,10 @@ Origin is only supported on Windows. **Note:** [EA is deprecating Origin](https:
 **Usage:**
 
 ```csharp
-using System;
-using GameFinder.StoreHandlers.Origin;
-
 var handler = new OriginHandler();
-var results = handler.FindAllGames();
 
-foreach (var (game, error) in results)
+// method 1: iterate over the game-error result
+foreach (var (game, error) in handler.FindAllGames())
 {
     if (game is not null)
     {
@@ -128,6 +131,12 @@ foreach (var (game, error) in results)
         Console.WriteLine($"Error: {error}");
     }
 }
+
+// method 2: use the dictionary if you need to find games by id
+Dictionary<OriginGame, string> games = handler.FindAllGamesById(out string[] errors);
+
+// method 3: find a single game by id
+OriginGame? game = handler.FindOneGameById("Origin.OFR.50.0001456", out string[] errors);
 ```
 
 ### EA Desktop
