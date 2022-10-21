@@ -73,12 +73,13 @@ public class EGSTests
     [Fact]
     public void Test_ShouldError_MissingDirectory_Registry()
     {
+        var fs = new MockFileSystem();
         var registry = new InMemoryRegistry();
 
-        var regKey = registry.AddKey(RegistryHive.CurrentUser, EGSHandler.RegKey);
-        regKey.AddValue("ModSdkMetadataDir", "C:\\foo");
+        var metadataDir = fs.Path.Combine(fs.Path.GetTempPath(), "ModSdkMetadataDir");
 
-        var fs = new MockFileSystem();
+        var regKey = registry.AddKey(RegistryHive.CurrentUser, EGSHandler.RegKey);
+        regKey.AddValue("ModSdkMetadataDir", metadataDir);
 
         var handler = new EGSHandler(registry, fs);
 
@@ -86,7 +87,7 @@ public class EGSTests
         Assert.Collection(results, result =>
         {
             Assert.Null(result.Game);
-            Assert.Equal("The manifest directory C:\\foo does not exist!", result.Error);
+            Assert.Equal($"The manifest directory {metadataDir} does not exist!", result.Error);
         });
     }
 
