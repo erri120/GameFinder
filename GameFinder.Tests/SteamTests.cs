@@ -11,8 +11,7 @@ namespace GameFinder.Tests;
 [SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class SteamTests
 {
-    [Fact]
-    public void Test_ShouldWork()
+    private static (SteamHandler, SteamGame[]) SetupHandler()
     {
         var fs = new MockFileSystem();
 
@@ -53,6 +52,14 @@ public class SteamTests
 
         var handler = new SteamHandler(fs, new InMemoryRegistry());
 
+        return (handler, expectedGames);
+    }
+
+    [Fact]
+    public void Test_ShouldWork_FindAllGames()
+    {
+        var (handler, expectedGames) = SetupHandler();
+
         var results = handler.FindAllGames().ToArray();
         var actualGames = results.Select(tuple =>
         {
@@ -63,6 +70,17 @@ public class SteamTests
 
         Assert.Equal(expectedGames.Length, actualGames.Length);
         Assert.Equal(expectedGames, actualGames);
+    }
+
+    [Fact]
+    public void Test_ShouldWork_FindAllGamesById()
+    {
+        var (handler, expectedGames) = SetupHandler();
+
+        var games = handler.FindAllGamesById(out var errors);
+        Assert.Empty(errors);
+        Assert.All(expectedGames, game => Assert.True(games.ContainsKey(game.AppId)));
+        Assert.Equal(expectedGames, games.Values);
     }
 
     [Fact]

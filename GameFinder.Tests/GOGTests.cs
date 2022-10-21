@@ -9,8 +9,7 @@ namespace GameFinder.Tests;
 [SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class GOGTests
 {
-    [Fact]
-    public void Test_ShouldWork()
+    private static (GOGHandler, GOGGame[]) SetupHandler()
     {
         var registry = new InMemoryRegistry();
 
@@ -30,6 +29,14 @@ public class GOGTests
 
         var handler = new GOGHandler(registry);
 
+        return (handler, expectedGames);
+    }
+
+    [Fact]
+    public void Test_ShouldWork_FindAllGames()
+    {
+        var (handler, expectedGames) = SetupHandler();
+
         var results = handler.FindAllGames().ToArray();
         var actualGames = results.Select(tuple =>
         {
@@ -40,6 +47,17 @@ public class GOGTests
 
         Assert.Equal(expectedGames.Length, actualGames.Length);
         Assert.Equal(expectedGames, actualGames);
+    }
+
+    [Fact]
+    public void Test_ShouldWork_FindAllGamesById()
+    {
+        var (handler, expectedGames) = SetupHandler();
+
+        var games = handler.FindAllGamesById(out var errors);
+        Assert.Empty(errors);
+        Assert.All(expectedGames, game => Assert.True(games.ContainsKey(game.Id)));
+        Assert.Equal(expectedGames, games.Values);
     }
 
     [Fact]

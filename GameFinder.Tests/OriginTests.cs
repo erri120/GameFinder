@@ -11,15 +11,14 @@ namespace GameFinder.Tests;
 [SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class OriginTests
 {
-    [Fact]
-    public void Test_ShouldWork()
+    private static (OriginHandler, OriginGame[]) SetupHandler()
     {
         var fs = new MockFileSystem();
         var manifestDir = OriginHandler.GetManifestDir(fs);
 
         fs.AddDirectory(manifestDir.FullName);
 
-        var expectedGames = new List<OriginGame>
+        var expectedGames = new OriginGame[]
         {
             new("Origin.OFR.50.0001456", "C:\\Games\\Titanfall2"),
             new("Origin.OFR.50.0003803", "C:\\Games\\Slay the Spire")
@@ -33,16 +32,35 @@ public class OriginTests
 
         var handler = new OriginHandler(fs);
 
-        var results = handler.FindAllGames().ToList();
+        return (handler, expectedGames);
+    }
+
+    [Fact]
+    public void Test_ShouldWork_FindAllGames()
+    {
+        var (handler, expectedGames) = SetupHandler();
+
+        var results = handler.FindAllGames().ToArray();
         var actualGames = results.Select(tuple =>
         {
             var (game, error) = tuple;
             Assert.True(game is not null, error);
             return game;
-        }).ToList();
+        }).ToArray();
 
-        Assert.Equal(expectedGames.Count, actualGames.Count);
+        Assert.Equal(expectedGames.Length, actualGames.Length);
         Assert.Equal(expectedGames, actualGames);
+    }
+
+    [Fact]
+    public void Test_ShouldWork_FindAllGamesById()
+    {
+        var (handler, expectedGames) = SetupHandler();
+
+        var games = handler.FindAllGamesById(out var errors);
+        Assert.Empty(errors);
+        Assert.All(expectedGames, game => Assert.True(games.ContainsKey(game.Id)));
+        Assert.Equal(expectedGames, games.Values);
     }
 
     [Fact]
