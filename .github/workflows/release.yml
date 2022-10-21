@@ -19,7 +19,7 @@ jobs:
         INPUT_VERSION: ${{ github.event.inputs.version }}
       run: |
         echo ::set-output name=current_version::${INPUT_VERSION}
-    
+
     - uses: actions/checkout@v3
 
     - name: Setup .NET
@@ -34,7 +34,7 @@ jobs:
 
     - name: Build
       run: dotnet build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
-  
+
 #    - name: Publish Example Project
 #      run: dotnet publish GameFinder.Example/GameFinder.Example.csproj --no-restore -o "out" -p:PublishSingleFile=true -p:PublishTrimmed=true -c Release -f net6.0 -r win-x64
 #
@@ -52,7 +52,7 @@ jobs:
 
     #- name: Pack
     #  run: dotnet pack ${{ env.PROJECT_FILE }} --no-build --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
-    
+
     #- name: Upload Artifact
     #  uses: actions/upload-artifact@v2
     #  with:
@@ -60,9 +60,12 @@ jobs:
     #    path: '**/*.nupkg'
     #    if-no-files-found: error
 
-    - name: Push
+    - name: Push to NuGet
       run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-    
+
+    - name: Push to GitHub Packages
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/erri120/index.json
+
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
@@ -74,7 +77,7 @@ jobs:
         body: ${{ steps.changelog_reader.outputs.changes }}
         draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
         prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
-        files: |
-          **/*.nupkg
-          **/*.snupkg
+#        files: |
+#          **/*.nupkg
+#          **/*.snupkg
 #          out/GameFinder.Example.zip
