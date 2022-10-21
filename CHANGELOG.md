@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [2.1.0] - 2022-10-21
+
+Minor update after the major rework:
+
+- everything was made safer and less functions will throw (you should still wrap the `FindAllGames` function call)
+- API changed a bit: `FindAllGames` will now return a readonly record struct instead of a named tuple
+- lots of internal changes and more tests
+
 ## [2.0.1] - 2022-10-19
 
 - Origin: fix parsing manifests with duplicate key-value entries
@@ -191,8 +199,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v2.0.1...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v2.1.0...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[2.0.1]: https://github.com/erri120/GameFinder/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/erri120/GameFinder/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/erri120/GameFinder/compare/v1.8.0...v2.0.0
 [1.8.0]: https://github.com/erri120/GameFinder/compare/v1.7.3...v1.8.0
