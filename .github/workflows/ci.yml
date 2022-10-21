@@ -30,7 +30,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Setup code coverage
-      rune: dotnet tool install --global dotnet-coverage
+      run: dotnet tool install --global dotnet-coverage
 
     - name: Test and generate code coverage
       run: dotnet-coverage collect 'dotnet test --no-build --verbosity normal' -f xml -o 'coverage.xml'
