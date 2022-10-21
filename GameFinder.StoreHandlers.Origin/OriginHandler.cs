@@ -23,7 +23,7 @@ public record OriginGame(string Id, string InstallPath);
 /// Handler for finding games install with Origin.
 /// </summary>
 [PublicAPI]
-public class OriginHandler : IHandler<OriginGame, string>
+public class OriginHandler : AHandler<OriginGame, string>
 {
     private readonly IFileSystem _fileSystem;
 
@@ -51,7 +51,7 @@ public class OriginHandler : IHandler<OriginGame, string>
     }
 
     /// <inheritdoc/>
-    public IEnumerable<Result> FindAllGames()
+    public override IEnumerable<Result> FindAllGames()
     {
         var manifestDir = GetManifestDir(_fileSystem);
 
@@ -85,7 +85,7 @@ public class OriginHandler : IHandler<OriginGame, string>
     }
 
     /// <inheritdoc/>
-    public Dictionary<string, OriginGame> FindAllGamesById(out string[] errors)
+    public override Dictionary<string, OriginGame> FindAllGamesById(out string[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;

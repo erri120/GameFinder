@@ -22,7 +22,7 @@ public record GOGGame(long Id, string Name, string Path);
 /// Handler for finding games installed with GOG Galaxy.
 /// </summary>
 [PublicAPI]
-public class GOGHandler : IHandler<GOGGame, long>
+public class GOGHandler : AHandler<GOGGame, long>
 {
     internal const string GOGRegKey = @"Software\GOG.com\Games";
 
@@ -45,7 +45,7 @@ public class GOGHandler : IHandler<GOGGame, long>
     }
 
     /// <inheritdoc/>
-    public IEnumerable<Result> FindAllGames()
+    public override IEnumerable<Result> FindAllGames()
     {
         try
         {
@@ -74,7 +74,7 @@ public class GOGHandler : IHandler<GOGGame, long>
     }
 
     /// <inheritdoc/>
-    public Dictionary<long, GOGGame> FindAllGamesById(out string[] errors)
+    public override Dictionary<long, GOGGame> FindAllGamesById(out string[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;

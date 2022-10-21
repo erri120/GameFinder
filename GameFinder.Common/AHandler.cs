@@ -9,7 +9,7 @@ namespace GameFinder.Common;
 /// <typeparam name="TGame"></typeparam>
 /// <typeparam name="TId"></typeparam>
 [PublicAPI]
-public interface IHandler<TGame, TId>
+public abstract class AHandler<TGame, TId>
     where TGame: class
 {
     /// <summary>
@@ -18,7 +18,7 @@ public interface IHandler<TGame, TId>
     /// </summary>
     /// <returns></returns>
     [MustUseReturnValue]
-    IEnumerable<Result<TGame>> FindAllGames();
+    public abstract IEnumerable<Result<TGame>> FindAllGames();
 
     /// <summary>
     /// Calls <see cref="FindAllGames"/> and converts the result into a dictionary where
@@ -27,7 +27,7 @@ public interface IHandler<TGame, TId>
     /// <param name="errors"></param>
     /// <returns></returns>
     [MustUseReturnValue]
-    Dictionary<TId, TGame> FindAllGamesById(out string[] errors);
+    public abstract Dictionary<TId, TGame> FindAllGamesById(out string[] errors);
 
     /// <summary>
     /// Wrapper around <see cref="FindAllGamesById"/> if you just need to find one game.

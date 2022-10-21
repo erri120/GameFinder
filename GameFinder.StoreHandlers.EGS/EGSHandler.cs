@@ -26,7 +26,7 @@ public record EGSGame(string CatalogItemId, string DisplayName, string InstallLo
 /// Handler for finding games installed with the Epic Games Store.
 /// </summary>
 [PublicAPI]
-public class EGSHandler : IHandler<EGSGame, string>
+public class EGSHandler : AHandler<EGSGame, string>
 {
     internal const string RegKey = @"Software\Epic Games\EOS";
 
@@ -66,7 +66,7 @@ public class EGSHandler : IHandler<EGSGame, string>
     }
 
     /// <inheritdoc/>
-    public IEnumerable<Result> FindAllGames()
+    public override IEnumerable<Result> FindAllGames()
     {
         var manifestDir = _fileSystem.DirectoryInfo.FromDirectoryName(GetManifestDir());
         if (!manifestDir.Exists)
@@ -92,7 +92,7 @@ public class EGSHandler : IHandler<EGSGame, string>
     }
 
     /// <inheritdoc/>
-    public Dictionary<string, EGSGame> FindAllGamesById(out string[] errors)
+    public override Dictionary<string, EGSGame> FindAllGamesById(out string[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;

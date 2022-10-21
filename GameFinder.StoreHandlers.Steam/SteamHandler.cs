@@ -27,7 +27,7 @@ public record SteamGame(int AppId, string Name, string Path);
 /// Handler for finding games installed with Steam.
 /// </summary>
 [PublicAPI]
-public class SteamHandler : IHandler<SteamGame, int>
+public class SteamHandler : AHandler<SteamGame, int>
 {
     internal const string RegKey = @"Software\Valve\Steam";
 
@@ -62,7 +62,7 @@ public class SteamHandler : IHandler<SteamGame, int>
     }
 
     /// <inheritdoc/>
-    public IEnumerable<Result> FindAllGames()
+    public override IEnumerable<Result> FindAllGames()
     {
         var (libraryFoldersFile, steamSearchError) = FindSteam();
         if (libraryFoldersFile is null)
@@ -105,7 +105,7 @@ public class SteamHandler : IHandler<SteamGame, int>
     }
 
     /// <inheritdoc/>
-    public Dictionary<int, SteamGame> FindAllGamesById(out string[] errors)
+    public override Dictionary<int, SteamGame> FindAllGamesById(out string[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;
