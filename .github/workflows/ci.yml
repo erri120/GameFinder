@@ -11,7 +11,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    env:
+      OS: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v3
@@ -41,3 +46,4 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: coverage.xml
         fail_ci_if_error: false
+        env_vars: OS
