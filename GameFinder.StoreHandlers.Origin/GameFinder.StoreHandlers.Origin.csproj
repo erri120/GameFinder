@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Title>GameFinder.StoreHandlers.Origin</Title>
         <Description>Library for finding games installed with Origin.</Description>
         <PackageTags>ea origin games</PackageTags>
 
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
     
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

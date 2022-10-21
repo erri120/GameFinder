@@ -1,12 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Title>GameFinder.StoreHandlers.EGS</Title>
         <Description>Library for finding games installed with the Epic Games Store.</Description>
         <PackageTags>epic egs epic-games-store games</PackageTags>
 
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
