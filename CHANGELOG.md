@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [2.2.1] - 2022-10-21
+
+Small update that changes the equality comparer of the dictionary returned by `EGSHandler.FindAllGamesById` and `OriginHandler.FindAllGamesById` to `StringComparer.OrdinalIgnoreCase`.
+
 ## [2.2.0] - 2022-10-21
 
 This update adds some utility functions you can use. I've also created a new package `GameFinder.Common` where all those new utility functions live:
