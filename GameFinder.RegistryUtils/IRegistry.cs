@@ -127,35 +127,6 @@ public interface IRegistryKey : IDisposable
     }
 
     /// <summary>
-    /// Gets a QWord (long).
-    /// </summary>
-    /// <param name="valueName"></param>
-    /// <returns></returns>
-    public long? GetQWord(string? valueName)
-    {
-        var value = GetValue(valueName);
-        return (long?)value;
-    }
-
-    /// <summary>
-    /// Tries to get a QWord (long).
-    /// </summary>
-    /// <param name="valueName"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public bool TryGetQWord(string? valueName, out long value)
-    {
-        value = default;
-
-        var obj = GetValue(valueName);
-        if (obj is not long qword) return false;
-
-        value = qword;
-        return true;
-
-    }
-
-    /// <summary>
     /// Gets a string.
     /// </summary>
     /// <param name="valueName"></param>
