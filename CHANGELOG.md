@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [2.2.2] - 2022-11-11
+
+- `FindAllGamesById` will no longer throw an exception for duplicate IDs
+
 ## [2.2.1] - 2022-10-21
 
 Small update that changes the equality comparer of the dictionary returned by `EGSHandler.FindAllGamesById` and `OriginHandler.FindAllGamesById` to `StringComparer.OrdinalIgnoreCase`.

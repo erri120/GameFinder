@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 
@@ -61,5 +62,35 @@ public static class Extensions
         var errors = allResults.OnlyErrors().ToArray();
 
         return (games, errors);
+    }
+
+    /// <summary>
+    /// Custom <see cref="Enumerable.ToDictionary{TSource,TKey}(System.Collections.Generic.IEnumerable{TSource},System.Func{TSource,TKey})"/>
+    /// function that skips duplicate keys.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="keySelector"></param>
+    /// <param name="elementSelector"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TElement"></typeparam>
+    /// <returns></returns>
+    public static Dictionary<TKey, TElement> CustomToDictionary<TSource, TKey, TElement>(
+        [InstantHandle] this IEnumerable<TSource> source, Func<TSource, TKey> keySelector,
+        Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer = null)
+        where TKey: notnull
+    {
+        var dictionary = new Dictionary<TKey, TElement>(comparer);
+
+        foreach (var element in source)
+        {
+            var key = keySelector(element);
+            if (dictionary.ContainsKey(key)) continue;
+
+            dictionary.Add(key, elementSelector(element));
+        }
+
+        return dictionary;
     }
 }

@@ -110,7 +110,7 @@ public class SteamHandler : AHandler<SteamGame, int>
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;
 
-        return games.ToDictionary(game => game.AppId, game => game);
+        return games.CustomToDictionary(game => game.AppId, game => game);
     }
 
     private (IFileInfo? libraryFoldersFile, string? error) FindSteam()

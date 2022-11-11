@@ -97,7 +97,7 @@ public class EGSHandler : AHandler<EGSGame, string>
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;
 
-        return games.ToDictionary(game => game.CatalogItemId, game => game, StringComparer.OrdinalIgnoreCase);
+        return games.CustomToDictionary(game => game.CatalogItemId, game => game, StringComparer.OrdinalIgnoreCase);
     }
 
     private Result DeserializeGame(IFileInfo itemFile)

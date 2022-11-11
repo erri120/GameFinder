@@ -105,6 +105,7 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     /// <param name="value"></param>
     public void AddValue(string valueName, object value)
     {
+        if (_values.ContainsKey(valueName)) return;
         _values.Add(valueName, value);
     }
 

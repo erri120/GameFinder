@@ -79,7 +79,7 @@ public class GOGHandler : AHandler<GOGGame, long>
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;
 
-        return games.ToDictionary(game => game.Id, game => game);
+        return games.CustomToDictionary(game => game.Id, game => game);
     }
 
     private static Result ParseSubKey(IRegistryKey gogKey, string subKeyName)

@@ -90,7 +90,7 @@ public class OriginHandler : AHandler<OriginGame, string>
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;
 
-        return games.ToDictionary(game => game.Id, game => game, StringComparer.OrdinalIgnoreCase);
+        return games.CustomToDictionary(game => game.Id, game => game, StringComparer.OrdinalIgnoreCase);
     }
 
     private static Result ParseMfstFile(IFileInfo fileInfo)
