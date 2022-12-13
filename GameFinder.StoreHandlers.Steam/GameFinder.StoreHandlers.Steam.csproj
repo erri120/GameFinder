@@ -17,7 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="ValveKeyValue" Version="0.8.2.162" />
-        <PackageReference Include="System.IO.Abstractions" Version="17.2.3" />
+        <PackageReference Include="System.IO.Abstractions" Version="19.1.1" />
     </ItemGroup>
 
     <ItemGroup>
