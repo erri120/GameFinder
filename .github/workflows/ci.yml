@@ -28,6 +28,9 @@ jobs:
           6.0.x
           7.0.x
 
+    - name: Print Debug Info
+      run: dotnet --info
+
     - name: Restore dependencies
       run: dotnet restore
 
