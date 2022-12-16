@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [2.3.0] - 2022-12-16
 
+- upgrade to C# 11
 - upgrade `System.IO.Abstractions` to v19.1.1
 
 ## [2.2.2] - 2022-11-11
