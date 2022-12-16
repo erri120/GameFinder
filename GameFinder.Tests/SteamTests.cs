@@ -120,7 +120,7 @@ public class SteamTests
     {
         var fs = new MockFileSystem();
 
-        var steamDir = fs.DirectoryInfo.FromDirectoryName(fs.Path.Combine(fs.Path.GetTempPath(), "Steam"));
+        var steamDir = fs.DirectoryInfo.New(fs.Path.Combine(fs.Path.GetTempPath(), "Steam"));
         var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
 
         var registry = new InMemoryRegistry();
@@ -142,7 +142,7 @@ public class SteamTests
     {
         var fs = new MockFileSystem();
 
-        var steamDir = fs.DirectoryInfo.FromDirectoryName(fs.Path.Combine(fs.Path.GetTempPath(), "Steam"));
+        var steamDir = fs.DirectoryInfo.New(fs.Path.Combine(fs.Path.GetTempPath(), "Steam"));
         var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
 
         var libraryFoldersFile = SteamHandler.GetLibraryFoldersFile(steamDir);

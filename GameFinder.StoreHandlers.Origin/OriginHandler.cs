@@ -43,7 +43,7 @@ public class OriginHandler : AHandler<OriginGame, string>
 
     internal static IDirectoryInfo GetManifestDir(IFileSystem fileSystem)
     {
-        return fileSystem.DirectoryInfo.FromDirectoryName(fileSystem.Path.Combine(
+        return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
             "Origin",
             "LocalContent"

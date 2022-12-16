@@ -80,7 +80,7 @@ public class SteamHandler : AHandler<SteamGame, int>
 
         foreach (var libraryFolderPath in libraryFolderPaths)
         {
-            var libraryFolder = _fileSystem.DirectoryInfo.FromDirectoryName(libraryFolderPath);
+            var libraryFolder = _fileSystem.DirectoryInfo.New(libraryFolderPath);
             if (!libraryFolder.Exists)
             {
                 yield return new Result(null, $"Steam Library {libraryFolder.FullName} does not exist!");
@@ -164,7 +164,7 @@ public class SteamHandler : AHandler<SteamGame, int>
 
         if (!regKey.TryGetString("SteamPath", out var steamPath)) return null;
 
-        var directoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(steamPath);
+        var directoryInfo = _fileSystem.DirectoryInfo.New(steamPath);
         return directoryInfo;
     }
 
@@ -172,7 +172,7 @@ public class SteamHandler : AHandler<SteamGame, int>
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            return fileSystem.DirectoryInfo.FromDirectoryName(fileSystem.Path.Combine(
+            return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
                 "Steam"
             ));
@@ -182,7 +182,7 @@ public class SteamHandler : AHandler<SteamGame, int>
         {
             // steam on linux can be found in ~/.local/share/Steam
             // https://github.com/dotnet/runtime/blob/3b1df9396e2a7cc6797e76793e8547f8a7771953/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs#L124
-            return fileSystem.DirectoryInfo.FromDirectoryName(fileSystem.Path.Combine(
+            return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Steam"
             ));
@@ -195,7 +195,7 @@ public class SteamHandler : AHandler<SteamGame, int>
     {
         var fileSystem = steamDirectory.FileSystem;
 
-        var fileInfo = fileSystem.FileInfo.FromFileName(fileSystem.Path.Combine(
+        var fileInfo = fileSystem.FileInfo.New(fileSystem.Path.Combine(
             steamDirectory.FullName,
             "steamapps",
             "libraryfolders.vdf"));

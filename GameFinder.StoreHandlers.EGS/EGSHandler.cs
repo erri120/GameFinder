@@ -68,7 +68,7 @@ public class EGSHandler : AHandler<EGSGame, string>
     /// <inheritdoc/>
     public override IEnumerable<Result> FindAllGames()
     {
-        var manifestDir = _fileSystem.DirectoryInfo.FromDirectoryName(GetManifestDir());
+        var manifestDir = _fileSystem.DirectoryInfo.New(GetManifestDir());
         if (!manifestDir.Exists)
         {
             yield return new Result(null, $"The manifest directory {manifestDir.FullName} does not exist!");

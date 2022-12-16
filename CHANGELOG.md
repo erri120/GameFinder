@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [2.3.0] - 2022-12-16
+
+- upgrade `System.IO.Abstractions` to v19.1.1
+
 ## [2.2.2] - 2022-11-11
 
 - `FindAllGamesById` will no longer throw an exception for duplicate IDs
