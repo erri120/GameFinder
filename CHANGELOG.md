@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 ## [2.3.0] - 2022-12-16
 
 - Steam: added `~/.steam` and `~/.local/.steam` as possible default Steam directories on Linux
+- Steam: added constructor that accepts a custom Steam path in case the library can't find it
 - upgrade to C# 11
 - upgrade `System.IO.Abstractions` to v19.1.1
 

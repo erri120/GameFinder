@@ -33,6 +33,7 @@ public class SteamHandler : AHandler<SteamGame, int>
 
     private readonly IRegistry? _registry;
     private readonly IFileSystem _fileSystem;
+    private readonly string? _customSteamPath;
 
     /// <summary>
     /// Default constructor that uses the real filesystem <see cref="FileSystem"/> and
@@ -59,6 +60,26 @@ public class SteamHandler : AHandler<SteamGame, int>
     {
         _fileSystem = fileSystem;
         _registry = registry;
+    }
+
+    /// <summary>
+    /// Constructor for specifying a custom Steam path. Only use this if this library can't
+    /// find Steam using the default paths and registry. The custom path will be the only path
+    /// this library looks at and should only be given if you known that Steam is located there.
+    /// </summary>
+    /// <param name="customSteamPath"></param>
+    /// <param name="fileSystem"></param>
+    /// <param name="registry"></param>
+    /// <exception cref="ArgumentException">The path <paramref name="customSteamPath"/> must be fully qualified.</exception>
+    public SteamHandler(string customSteamPath, IFileSystem fileSystem, IRegistry? registry)
+    {
+        _fileSystem = fileSystem;
+        _registry = registry;
+
+        if (!_fileSystem.Path.IsPathFullyQualified(customSteamPath))
+            throw new ArgumentException($"Path {customSteamPath} is not fully qualified!", nameof(customSteamPath));
+
+        _customSteamPath = customSteamPath;
     }
 
     /// <inheritdoc/>
@@ -115,6 +136,11 @@ public class SteamHandler : AHandler<SteamGame, int>
 
     private (IFileInfo? libraryFoldersFile, string? error) FindSteam()
     {
+        if (_customSteamPath is not null)
+        {
+            return (GetLibraryFoldersFile(_fileSystem.DirectoryInfo.New(_customSteamPath)), null);
+        }
+
         try
         {
             var defaultSteamDirs = GetDefaultSteamDirectories(_fileSystem)
