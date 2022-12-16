@@ -15,7 +15,7 @@ public class SteamTests
     {
         var fs = new MockFileSystem();
 
-        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
+        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectories(fs).First();
         var libraryFoldersFile = SteamHandler.GetLibraryFoldersFile(defaultSteamDir);
 
         fs.AddFile(libraryFoldersFile.FullName, $@"
@@ -87,7 +87,7 @@ public class SteamTests
     public void Test_ShouldError_NoSteam_DefaultPath()
     {
         var fs = new MockFileSystem();
-        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
+        var defaultSteamDirString = $"[{SteamHandler.GetDefaultSteamDirectories(fs).Select(dir => dir.FullName).Aggregate((a, b) => $"{a}, {b}")}]";
 
         var handler = new SteamHandler(fs, null);
 
@@ -95,7 +95,7 @@ public class SteamTests
         Assert.Collection(results, result =>
         {
             Assert.Null(result.Game);
-            Assert.Equal($"Unable to find Steam in the default path {defaultSteamDir.FullName}", result.Error);
+            Assert.Equal($"Unable to find Steam in one of the default paths {defaultSteamDirString}", result.Error);
         });
     }
 
@@ -103,7 +103,7 @@ public class SteamTests
     public void Test_ShouldError_NoSteam_Registry()
     {
         var fs = new MockFileSystem();
-        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
+        var defaultSteamDirString = $"[{SteamHandler.GetDefaultSteamDirectories(fs).Select(dir => dir.FullName).Aggregate((a, b) => $"{a}, {b}")}]";
 
         var handler = new SteamHandler(fs, new InMemoryRegistry());
 
@@ -111,7 +111,7 @@ public class SteamTests
         Assert.Collection(results, result =>
         {
             Assert.Null(result.Game);
-            Assert.Equal($"Unable to find Steam in the registry and the default path {defaultSteamDir.FullName}", result.Error);
+            Assert.Equal($"Unable to find Steam in the registry and one of the default paths {defaultSteamDirString}", result.Error);
         });
     }
 
@@ -121,7 +121,7 @@ public class SteamTests
         var fs = new MockFileSystem();
 
         var steamDir = fs.DirectoryInfo.New(fs.Path.Combine(fs.Path.GetTempPath(), "Steam"));
-        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
+        var defaultSteamDirString = $"[{SteamHandler.GetDefaultSteamDirectories(fs).Select(dir => dir.FullName).Aggregate((a, b) => $"{a}, {b}")}]";
 
         var registry = new InMemoryRegistry();
         var key = registry.AddKey(RegistryHive.CurrentUser, SteamHandler.RegKey);
@@ -133,7 +133,7 @@ public class SteamTests
         Assert.Collection(results, result =>
         {
             Assert.Null(result.Game);
-            Assert.Equal($"Unable to find Steam in the default path {defaultSteamDir.FullName} and the path from the registry does not exist: {steamDir.FullName}", result.Error);
+            Assert.Equal($"Unable to find Steam in one of the default paths {defaultSteamDirString} and the path from the registry does not exist: {steamDir.FullName}", result.Error);
         });
     }
 
@@ -143,7 +143,7 @@ public class SteamTests
         var fs = new MockFileSystem();
 
         var steamDir = fs.DirectoryInfo.New(fs.Path.Combine(fs.Path.GetTempPath(), "Steam"));
-        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
+        var defaultSteamDirString = $"[{SteamHandler.GetDefaultSteamDirectories(fs).Select(dir => dir.FullName).Aggregate((a, b) => $"{a}, {b}")}]";
 
         var libraryFoldersFile = SteamHandler.GetLibraryFoldersFile(steamDir);
 
@@ -159,7 +159,7 @@ public class SteamTests
         Assert.Collection(results, result =>
         {
             Assert.Null(result.Game);
-            Assert.Equal($"Unable to find Steam in the default path {defaultSteamDir.FullName} and the path from the registry is not a valid Steam installation because {libraryFoldersFile.FullName} does not exist", result.Error);
+            Assert.Equal($"Unable to find Steam in one of the default paths {defaultSteamDirString} and the path from the registry is not a valid Steam installation because {libraryFoldersFile.FullName} does not exist", result.Error);
         });
     }
 
@@ -168,7 +168,7 @@ public class SteamTests
     {
         var fs = new MockFileSystem();
 
-        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
+        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectories(fs).First();
         var libraryFoldersFile = SteamHandler.GetLibraryFoldersFile(defaultSteamDir);
 
         fs.AddFile(libraryFoldersFile.FullName, $@"
@@ -195,7 +195,7 @@ public class SteamTests
     {
         var fs = new MockFileSystem();
 
-        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectory(fs);
+        var defaultSteamDir = SteamHandler.GetDefaultSteamDirectories(fs).First();
         var libraryFoldersFile = SteamHandler.GetLibraryFoldersFile(defaultSteamDir);
 
         fs.AddFile(libraryFoldersFile.FullName, $@"

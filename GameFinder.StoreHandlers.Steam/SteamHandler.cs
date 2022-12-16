@@ -117,34 +117,40 @@ public class SteamHandler : AHandler<SteamGame, int>
     {
         try
         {
-            var defaultSteamDir = GetDefaultSteamDirectory(_fileSystem);
-            var libraryFoldersFile = GetLibraryFoldersFile(defaultSteamDir);
+            var defaultSteamDirs = GetDefaultSteamDirectories(_fileSystem)
+                .ToArray();
 
-            if (libraryFoldersFile.Exists)
+            var defaultSteamDirString = $"[{defaultSteamDirs.Select(dir => dir.FullName).Aggregate((a,b) => $"{a}, {b}")}]";
+
+            var libraryFoldersFile = defaultSteamDirs
+                .Select(GetLibraryFoldersFile)
+                .FirstOrDefault(file => file.Exists);
+
+            if (libraryFoldersFile is not null)
             {
                 return (libraryFoldersFile, null);
             }
 
             if (_registry is null)
             {
-                return (null, $"Unable to find Steam in the default path {defaultSteamDir.FullName}");
+                return (null, $"Unable to find Steam in one of the default paths {defaultSteamDirString}");
             }
 
             var steamDir = FindSteamInRegistry(_registry);
             if (steamDir is null)
             {
-                return (null, $"Unable to find Steam in the registry and the default path {defaultSteamDir.FullName}");
+                return (null, $"Unable to find Steam in the registry and one of the default paths {defaultSteamDirString}");
             }
 
             if (!steamDir.Exists)
             {
-                return (null, $"Unable to find Steam in the default path {defaultSteamDir.FullName} and the path from the registry does not exist: {steamDir.FullName}");
+                return (null, $"Unable to find Steam in one of the default paths {defaultSteamDirString} and the path from the registry does not exist: {steamDir.FullName}");
             }
 
             libraryFoldersFile = GetLibraryFoldersFile(steamDir);
             if (!libraryFoldersFile.Exists)
             {
-                return (null, $"Unable to find Steam in the default path {defaultSteamDir.FullName} and the path from the registry is not a valid Steam installation because {libraryFoldersFile.FullName} does not exist");
+                return (null, $"Unable to find Steam in one of the default paths {defaultSteamDirString} and the path from the registry is not a valid Steam installation because {libraryFoldersFile.FullName} does not exist");
             }
 
             return (libraryFoldersFile, null);
@@ -168,24 +174,44 @@ public class SteamHandler : AHandler<SteamGame, int>
         return directoryInfo;
     }
 
-    internal static IDirectoryInfo GetDefaultSteamDirectory(IFileSystem fileSystem)
+    internal static IEnumerable<IDirectoryInfo> GetDefaultSteamDirectories(IFileSystem fileSystem)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
+            yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
                 "Steam"
             ));
+
+            yield break;
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            // steam on linux can be found in ~/.local/share/Steam
+            // steam on linux can be found in various places
+
+            // ~/.local/share/Steam (common)
             // https://github.com/dotnet/runtime/blob/3b1df9396e2a7cc6797e76793e8547f8a7771953/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs#L124
-            return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
+            yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Steam"
             ));
+
+            // ~/.steam (common)
+            // https://github.com/dotnet/runtime/blob/3b1df9396e2a7cc6797e76793e8547f8a7771953/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs#L90
+            yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".steam"
+            ));
+
+            // ~/.local/.steam (rare)
+            yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".local",
+                ".steam"
+            ));
+
+            yield break;
         }
 
         throw new PlatformNotSupportedException();
