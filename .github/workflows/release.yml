@@ -29,7 +29,7 @@ jobs:
       run: dotnet restore
 
     - name: Pack
-      run: dotnet pack --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}"
+      run: dotnet pack --no-restore -p:Version="${{ steps.tag_name.outputs.current_version }}" -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit="${{ github.sha }}"
 
     - name: Get Changelog Entry
       id: changelog_reader
