@@ -1,7 +1,10 @@
 <Project>
     <PropertyGroup>
         <Authors>erri120</Authors>
+
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
         <PackageProjectUrl>https://github.com/erri120/GameFinder</PackageProjectUrl>
         <RepositoryUrl>https://github.com/erri120/GameFinder.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -10,4 +13,8 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath=""/>
+    </ItemGroup>
 </Project>
