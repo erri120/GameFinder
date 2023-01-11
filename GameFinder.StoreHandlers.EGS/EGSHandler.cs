@@ -92,7 +92,7 @@ public class EGSHandler : AHandler<EGSGame, string>
     }
 
     /// <inheritdoc/>
-    public override Dictionary<string, EGSGame> FindAllGamesById(out string[] errors)
+    public override IDictionary<string, EGSGame> FindAllGamesById(out string[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;

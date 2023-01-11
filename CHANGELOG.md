@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [2.4.0] - 2023-01-11
+
+- All: return `IDictionary<TKey, TValue>` instead of `Dictionary<TKey, TValue>`
+
 ## [2.3.0] - 2022-12-16
 
 - Steam: added `~/.steam` and `~/.local/.steam` as possible default Steam directories on Linux

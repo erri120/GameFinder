@@ -27,7 +27,7 @@ public abstract class AHandler<TGame, TId>
     /// <param name="errors"></param>
     /// <returns></returns>
     [MustUseReturnValue]
-    public abstract Dictionary<TId, TGame> FindAllGamesById(out string[] errors);
+    public abstract IDictionary<TId, TGame> FindAllGamesById(out string[] errors);
 
     /// <summary>
     /// Wrapper around <see cref="FindAllGamesById"/> if you just need to find one game.

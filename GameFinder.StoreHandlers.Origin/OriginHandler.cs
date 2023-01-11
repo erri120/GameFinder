@@ -85,7 +85,7 @@ public class OriginHandler : AHandler<OriginGame, string>
     }
 
     /// <inheritdoc/>
-    public override Dictionary<string, OriginGame> FindAllGamesById(out string[] errors)
+    public override IDictionary<string, OriginGame> FindAllGamesById(out string[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;

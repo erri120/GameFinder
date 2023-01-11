@@ -75,7 +75,7 @@ public class GOGHandler : AHandler<GOGGame, long>
     }
 
     /// <inheritdoc/>
-    public override Dictionary<long, GOGGame> FindAllGamesById(out string[] errors)
+    public override IDictionary<long, GOGGame> FindAllGamesById(out string[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;

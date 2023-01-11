@@ -126,7 +126,7 @@ public class SteamHandler : AHandler<SteamGame, int>
     }
 
     /// <inheritdoc/>
-    public override Dictionary<int, SteamGame> FindAllGamesById(out string[] errors)
+    public override IDictionary<int, SteamGame> FindAllGamesById(out string[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;
