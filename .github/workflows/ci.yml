@@ -43,3 +43,4 @@ jobs:
         files: coverage.xml
         fail_ci_if_error: false
         env_vars: OS
+        flags: ${{ env.OS }}
