@@ -1,0 +1,25 @@
+﻿name: Validate codecov.yml
+
+on:
+  push:
+    paths:
+      - "codecov.yml"
+      - ".github/workflows/validate-codecov.yml"
+    branches: [ master ]
+  pull_request:
+    paths:
+      - "codecov.yml"
+      - ".github/workflows/validate-codecov.yml"
+    branches: [ master ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Validate
+        shell: bash
+        run: |
+          curl --fail --data-binary @codecov.yml https://codecov.io/validate
