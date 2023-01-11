@@ -10,8 +10,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [2.4.0] - 2023-01-11
 
+Although this release contains some API changes and a lot of internal changes, consumers will likely not be affected.
+
 - All: return `IDictionary<TKey, TValue>` instead of `Dictionary<TKey, TValue>`
-- reworked `Result<TGame>` to a custom `readonly struct`, API Consumers should not be affected.
+- reworked `Result<TGame>` to a custom `readonly struct`
 
 ## [2.3.0] - 2022-12-16
 

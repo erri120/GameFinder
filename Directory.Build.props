@@ -30,4 +30,8 @@
         <!-- MA0048: File name must match type name -->
         <NoWarn>MA0048</NoWarn>
     </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="GameFinder.Tests" />
+    </ItemGroup>
 </Project>
