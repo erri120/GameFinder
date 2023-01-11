@@ -19,5 +19,15 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" PrivateAssets="all" />
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.5">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
+
+    <PropertyGroup>
+        <!-- https://github.com/meziantou/Meziantou.Analyzer/tree/main/docs/Rules -->
+        <!-- MA0048: File name must match type name -->
+        <NoWarn>MA0048</NoWarn>
+    </PropertyGroup>
 </Project>
