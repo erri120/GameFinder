@@ -7,7 +7,6 @@ using System.Text;
 using System.Web;
 using GameFinder.Common;
 using JetBrains.Annotations;
-using Result = GameFinder.Common.Result<GameFinder.StoreHandlers.Origin.OriginGame>;
 
 namespace GameFinder.StoreHandlers.Origin;
 
@@ -51,20 +50,20 @@ public class OriginHandler : AHandler<OriginGame, string>
     }
 
     /// <inheritdoc/>
-    public override IEnumerable<Result> FindAllGames()
+    public override IEnumerable<Result<OriginGame>> FindAllGames()
     {
         var manifestDir = GetManifestDir(_fileSystem);
 
         if (!manifestDir.Exists)
         {
-            yield return new Result(null, $"Manifest folder {manifestDir.FullName} does not exist!");
+            yield return Result.FromError<OriginGame>($"Manifest folder {manifestDir.FullName} does not exist!");
             yield break;
         }
 
         var mfstFiles = manifestDir.EnumerateFiles("*.mfst", SearchOption.AllDirectories).ToList();
         if (mfstFiles.Count == 0)
         {
-            yield return new Result(null,$"Manifest folder {manifestDir.FullName} does not contain any .mfst files");
+            yield return Result.FromError<OriginGame>($"Manifest folder {manifestDir.FullName} does not contain any .mfst files");
             yield break;
         }
 
@@ -73,14 +72,13 @@ public class OriginHandler : AHandler<OriginGame, string>
             var (game, error) = ParseMfstFile(mfstFile);
             if (error is not null)
             {
-                yield return new Result(null, error);
+                yield return Result.FromError<OriginGame>(error);
                 continue;
             }
 
             // ignored game
             if (game is null) continue;
-
-            yield return new Result(game, null);
+            yield return Result.FromGame(game);
         }
     }
 
@@ -93,7 +91,7 @@ public class OriginHandler : AHandler<OriginGame, string>
         return games.CustomToDictionary(game => game.Id, game => game, StringComparer.OrdinalIgnoreCase);
     }
 
-    private static Result ParseMfstFile(IFileInfo fileInfo)
+    private static Result<OriginGame> ParseMfstFile(IFileInfo fileInfo)
     {
         try
         {
@@ -104,24 +102,25 @@ public class OriginHandler : AHandler<OriginGame, string>
             var ids = query.GetValues("id");
             if (ids is null || ids.Length == 0)
             {
-                return new Result(null,$"Manifest {fileInfo.FullName} does not have a value \"id\"");
+                return Result.FromError<OriginGame>($"Manifest {fileInfo.FullName} does not have a value \"id\"");
             }
 
-            var id = ids.First();
+            var id = ids[0];
             if (id.EndsWith("@steam", StringComparison.OrdinalIgnoreCase))
-                return new Result(null, null);
+                return new Result<OriginGame>();
 
             var installPaths = query.GetValues("dipInstallPath");
             if (installPaths is null || installPaths.Length == 0)
             {
-                return new Result(null, $"Manifest {fileInfo.FullName} does not have a value \"dipInstallPath\"");
+                return Result.FromError<OriginGame>($"Manifest {fileInfo.FullName} does not have a value \"dipInstallPath\"");
             }
 
-            return new Result(new OriginGame(id, installPaths.First()), null);
+            var game = new OriginGame(id, installPaths[0]);
+            return Result.FromGame(game);
         }
         catch (Exception e)
         {
-            return new Result(null, $"Exception while parsing {fileInfo.FullName}\n{e}");
+            return Result.FromError<OriginGame>($"Exception while parsing {fileInfo.FullName}\n{e}");
         }
     }
 }

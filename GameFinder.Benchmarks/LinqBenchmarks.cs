@@ -25,7 +25,7 @@ public class LinqBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        var enumerable = Enumerable.Range(0, 100).Select(_ => new Result<string>("", null));
+        var enumerable = Enumerable.Range(0, 100).Select(_ => Result.FromGame(""));
 
         _results = Type switch
         {

@@ -9,7 +9,6 @@ using System.Text.Json;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
-using Result = GameFinder.Common.Result<GameFinder.StoreHandlers.EGS.EGSGame>;
 
 namespace GameFinder.StoreHandlers.EGS;
 
@@ -66,12 +65,12 @@ public class EGSHandler : AHandler<EGSGame, string>
     }
 
     /// <inheritdoc/>
-    public override IEnumerable<Result> FindAllGames()
+    public override IEnumerable<Result<EGSGame>> FindAllGames()
     {
         var manifestDir = _fileSystem.DirectoryInfo.New(GetManifestDir());
         if (!manifestDir.Exists)
         {
-            yield return new Result(null, $"The manifest directory {manifestDir.FullName} does not exist!");
+            yield return Result.FromError<EGSGame>($"The manifest directory {manifestDir.FullName} does not exist!");
             yield break;
         }
 
@@ -81,7 +80,7 @@ public class EGSHandler : AHandler<EGSGame, string>
 
         if (itemFiles.Length == 0)
         {
-            yield return new Result(null, $"The manifest directory {manifestDir.FullName} does not contain any .item files");
+            yield return Result.FromError<EGSGame>($"The manifest directory {manifestDir.FullName} does not contain any .item files");
             yield break;
         }
 
@@ -100,7 +99,7 @@ public class EGSHandler : AHandler<EGSGame, string>
         return games.CustomToDictionary(game => game.CatalogItemId, game => game, StringComparer.OrdinalIgnoreCase);
     }
 
-    private Result DeserializeGame(IFileInfo itemFile)
+    private Result<EGSGame> DeserializeGame(IFileInfo itemFile)
     {
         using var stream = itemFile.OpenRead();
 
@@ -110,32 +109,32 @@ public class EGSHandler : AHandler<EGSGame, string>
 
             if (game is null)
             {
-                return new Result(null, $"Unable to deserialize file {itemFile.FullName}");
+                return Result.FromError<EGSGame>($"Unable to deserialize file {itemFile.FullName}");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (game.CatalogItemId is null)
             {
-                return new Result(null, $"Manifest {itemFile.FullName} does not have a value \"CatalogItemId\"");
+                return Result.FromError<EGSGame>($"Manifest {itemFile.FullName} does not have a value \"CatalogItemId\"");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (game.DisplayName is null)
             {
-                return new Result(null, $"Manifest {itemFile.FullName} does not have a value \"DisplayName\"");
+                return Result.FromError<EGSGame>($"Manifest {itemFile.FullName} does not have a value \"DisplayName\"");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (game.InstallLocation is null)
             {
-                return new Result(null, $"Manifest {itemFile.FullName} does not have a value \"InstallLocation\"");
+                return Result.FromError<EGSGame>($"Manifest {itemFile.FullName} does not have a value \"InstallLocation\"");
             }
 
-            return new Result(game, null);
+            return Result.FromGame(game);
         }
         catch (Exception e)
         {
-            return new Result(null, $"Unable to deserialize file {itemFile.FullName}:\n{e}");
+            return Result.FromError<EGSGame>($"Unable to deserialize file {itemFile.FullName}:\n{e}");
         }
     }
 

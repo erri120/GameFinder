@@ -10,7 +10,6 @@ using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using ValveKeyValue;
-using Result = GameFinder.Common.Result<GameFinder.StoreHandlers.Steam.SteamGame>;
 
 namespace GameFinder.StoreHandlers.Steam;
 
@@ -34,6 +33,13 @@ public class SteamHandler : AHandler<SteamGame, int>
     private readonly IRegistry? _registry;
     private readonly IFileSystem _fileSystem;
     private readonly string? _customSteamPath;
+
+    private static readonly KVSerializerOptions KvSerializerOptions =
+        new()
+        {
+            HasEscapeSequences = true,
+            EnableValveNullByteBugBehavior = true,
+        };
 
     /// <summary>
     /// Default constructor that uses the real filesystem <see cref="FileSystem"/> and
@@ -83,19 +89,19 @@ public class SteamHandler : AHandler<SteamGame, int>
     }
 
     /// <inheritdoc/>
-    public override IEnumerable<Result> FindAllGames()
+    public override IEnumerable<Result<SteamGame>> FindAllGames()
     {
         var (libraryFoldersFile, steamSearchError) = FindSteam();
         if (libraryFoldersFile is null)
         {
-            yield return new Result(null, steamSearchError ?? "Unable to find Steam!");
+            yield return Result.FromError<SteamGame>(steamSearchError ?? "Unable to find Steam!");
             yield break;
         }
 
         var libraryFolderPaths = ParseLibraryFoldersFile(libraryFoldersFile);
         if (libraryFolderPaths is null || libraryFolderPaths.Count == 0)
         {
-            yield return new Result(null, $"Found no Steam Libraries in {libraryFoldersFile.FullName}");
+            yield return Result.FromError<SteamGame>($"Found no Steam Libraries in {libraryFoldersFile.FullName}");
             yield break;
         }
 
@@ -104,7 +110,7 @@ public class SteamHandler : AHandler<SteamGame, int>
             var libraryFolder = _fileSystem.DirectoryInfo.New(libraryFolderPath);
             if (!libraryFolder.Exists)
             {
-                yield return new Result(null, $"Steam Library {libraryFolder.FullName} does not exist!");
+                yield return Result.FromError<SteamGame>($"Steam Library {libraryFolder.FullName} does not exist!");
                 continue;
             }
 
@@ -114,7 +120,7 @@ public class SteamHandler : AHandler<SteamGame, int>
 
             if (acfFiles.Length == 0)
             {
-                yield return new Result(null,$"Library folder {libraryFolder.FullName} does not contain any manifests");
+                yield return Result.FromError<SteamGame>($"Library folder {libraryFolder.FullName} does not contain any manifests");
                 continue;
             }
 
@@ -262,11 +268,7 @@ public class SteamHandler : AHandler<SteamGame, int>
             using var stream = fileInfo.OpenRead();
 
             var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
-            var data = kv.Deserialize(stream, new KVSerializerOptions
-            {
-                HasEscapeSequences = true,
-                EnableValveNullByteBugBehavior = true
-            });
+            var data = kv.Deserialize(stream, KvSerializerOptions);
 
             if (data is null) return null;
             if (!data.Name.Equals("libraryfolders", StringComparison.OrdinalIgnoreCase)) return null;
@@ -287,45 +289,41 @@ public class SteamHandler : AHandler<SteamGame, int>
         }
     }
 
-    private Result ParseAppManifestFile(IFileInfo manifestFile, IDirectoryInfo libraryFolder)
+    private Result<SteamGame> ParseAppManifestFile(IFileInfo manifestFile, IDirectoryInfo libraryFolder)
     {
         try
         {
             using var stream = manifestFile.OpenRead();
 
             var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
-            var data = kv.Deserialize(stream, new KVSerializerOptions
-            {
-                HasEscapeSequences = true,
-                EnableValveNullByteBugBehavior = true
-            });
+            var data = kv.Deserialize(stream, KvSerializerOptions);
 
             if (data is null)
             {
-                return new Result(null, $"Unable to parse {manifestFile.FullName}");
+                return Result.FromError<SteamGame>($"Unable to parse {manifestFile.FullName}");
             }
 
             if (!data.Name.Equals("AppState", StringComparison.OrdinalIgnoreCase))
             {
-                return new Result(null, $"Manifest {manifestFile.FullName} is not a valid format!");
+                return Result.FromError<SteamGame>($"Manifest {manifestFile.FullName} is not a valid format!");
             }
 
             var appIdValue = data["appid"];
             if (appIdValue is null)
             {
-                return new Result(null, $"Manifest {manifestFile.FullName} does not have the value \"appid\"");
+                return Result.FromError<SteamGame>($"Manifest {manifestFile.FullName} does not have the value \"appid\"");
             }
 
             var nameValue = data["name"];
             if (nameValue is null)
             {
-                return new Result(null, $"Manifest {manifestFile.FullName} does not have the value \"name\"");
+                return Result.FromError<SteamGame>($"Manifest {manifestFile.FullName} does not have the value \"name\"");
             }
 
             var installDirValue = data["installdir"];
             if (installDirValue is null)
             {
-                return new Result(null, $"Manifest {manifestFile.FullName} does not have the value \"installdir\"");
+                return Result.FromError<SteamGame>($"Manifest {manifestFile.FullName} does not have the value \"installdir\"");
             }
 
             var appId = appIdValue.ToInt32(NumberFormatInfo.InvariantInfo);
@@ -339,11 +337,11 @@ public class SteamHandler : AHandler<SteamGame, int>
             );
 
             var game = new SteamGame(appId, name, gamePath);
-            return new Result(game, null);
+            return Result.FromGame(game);
         }
         catch (Exception e)
         {
-            return new Result(null, $"Exception while parsing file {manifestFile.FullName}:\n{e}");
+            return Result.FromError<SteamGame>($"Exception while parsing file {manifestFile.FullName}:\n{e}");
         }
     }
 }
