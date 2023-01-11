@@ -272,7 +272,7 @@ public class SteamHandler : AHandler<SteamGame, int>
             if (!data.Name.Equals("libraryfolders", StringComparison.OrdinalIgnoreCase)) return null;
 
             var paths = data.Children
-                .Where(child => int.TryParse(child.Name, out _))
+                .Where(child => int.TryParse(child.Name, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
                 .Select(child => child["path"])
                 .Where(pathValue => pathValue is not null && pathValue.ValueType == KVValueType.String)
                 .Select(pathValue => pathValue.ToString(CultureInfo.InvariantCulture))

@@ -140,7 +140,7 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     /// <inheritdoc/>
     public RegistryValueKind GetValueKind(string? valueName)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     /// <inheritdoc/>

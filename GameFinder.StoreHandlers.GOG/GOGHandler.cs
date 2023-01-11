@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Versioning;
 using GameFinder.Common;
@@ -97,7 +98,7 @@ public class GOGHandler : AHandler<GOGGame, long>
                 return new Result(null,$"{subKey.GetName()} doesn't have a string value \"gameID\"");
             }
 
-            if (!long.TryParse(sId, out var id))
+            if (!long.TryParse(sId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
             {
                 return new Result(null,$"The value \"gameID\" of {subKey.GetName()} is not a number: \"{sId}\"");
             }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
@@ -23,7 +24,7 @@ public class SteamTests
 {{
     ""0""
     {{
-        ""path""        ""{defaultSteamDir.FullName.Replace("\\", "\\\\")}""
+        ""path""        ""{defaultSteamDir.FullName.Replace("\\", "\\\\", StringComparison.OrdinalIgnoreCase)}""
     }}
 }}");
 
@@ -44,7 +45,7 @@ public class SteamTests
 {{
     ""appid""       ""{game.AppId}""
     ""name""        ""{game.Name}""
-    ""installdir""      ""{game.Path.Replace("\\", "\\\\")}""
+    ""installdir""      ""{game.Path.Replace("\\", "\\\\", StringComparison.OrdinalIgnoreCase)}""
 }}";
 
             fs.AddFile(manifestPath, manifestContents);
@@ -176,7 +177,7 @@ public class SteamTests
 {{
     ""0""
     {{
-        ""path""        ""{defaultSteamDir.FullName.Replace("\\", "\\\\")}""
+        ""path""        ""{defaultSteamDir.FullName.Replace("\\", "\\\\", StringComparison.OrdinalIgnoreCase)}""
     }}
 }}");
 
@@ -191,6 +192,7 @@ public class SteamTests
     }
 
     [Fact]
+    [SuppressMessage("Design", "MA0051:Method is too long")]
     public void Test_ShouldError_MissingValues()
     {
         var fs = new MockFileSystem();
@@ -203,7 +205,7 @@ public class SteamTests
 {{
     ""0""
     {{
-        ""path""        ""{defaultSteamDir.FullName.Replace("\\", "\\\\")}""
+        ""path""        ""{defaultSteamDir.FullName.Replace("\\", "\\\\", StringComparison.OrdinalIgnoreCase)}""
     }}
 }}");
 
@@ -266,7 +268,7 @@ public class SteamTests
         }, result =>
         {
             Assert.Null(result.Game);
-            Assert.StartsWith($"Exception while parsing file {manifest4}", result.Error);
+            Assert.StartsWith($"Exception while parsing file {manifest4}", result.Error, StringComparison.OrdinalIgnoreCase);
         });
     }
 }

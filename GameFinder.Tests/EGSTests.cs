@@ -28,7 +28,7 @@ public class EGSTests
             var mockData = @$"{{
     ""CatalogItemId"": ""{game.CatalogItemId}"",
     ""DisplayName"": ""{game.DisplayName}"",
-    ""InstallLocation"": ""{game.InstallLocation.Replace("\\", "\\\\")}""
+    ""InstallLocation"": ""{game.InstallLocation.Replace("\\", "\\\\", StringComparison.OrdinalIgnoreCase)}""
 }}";
 
             fs.AddFile($"{fs.Path.Combine(manifestDir, $"{game.CatalogItemId}.item")}", mockData);
@@ -131,7 +131,7 @@ public class EGSTests
         Assert.Collection(results, result =>
         {
             Assert.Null(result.Game);
-            Assert.StartsWith("Unable to deserialize file", result.Error);
+            Assert.StartsWith("Unable to deserialize file", result.Error, StringComparison.OrdinalIgnoreCase);
         });
     }
 
