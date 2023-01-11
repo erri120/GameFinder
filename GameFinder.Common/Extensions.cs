@@ -22,10 +22,13 @@ public static class Extensions
         this IEnumerable<Result<TGame>> results)
         where TGame : class
     {
-        return results
-            .Select(result => result.Game)
-            .Where(game => game is not null)
-            .Select(game => game!);
+        foreach (var result in results)
+        {
+            if (result.Game is not null)
+            {
+                yield return result.Game;
+            }
+        }
     }
 
     /// <summary>
@@ -39,10 +42,13 @@ public static class Extensions
         this IEnumerable<Result<TGame>> results)
         where TGame : class
     {
-        return results
-            .Select(result => result.Error)
-            .Where(error => error is not null)
-            .Select(error => error!);
+        foreach (var result in results)
+        {
+            if (result.Error is not null)
+            {
+                yield return result.Error;
+            }
+        }
     }
 
     /// <summary>
