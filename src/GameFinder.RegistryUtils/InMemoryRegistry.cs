@@ -55,7 +55,7 @@ public sealed class InMemoryRegistry : IRegistry
 
         foreach (var keyName in keyNames)
         {
-            var child = parent.AddSubKey(hive, keyName);
+            var child = parent.AddSubKey(keyName);
             parent = child;
         }
 
@@ -98,11 +98,16 @@ public sealed class InMemoryRegistryKey : IRegistryKey
         _name = $"{parent._name}\\{_key}";
     }
 
-    public InMemoryRegistryKey AddSubKey(RegistryHive hive, string key)
+    /// <summary>
+    /// Adds a sub-key to the current key.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public InMemoryRegistryKey AddSubKey(string key)
     {
         if (_children.TryGetValue(key, out var child)) return child;
 
-        child = new InMemoryRegistryKey(hive, this, key);
+        child = new InMemoryRegistryKey(_hive, this, key);
         _children.Add(key, child);
 
         return child;
