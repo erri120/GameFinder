@@ -28,4 +28,25 @@ public static class AssertionHelpers
 
         return result.Error!;
     }
+
+    public static void ShouldFindAllGames<TGame, TId>(this AHandler<TGame, TId> handler,
+        IEnumerable<TGame> expectedGames) where TGame: class
+    {
+        var results = handler.FindAllGames().ToArray();
+        var games = results.ShouldOnlyBeGames();
+
+        games.Should().Equal(expectedGames);
+    }
+
+    public static void ShouldFindAllGamesById<TGame, TId>(
+        this AHandler<TGame, TId> handler,
+        ICollection<TGame> expectedGames,
+        Func<TGame, TId> keySelector) where TGame: class
+    {
+        var results = handler.FindAllGamesById(out var errors);
+        errors.Should().BeEmpty();
+
+        results.Should().ContainKeys(expectedGames.Select(keySelector));
+        results.Should().ContainValues(expectedGames);
+    }
 }

@@ -13,9 +13,15 @@ public partial class EGSTests
         var (handler, manifestDir) = SetupHandler(fs, registry);
         var expectedGames = SetupGames(fs, manifestDir);
 
-        var results = handler.FindAllGames().ToArray();
-        var games = results.ShouldOnlyBeGames();
+        handler.ShouldFindAllGames(expectedGames);
+    }
 
-        games.Should().Equal(expectedGames);
+    [Theory, EGSAutoData]
+    public void Test_ShouldWork_FindAllGamesById(MockFileSystem fs, InMemoryRegistry registry)
+    {
+        var (handler, manifestDir) = SetupHandler(fs, registry);
+        var expectedGames = SetupGames(fs, manifestDir).ToArray();
+
+        handler.ShouldFindAllGamesById(expectedGames, game => game.CatalogItemId);
     }
 }
