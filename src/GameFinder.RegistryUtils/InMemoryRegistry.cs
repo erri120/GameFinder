@@ -98,7 +98,7 @@ public sealed class InMemoryRegistryKey : IRegistryKey
         _name = $"{parent._name}\\{_key}";
     }
 
-    internal InMemoryRegistryKey AddSubKey(RegistryHive hive, string key)
+    public InMemoryRegistryKey AddSubKey(RegistryHive hive, string key)
     {
         if (_children.TryGetValue(key, out var child)) return child;
 

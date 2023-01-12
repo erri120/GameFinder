@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS.Tests.AutoData;
+using TestUtils;
 
 namespace GameFinder.StoreHandlers.EGS.Tests;
 
@@ -18,10 +19,8 @@ public partial class EGSTests
         fs.AddFile(manifestItem, new MockFileData(randomBytes));
 
         var results = handler.FindAllGames().ToArray();
-        results.Should().SatisfyRespectively(result =>
-        {
-            result.Game.Should().BeNull();
-            result.Error.Should().StartWith($"Unable to deserialize file {manifestItem}");
-        });
+        var error = results.ShouldOnlyBeOneError();
+
+        error.Should().StartWith($"Unable to deserialize file {manifestItem}");
     }
 }

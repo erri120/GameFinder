@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS.Tests.AutoData;
+using TestUtils;
 
 namespace GameFinder.StoreHandlers.EGS.Tests;
 
@@ -16,11 +17,9 @@ public partial class EGSTests
         fs.AddFile(manifest, "{}");
 
         var results = handler.FindAllGames().ToArray();
-        results.Should().SatisfyRespectively(result =>
-        {
-            result.Game.Should().BeNull();
-            result.Error.Should().Be($"Manifest {manifest} does not have a value \"CatalogItemId\"");
-        });
+        var error = results.ShouldOnlyBeOneError();
+
+        error.Should().Be($"Manifest {manifest} does not have a value \"CatalogItemId\"");
     }
 
     [Theory, EGSAutoData]
@@ -33,11 +32,9 @@ public partial class EGSTests
         fs.AddFile(manifest, $@"{{ ""CatalogItemId"": ""{value}"" }}");
 
         var results = handler.FindAllGames().ToArray();
-        results.Should().SatisfyRespectively(result =>
-        {
-            result.Game.Should().BeNull();
-            result.Error.Should().Be($"Manifest {manifest} does not have a value \"DisplayName\"");
-        });
+        var error = results.ShouldOnlyBeOneError();
+
+        error.Should().Be($"Manifest {manifest} does not have a value \"DisplayName\"");
     }
 
     [Theory, EGSAutoData]
@@ -50,10 +47,8 @@ public partial class EGSTests
         fs.AddFile(manifest,$@"{{ ""CatalogItemId"": ""{value}"", ""DisplayName"": ""{value}"" }}");
 
         var results = handler.FindAllGames().ToArray();
-        results.Should().SatisfyRespectively(result =>
-        {
-            result.Game.Should().BeNull();
-            result.Error.Should().Be($"Manifest {manifest} does not have a value \"InstallLocation\"");
-        });
+        var error = results.ShouldOnlyBeOneError();
+
+        error.Should().Be($"Manifest {manifest} does not have a value \"InstallLocation\"");
     }
 }

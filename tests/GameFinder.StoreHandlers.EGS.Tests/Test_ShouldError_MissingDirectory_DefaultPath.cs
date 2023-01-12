@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
 using GameFinder.RegistryUtils;
+using TestUtils;
 
 namespace GameFinder.StoreHandlers.EGS.Tests;
 
@@ -11,10 +12,8 @@ public partial class EGSTests
         var handler = new EGSHandler(registry, fs);
 
         var results = handler.FindAllGames().ToArray();
-        results.Should().SatisfyRespectively(result =>
-        {
-            result.Game.Should().BeNull();
-            result.Error.Should().Be($"The manifest directory {EGSHandler.GetDefaultManifestsPath(fs)} does not exist!");
-        });
+        var error = results.ShouldOnlyBeOneError();
+
+        error.Should().Be($"The manifest directory {EGSHandler.GetDefaultManifestsPath(fs)} does not exist!");
     }
 }
