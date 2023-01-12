@@ -1,7 +1,6 @@
 ignore:
-  - "GameFinder.Example"
-  - "GameFinder.Benchmarks"
-  - "GameFinder.Tests"
+  - "tests/**/*"
+  - "other/**/*"
 
 github_checks:
   annotations: true

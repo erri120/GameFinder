@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.GOG\GameFinder.StoreHandlers.GOG.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Usings.cs">
+            <Link>Usings.cs</Link>
+        </Compile>
+    </ItemGroup>
+</Project>

@@ -1,24 +1,9 @@
 <Project>
     <PropertyGroup>
-        <Authors>erri120</Authors>
-
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-
-        <PackageProjectUrl>https://github.com/erri120/GameFinder</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/erri120/GameFinder.git</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../README.md" Pack="true" PackagePath=""/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" PrivateAssets="all" />
         <PackageReference Include="Meziantou.Analyzer" Version="2.0.5">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -30,8 +15,4 @@
         <!-- MA0048: File name must match type name -->
         <NoWarn>MA0048</NoWarn>
     </PropertyGroup>
-
-    <ItemGroup>
-        <InternalsVisibleTo Include="GameFinder.Tests" />
-    </ItemGroup>
 </Project>

@@ -2,9 +2,6 @@ name: CI
 
 on:
   push:
-    paths:
-      - 'GameFinder**'
-      - '.github/workflows/**'
     branches: [ master ]
   pull_request:
     branches: [ master ]
