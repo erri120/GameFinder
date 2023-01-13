@@ -120,7 +120,7 @@ public class OriginHandler : AHandler<OriginGame, string>
         }
         catch (Exception e)
         {
-            return Result.FromError<OriginGame>($"Exception while parsing {fileInfo.FullName}:\n{e}");
+            return Result.FromException<OriginGame>($"Exception while parsing {fileInfo.FullName}", e);
         }
     }
 }

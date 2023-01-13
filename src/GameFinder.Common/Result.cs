@@ -95,6 +95,6 @@ public static class Result
     /// <returns></returns>
     public static Result<TGame> FromException<TGame>(string msg, Exception exception) where TGame : class
     {
-        return new Result<TGame>(game: null, $"{msg}\n{exception}");
+        return new Result<TGame>(game: null, $"{msg}:\n{exception}");
     }
 }
