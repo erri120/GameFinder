@@ -143,11 +143,11 @@ OriginGame? game = handler.FindOneGameById("Origin.OFR.50.0001456", out string[]
 
 [EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app) and replacing it with EA Desktop or EA App or whatever you want to call this new fancy launcher. The "old way" of finding games for Origin does not work for EA Desktop. In fact, I haven't found a clean way of finding games installed with the new launcher. See [the wiki](https://github.com/erri120/GameFinder/wiki/EA-Desktop) for more information.
 
-## Bethesda.net
+### Bethesda.net
 
 [As of May 11, 2022, the Bethesda.net launcher is no longer in use](https://bethesda.net/en/article/2RXxG1y000NWupPalzLblG/sunsetting-the-bethesda-net-launcher-and-migrating-to-steam). The package [GameFinder.StoreHandlers.BethNet](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet/) has been deprecated and marked as _legacy_.
 
-## Xbox Game Pass
+### Xbox Game Pass
 
 The package [GameFinder.StoreHandlers.Xbox](https://www.nuget.org/packages/GameFinder.StoreHandlers.Xbox/) has been deprecated and marked as _legacy_. I no longer maintain this package because it never got used. I initially made GameFinder for [Wabbajack](https://github.com/wabbajack-tools/wabbajack) and other modding tools however, you can't mod games installed with the Xbox App on Windows. These games are installed as UWP apps, which makes them protected and hard to modify. Another issue is the fact that you can't distinguish between normal UWP apps and Xbox games, meaning your calculator will show up as an Xbox game.
 
