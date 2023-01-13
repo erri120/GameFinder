@@ -21,7 +21,7 @@ If you are interested in understanding _how_ GameFinder finds these games, check
 
 ### Steam
 
-Steam is supported on Windows and Linux. Visit [SteamDB](https://steamdb.info/) if you need to find the Id of a game.
+Steam is supported on Windows and Linux. Use [SteamDB](https://steamdb.info/) to find the ID of a game.
 
 **Usage:**
 
@@ -30,7 +30,7 @@ Steam is supported on Windows and Linux. Visit [SteamDB](https://steamdb.info/) 
 // Linux doesn't have a registry
 var handler = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
     ? new SteamHandler(new WindowsRegistry())
-    : new SteamHandler(null);
+    : new SteamHandler(registry: null);
 
 // method 1: iterate over the game-error result
 foreach (var (game, error) in handler.FindAllGames())
@@ -54,7 +54,7 @@ SteamGame? game = handler.FindOneGameById(570940, out string[] errors);
 
 ### GOG Galaxy
 
-GOG Galaxy is only supported on Windows. Visit [GOG Database](https://www.gogdb.org/) if you need to find the Id of a game.
+GOG Galaxy is only supported on Windows. Use the [GOG Database](https://www.gogdb.org/) to find the ID of a game.
 
 **Usage:**
 
@@ -141,7 +141,7 @@ OriginGame? game = handler.FindOneGameById("Origin.OFR.50.0001456", out string[]
 
 ### EA Desktop
 
-[EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app) and replacing it with EA Desktop or EA App or whatever you want to call this new fancy launcher. The "old way" of finding games for Origin does not work for EA Desktop. In fact, there is no clean way of finding any games installed with the new launcher. See [the wiki](https://github.com/erri120/GameFinder/wiki/EA-Desktop) for more information.
+[EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app) and replacing it with EA Desktop or EA App or whatever you want to call this new fancy launcher. The "old way" of finding games for Origin does not work for EA Desktop. In fact, I haven't found a clean way of finding games installed with the new launcher. See [the wiki](https://github.com/erri120/GameFinder/wiki/EA-Desktop) for more information.
 
 ## Bethesda.net
 
@@ -149,11 +149,11 @@ OriginGame? game = handler.FindOneGameById("Origin.OFR.50.0001456", out string[]
 
 ## Xbox Game Pass
 
-The package [GameFinder.StoreHandlers.Xbox](https://www.nuget.org/packages/GameFinder.StoreHandlers.Xbox/) has been deprecated and marked as _legacy_. I no longer maintain this package because it never got used. I initially made GameFinder for [Wabbajack](https://github.com/wabbajack-tools/wabbajack) and other modding tools however you can't mod games installed with the Xbox App on Windows. The games are installed as UWP apps which makes them protected and hard to modify. Another issue is the fact that you can't distinguish between normal UWP apps and Xbox games meaning your calculator will show up as an Xbox game.
+The package [GameFinder.StoreHandlers.Xbox](https://www.nuget.org/packages/GameFinder.StoreHandlers.Xbox/) has been deprecated and marked as _legacy_. I no longer maintain this package because it never got used. I initially made GameFinder for [Wabbajack](https://github.com/wabbajack-tools/wabbajack) and other modding tools however, you can't mod games installed with the Xbox App on Windows. These games are installed as UWP apps, which makes them protected and hard to modify. Another issue is the fact that you can't distinguish between normal UWP apps and Xbox games, meaning your calculator will show up as an Xbox game.
 
-The final issue is related to actual code: in order to find all UWP apps I used the Windows SDK which was a pain to integrate. The CI had to be on Windows, the .NET target framework had to be `net6.0-windows-XXXXXXXXXX` which a specific SDK version and it was not nice to use.
+The final issue is related to actual code: in order to find all UWP apps I used the Windows SDK, which was a pain to integrate. The CI had to be on Windows, the .NET target framework had to be a Windows specific version (`net6.0-windows-XXXXXXXXXX`), and it was overall not nice to use.
 
-The package is of course still available on [NuGet](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet/) and should still work but it's marked as deprecated so don't expect any updates.
+The package is still available on [NuGet](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet/) and should still work, but it's marked as deprecated and won't receive any updates.
 
 ## Contributing
 
