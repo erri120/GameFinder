@@ -1,8 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-    </PropertyGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.EGS\GameFinder.StoreHandlers.EGS.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.GOG\GameFinder.StoreHandlers.GOG.csproj" />

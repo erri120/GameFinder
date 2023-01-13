@@ -48,6 +48,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9C6671E1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "other", "other", "{7EA29B58-0E2E-4714-81AC-1F86FE253664}"
+	ProjectSection(SolutionItems) = preProject
+		other\Directory.Build.props = other\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{41011D08-70EF-410D-83E7-7BEAF795494E}"
 EndProject

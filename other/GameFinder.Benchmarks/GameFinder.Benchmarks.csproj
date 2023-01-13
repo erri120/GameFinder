@@ -1,13 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-    </PropertyGroup>
-
     <ItemGroup>
-      <PackageReference Include="BenchmarkDotNet" Version="0.13.3" />
+        <PackageReference Include="BenchmarkDotNet" Version="0.13.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\GameFinder.Common\GameFinder.Common.csproj" />
+        <ProjectReference Include="..\..\src\GameFinder.Common\GameFinder.Common.csproj" />
     </ItemGroup>
 </Project>
