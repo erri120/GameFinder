@@ -10,9 +10,7 @@ public partial class GOGTests
     {
         var handler = new GOGHandler(registry);
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Unable to open HKEY_LOCAL_MACHINE\\{GOGHandler.GOGRegKey}");
     }
 }

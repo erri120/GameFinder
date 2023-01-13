@@ -11,9 +11,7 @@ public partial class EGSTests
     {
         var (handler, manifestDir) = SetupHandler(fs, registry);
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"The manifest directory {manifestDir} does not contain any .item files");
     }
 }

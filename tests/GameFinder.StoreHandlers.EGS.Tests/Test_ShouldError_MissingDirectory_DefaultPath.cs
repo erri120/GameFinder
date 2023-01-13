@@ -11,9 +11,7 @@ public partial class EGSTests
     {
         var handler = new EGSHandler(registry, fs);
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"The manifest directory {EGSHandler.GetDefaultManifestsPath(fs)} does not exist!");
     }
 }

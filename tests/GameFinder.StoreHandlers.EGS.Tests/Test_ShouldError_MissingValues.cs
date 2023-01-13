@@ -16,9 +16,7 @@ public partial class EGSTests
         var manifest = fs.Path.Combine(manifestDir, $"{manifestItemName}.item");
         fs.AddFile(manifest, "{}");
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Manifest {manifest} does not have a value \"CatalogItemId\"");
     }
 
@@ -31,9 +29,7 @@ public partial class EGSTests
         var manifest = fs.Path.Combine(manifestDir, $"{manifestItemName}.item");
         fs.AddFile(manifest, $@"{{ ""CatalogItemId"": ""{value}"" }}");
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Manifest {manifest} does not have a value \"DisplayName\"");
     }
 
@@ -46,9 +42,7 @@ public partial class EGSTests
         var manifest = fs.Path.Combine(manifestDir, $"{manifestItemName}.item");
         fs.AddFile(manifest,$@"{{ ""CatalogItemId"": ""{value}"", ""DisplayName"": ""{value}"" }}");
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Manifest {manifest} does not have a value \"InstallLocation\"");
     }
 }

@@ -19,9 +19,7 @@ public partial class EGSTests
         var manifestItem = fs.Path.Combine(manifestDir, $"{manifestItemName}.item");
         fs.AddFile(manifestItem, new MockFileData(randomBytes));
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().StartWith($"Unable to deserialize file {manifestItem}:\n");
     }
 
@@ -34,9 +32,7 @@ public partial class EGSTests
         var manifestItem = fs.Path.Combine(manifestDir, $"{manifestItemName}.item");
         fs.AddFile(manifestItem, new MockFileData("null"));
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Unable to deserialize file {manifestItem}");
     }
 }

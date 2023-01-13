@@ -10,9 +10,7 @@ public partial class GOGTests
     {
         var (handler, gogKey) = SetupHandler(registry);
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Registry key {gogKey.GetName()} has no sub-keys");
     }
 }

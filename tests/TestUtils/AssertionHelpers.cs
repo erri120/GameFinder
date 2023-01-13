@@ -17,7 +17,7 @@ public static class AssertionHelpers
         return results.Select(result => result.Game!);
     }
 
-    public static string ShouldOnlyBeOneError<TGame>(
+    private static string ShouldOnlyBeOneError<TGame>(
         this ICollection<Result<TGame>> results) where TGame: class
     {
         results.Should().ContainSingle();
@@ -27,6 +27,13 @@ public static class AssertionHelpers
         result.Error.Should().NotBeNull();
 
         return result.Error!;
+    }
+
+    public static string ShouldOnlyBeOneError<TGame, TId>(
+        this AHandler<TGame, TId> handler) where TGame: class
+    {
+        var results = handler.FindAllGames().ToArray();
+        return results.ShouldOnlyBeOneError();
     }
 
     public static void ShouldFindAllGames<TGame, TId>(this AHandler<TGame, TId> handler,

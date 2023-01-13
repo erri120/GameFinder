@@ -11,9 +11,7 @@ public partial class OriginTests
         var manifestDir = OriginHandler.GetManifestDir(fs);
         var handler = new OriginHandler(fs);
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Manifest folder {manifestDir.FullName} does not exist!");
     }
 }

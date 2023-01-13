@@ -13,9 +13,7 @@ public partial class GOGTests
 
         var invalidKey = gogKey.AddSubKey(keyName);
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"{invalidKey.GetName()} doesn't have a string value \"gameID\"");
     }
 
@@ -27,9 +25,7 @@ public partial class GOGTests
         var invalidKey = gogKey.AddSubKey(keyName);
         invalidKey.AddValue("gameId", gameId.ToString(CultureInfo.InvariantCulture));
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"{invalidKey.GetName()} doesn't have a string value \"gameName\"");
     }
 
@@ -42,9 +38,7 @@ public partial class GOGTests
         invalidKey.AddValue("gameId", gameId.ToString(CultureInfo.InvariantCulture));
         invalidKey.AddValue("gameName", gameName);
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"{invalidKey.GetName()} doesn't have a string value \"path\"");
     }
 }

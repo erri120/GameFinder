@@ -10,9 +10,7 @@ public partial class OriginTests
     {
         var (handler, manifestDir) = SetupHandler(fs);
 
-        var results = handler.FindAllGames().ToArray();
-        var errors = results.ShouldOnlyBeOneError();
-
-        errors.Should().Be($"Manifest folder {manifestDir} does not contain any .mfst files");
+        var error = handler.ShouldOnlyBeOneError();
+        error.Should().Be($"Manifest folder {manifestDir} does not contain any .mfst files");
     }
 }

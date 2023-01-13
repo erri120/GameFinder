@@ -13,9 +13,7 @@ public partial class GOGTests
         var invalidKey = gogKey.AddSubKey(keyName);
         invalidKey.AddValue("gameId", gameId);
 
-        var results = handler.FindAllGames().ToArray();
-        var error = results.ShouldOnlyBeOneError();
-
+        var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"The value \"gameID\" of {invalidKey.GetName()} is not a number: \"{gameId}\"");
     }
 }
