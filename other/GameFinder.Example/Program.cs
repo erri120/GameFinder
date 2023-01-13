@@ -26,7 +26,7 @@ public static class Program
         var consoleTarget = new ConsoleTarget("console");
         var fileTarget = new FileTarget("file")
         {
-            FileName = "log.log"
+            FileName = "log.log",
         };
 
         config.AddRuleForAllLevels(consoleTarget);
@@ -34,16 +34,16 @@ public static class Program
 
         LogManager.Configuration = config;
 
-        var logger = new NLogLoggerProvider().CreateLogger("");
+        var logger = new NLogLoggerProvider().CreateLogger(nameof(Program));
 
-        Parser.Default.ParseArguments<Options>(args)
+        Parser.Default
+            .ParseArguments<Options>(args)
             .WithParsed(x => Run(x, logger));
     }
 
     private static void Run(Options options, ILogger logger)
     {
-        if (File.Exists("log.log"))
-            File.Delete("log.log");
+        if (File.Exists("log.log")) File.Delete("log.log");
 
         if (options.GOG)
         {
@@ -77,7 +77,7 @@ public static class Program
         {
             var handler = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? new SteamHandler(new WindowsRegistry())
-                : new SteamHandler(null);
+                : new SteamHandler(registry: null);
 
             var results = handler.FindAllGames();
             LogGamesAndErrors(results, logger);
