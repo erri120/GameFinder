@@ -12,9 +12,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 Although this release contains some API changes and a lot of internal changes, consumers will likely not be affected.
 
-- All: return `IDictionary<TKey, TValue>` instead of `Dictionary<TKey, TValue>`
-- reworked `Result<TGame>` to a custom `readonly struct`
-- restructured the project and reworked all tests
+- Core: `AHandler.FindAllGamesById` now returns `IDictionary<>` instead of `Dictionary<>`
+- Core: changed `Result<TGame>` from a record struct to a custom readonly struct
+- Steam: added `SteamGame.GetManifestPath` that returns the absolute path to the parsed manifest. This is useful if you need to extract more information from the manifest, after the game has been found.
+- Internal: restructured the project and reworked all tests
 
 ## [2.3.0] - 2022-12-16
 

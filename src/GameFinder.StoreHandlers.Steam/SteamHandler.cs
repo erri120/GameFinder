@@ -14,15 +14,6 @@ using ValveKeyValue;
 namespace GameFinder.StoreHandlers.Steam;
 
 /// <summary>
-/// Represents a game installed with Steam.
-/// </summary>
-/// <param name="AppId"></param>
-/// <param name="Name"></param>
-/// <param name="Path"></param>
-[PublicAPI]
-public record SteamGame(int AppId, string Name, string Path);
-
-/// <summary>
 /// Handler for finding games installed with Steam.
 /// </summary>
 [PublicAPI]
@@ -334,7 +325,7 @@ public class SteamHandler : AHandler<SteamGame, int>
         }
         catch (Exception e)
         {
-            return Result.FromError<SteamGame>($"Exception while parsing file {manifestFile.FullName}:\n{e}");
+            return Result.FromException<SteamGame>($"Exception while parsing file {manifestFile.FullName}", e);
         }
     }
 }
