@@ -152,8 +152,6 @@ public class SteamHandler : AHandler<SteamGame, int>
             var defaultSteamDirs = GetDefaultSteamDirectories(_fileSystem)
                 .ToArray();
 
-            var defaultSteamDirString = $"[{defaultSteamDirs.Select(dir => dir.FullName).Aggregate((a,b) => $"{a}, {b}")}]";
-
             var libraryFoldersFile = defaultSteamDirs
                 .Select(GetLibraryFoldersFile)
                 .FirstOrDefault(file => file.Exists);
@@ -165,24 +163,24 @@ public class SteamHandler : AHandler<SteamGame, int>
 
             if (_registry is null)
             {
-                return (null, $"Unable to find Steam in one of the default paths {defaultSteamDirString}");
+                return (null, "Unable to find Steam in one of the default paths");
             }
 
             var steamDir = FindSteamInRegistry(_registry);
             if (steamDir is null)
             {
-                return (null, $"Unable to find Steam in the registry and one of the default paths {defaultSteamDirString}");
+                return (null, "Unable to find Steam in the registry and one of the default paths");
             }
 
             if (!steamDir.Exists)
             {
-                return (null, $"Unable to find Steam in one of the default paths {defaultSteamDirString} and the path from the registry does not exist: {steamDir.FullName}");
+                return (null, $"Unable to find Steam in one of the default paths and the path from the registry does not exist: {steamDir.FullName}");
             }
 
             libraryFoldersFile = GetLibraryFoldersFile(steamDir);
             if (!libraryFoldersFile.Exists)
             {
-                return (null, $"Unable to find Steam in one of the default paths {defaultSteamDirString} and the path from the registry is not a valid Steam installation because {libraryFoldersFile.FullName} does not exist");
+                return (null, $"Unable to find Steam in one of the default paths and the path from the registry is not a valid Steam installation because {libraryFoldersFile.FullName} does not exist");
             }
 
             return (libraryFoldersFile, null);
@@ -297,11 +295,6 @@ public class SteamHandler : AHandler<SteamGame, int>
 
             var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
             var data = kv.Deserialize(stream, KvSerializerOptions);
-
-            if (data is null)
-            {
-                return Result.FromError<SteamGame>($"Unable to parse {manifestFile.FullName}");
-            }
 
             if (!data.Name.Equals("AppState", StringComparison.OrdinalIgnoreCase))
             {
