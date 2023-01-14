@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using CommandLine;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
+using GameFinder.StoreHandlers.EADesktop;
 using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
 using GameFinder.StoreHandlers.Origin;
@@ -92,6 +93,20 @@ public static class Program
             else
             {
                 var handler = new OriginHandler();
+                var results = handler.FindAllGames();
+                LogGamesAndErrors(results, logger);
+            }
+        }
+
+        if (options.EADesktop)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                logger.LogError("EA Desktop is only supported on Windows!");
+            }
+            else
+            {
+                var handler = new EADesktopHandler();
                 var results = handler.FindAllGames();
                 LogGamesAndErrors(results, logger);
             }
