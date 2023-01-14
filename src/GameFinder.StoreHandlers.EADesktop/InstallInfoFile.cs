@@ -7,22 +7,22 @@ namespace GameFinder.StoreHandlers.EADesktop;
 [UsedImplicitly]
 internal class InstallInfoFile
 {
-    public List<InstallInfo>? InstallInfos { get; set; }
-    public Schema? Schema { get; set; }
+    public List<InstallInfo>? InstallInfos { get; init; }
+    public Schema? Schema { get; init; }
 }
 
 [UsedImplicitly]
 internal class InstallInfo
 {
-    public string? BaseInstallPath { get; set; }
-    public string? BaseSlug { get; set; }
-    public string? InstallCheck { get; set; }
+    public string? BaseInstallPath { get; init; }
+    public string? BaseSlug { get; init; }
+    public string? InstallCheck { get; init; }
     [JsonPropertyName("softwareId")]
-    public string? SoftwareID { get; set; }
+    public string? SoftwareID { get; init; }
 }
 
 [UsedImplicitly]
 internal class Schema
 {
-    public int Version { get; set; }
+    public int Version { get; init; }
 }

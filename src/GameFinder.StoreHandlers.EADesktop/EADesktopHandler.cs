@@ -129,29 +129,11 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
         }
 
         var schemaVersion = schemaVersionNullable.Value;
-        if (schemaVersion != SupportedSchemaVersion)
+        var (schemaMessage, isSchemaError) = CreateSchemaVersionMessage(schemaPolicy, schemaVersion, installInfoFile.FullName);
+        if (schemaMessage is not null)
         {
-            switch (schemaPolicy)
-            {
-                case SchemaPolicy.Warn:
-                    yield return Result.FromError<EADesktopGame>(
-                        $"InstallInfoFile {installInfoFile.FullName} has a schema version " +
-                        $"{schemaVersion.ToString(CultureInfo.InvariantCulture)} but this library only supports schema version " +
-                        $"{SupportedSchemaVersion.ToString(CultureInfo.InvariantCulture)}. " +
-                        $"This message is a WARNING because the consumer of this library has set {nameof(SchemaPolicy)} to {nameof(SchemaPolicy.Warn)}");
-                    break;
-                case SchemaPolicy.Error:
-                    yield return Result.FromError<EADesktopGame>(
-                        $"InstallInfoFile {installInfoFile.FullName} has a schema version " +
-                        $"{schemaVersion.ToString(CultureInfo.InvariantCulture)} but this library only supports schema version " +
-                        $"{SupportedSchemaVersion.ToString(CultureInfo.InvariantCulture)}. " +
-                        $"This is an ERROR because the consumer of this library has set {nameof(SchemaPolicy)} to {nameof(SchemaPolicy.Error)}");
-                    yield break;
-                case SchemaPolicy.Ignore:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(schemaPolicy), schemaPolicy, message: null);
-            }
+            yield return Result.FromError<EADesktopGame>(schemaMessage);
+            if (isSchemaError) yield break;
         }
 
         var installInfos = installInfoFileContents.InstallInfos;
@@ -165,6 +147,30 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
         {
             yield return InstallInfoToGame(installInfos[i], i, installInfoFile.FullName);
         }
+    }
+
+    internal static (string? message, bool isError) CreateSchemaVersionMessage(
+        SchemaPolicy schemaPolicy, int schemaVersion, string installInfoFilePath)
+    {
+        if (schemaVersion == SupportedSchemaVersion) return (null, false);
+
+        return schemaPolicy switch
+        {
+            SchemaPolicy.Warn => (
+                $"InstallInfoFile {installInfoFilePath} has a schema version " +
+                $"{schemaVersion.ToString(CultureInfo.InvariantCulture)} but this library only supports schema version " +
+                $"{SupportedSchemaVersion.ToString(CultureInfo.InvariantCulture)}. " +
+                $"This message is a WARNING because the consumer of this library has set {nameof(SchemaPolicy)} to {nameof(SchemaPolicy.Warn)}",
+                false),
+            SchemaPolicy.Error => (
+                $"InstallInfoFile {installInfoFilePath} has a schema version " +
+                $"{schemaVersion.ToString(CultureInfo.InvariantCulture)} but this library only supports schema version " +
+                $"{SupportedSchemaVersion.ToString(CultureInfo.InvariantCulture)}. " +
+                $"This is an ERROR because the consumer of this library has set {nameof(SchemaPolicy)} to {nameof(SchemaPolicy.Error)}",
+                true),
+            SchemaPolicy.Ignore => (null, false),
+            _ => throw new ArgumentOutOfRangeException(nameof(schemaPolicy), schemaPolicy, message: null),
+        };
     }
 
     internal static Result<EADesktopGame> InstallInfoToGame(InstallInfo installInfo, int i, string installInfoFilePath)

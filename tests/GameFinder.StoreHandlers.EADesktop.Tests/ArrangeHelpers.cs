@@ -1,10 +1,7 @@
-﻿using System.Globalization;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Text;
 using System.Text.Json;
 using GameFinder.RegistryUtils;
-using TestUtils;
 
 namespace GameFinder.StoreHandlers.EADesktop.Tests;
 
@@ -39,7 +36,7 @@ public partial class EADesktopTests
                 fs.AddFile(installerDataPath, new MockFileData(string.Empty));
 
                 var installCheckKey = baseKey.AddSubKey(baseSlug);
-                installCheckKey.AddValue("Install Dir", baseInstallPath);
+                installCheckKey.AddValue("Install Dir", baseInstallPath + "\\");
 
                 var installCheck = $"[{installCheckKey.GetName()}\\Install Dir]__Installer\\installerdata.xml";
                 var game = new EADesktopGame(softwareID, baseSlug, baseInstallPath, installCheck, installInfoFile.FullName);
@@ -53,7 +50,7 @@ public partial class EADesktopTests
         var installInfos = games.Select(game => new InstallInfo
         {
             BaseSlug = game.BaseSlug,
-            BaseInstallPath = game.BaseInstallPath,
+            BaseInstallPath = game.BaseInstallPath + "\\",
             InstallCheck = game.InstallCheck,
             SoftwareID = game.SoftwareID,
         }).ToList();
