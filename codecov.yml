@@ -4,3 +4,38 @@ ignore:
 
 github_checks:
   annotations: true
+
+comment:
+  layout: "header, diff, flags, components"
+  behavior: default
+  require_changes: false
+
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+      - type: patch
+        target: auto
+  individual_components:
+    - component_id: core
+      name: Core
+      paths:
+        - "src/GameFinder.Common/**"
+        - "src/GameFinder.RegistryUtils/**"
+    - component_id: store_handler_egs
+      name: EGS
+      paths:
+        - "src/GameFinder.StoreHandlers.EGS/**"
+    - component_id: store_handler_gog
+      name: GOG
+      paths:
+        - "src/GameFinder.StoreHandlers.GOG/**"
+    - component_id: store_handler_origin
+      name: Origin
+      paths:
+        - "src/GameFinder.StoreHandlers.Origin/**"
+    - component_id: store_handler_steam
+      name: Steam
+      paths:
+        - "src/GameFinder.StoreHandlers.Steam/**"
