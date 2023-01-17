@@ -17,10 +17,9 @@ internal static class Decryption
         0xf2, 0xbc, 0xef,
     };
 
-    public static byte[]? CreateDecryptionKey(IHardwareInfoProvider hardwareInfoProvider, out string? error)
+    public static byte[] CreateDecryptionKey(IHardwareInfoProvider hardwareInfoProvider)
     {
-        var hardwareString = HardwareInformation.GenerateHardwareString(hardwareInfoProvider, out error);
-        if (hardwareString is null) return null;
+        var hardwareString = HardwareInformation.GenerateHardwareString(hardwareInfoProvider);
 
         var hardwareHash = Hashing.CalculateSHA1Hash(hardwareString);
         var hashInput = AllUsersGenericId + IS + hardwareHash;

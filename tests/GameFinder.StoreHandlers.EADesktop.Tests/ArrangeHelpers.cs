@@ -1,30 +1,48 @@
-﻿using System.IO.Abstractions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Security.Cryptography;
 using System.Text.Json;
+using AutoFixture.AutoMoq;
 using GameFinder.RegistryUtils;
+using GameFinder.StoreHandlers.EADesktop.Crypto;
 
 namespace GameFinder.StoreHandlers.EADesktop.Tests;
 
 public partial class EADesktopTests
 {
-    private static (EADesktopHandler handler, IDirectoryInfo parentFolder) SetupHandler(
-        MockFileSystem fs, string id)
+    private static IHardwareInfoProvider SetupHardwareInfoProvider()
     {
-        var dataFolder = EADesktopHandler.GetDataFolder(fs);
-        var parentFolder = dataFolder.CreateSubdirectory(id);
-
-        var handler = new EADesktopHandler(fs);
-        return (handler, parentFolder);
+        var fixture = new Fixture();
+        fixture.Customize(new AutoMoqCustomization());
+        return fixture.Create<IHardwareInfoProvider>();
     }
 
-    private static IEnumerable<EADesktopGame> SetupGames(MockFileSystem fs,
-        InMemoryRegistry registry, string keyName, IDirectoryInfo parentFolder)
+    private static (
+        EADesktopHandler handler,
+        IHardwareInfoProvider hardwareInfoProvider,
+        IDirectoryInfo parentFolder)
+        SetupHandler(MockFileSystem fs)
+    {
+        var dataFolder = EADesktopHandler.GetDataFolder(fs);
+        fs.AddDirectory(dataFolder.FullName);
+
+        var hardwareInfoProvider = SetupHardwareInfoProvider();
+        var handler = new EADesktopHandler(fs, hardwareInfoProvider);
+        return (handler, hardwareInfoProvider, dataFolder);
+    }
+
+    [SuppressMessage("Design", "MA0051:Method is too long")]
+    private static IEnumerable<EADesktopGame> SetupGames(
+        MockFileSystem fs, IHardwareInfoProvider hardwareInfoProvider,
+        InMemoryRegistry registry, string keyName, IDirectoryInfo dataFolder)
     {
         var fixture = new Fixture();
 
         var baseKey = registry.AddKey(RegistryHive.LocalMachine, $"SOFTWARE\\{keyName}");
 
-        var installInfoFile = EADesktopHandler.GetInstallInfoFile(parentFolder);
+        var installInfoFile = EADesktopHandler.GetInstallInfoFile(dataFolder);
+        installInfoFile.Directory!.Create();
 
         fixture.Customize<EADesktopGame>(composer => composer
             .FromFactory<string, string>((softwareID, baseSlug) =>
@@ -39,7 +57,7 @@ public partial class EADesktopTests
                 installCheckKey.AddValue("Install Dir", baseInstallPath + "\\");
 
                 var installCheck = $"[{installCheckKey.GetName()}\\Install Dir]__Installer\\installerdata.xml";
-                var game = new EADesktopGame(softwareID, baseSlug, baseInstallPath, installCheck, installInfoFile.FullName);
+                var game = new EADesktopGame(softwareID, baseSlug, baseInstallPath, installCheck);
 
                 return game;
             })
@@ -64,13 +82,24 @@ public partial class EADesktopTests
             },
         };
 
-        var fileContents = JsonSerializer.Serialize(installInfo, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-        });
+        var encryptionKey = Decryption.CreateDecryptionKey(hardwareInfoProvider);
 
-        fs.AddFile(installInfoFile.FullName, fileContents);
+        using (var aes = Aes.Create())
+        {
+            aes.Key = encryptionKey;
+            aes.IV = Decryption.CreateDecryptionIV();
+
+            var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+            using var fileStream = installInfoFile.Open(FileMode.Create, FileAccess.ReadWrite, FileShare.Write);
+            fileStream.Write(new byte[64]);
+
+            using var cryptoStream = new CryptoStream(fileStream, encryptor, CryptoStreamMode.Write);
+            JsonSerializer.Serialize(cryptoStream, installInfo, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            });
+        }
 
         return games;
     }

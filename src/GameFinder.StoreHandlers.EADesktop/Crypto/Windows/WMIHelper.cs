@@ -7,6 +7,7 @@ namespace GameFinder.StoreHandlers.EADesktop.Crypto.Windows;
 
 [SupportedOSPlatform("windows")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[ExcludeFromCodeCoverage(Justification = "Only available on Windows.")]
 internal static class WMIHelper
 {
     // private const string ComputerName = "localhost";
@@ -24,10 +25,8 @@ internal static class WMIHelper
     public const string NamePropertyName = "Name";
     public const string ProcessorIDPropertyName = "ProcessorId";
 
-    public static string? GetWMIProperty(string className, string propertyName, out string? error)
+    public static string GetWMIProperty(string className, string propertyName)
     {
-        error = null;
-
         try
         {
             var query = $"SELECT {propertyName} FROM {className}";
@@ -37,8 +36,7 @@ internal static class WMIHelper
             using var results = searcher.Get();
             if (results.Count != 1)
             {
-                error = $"Query did not return 1 element but {results.Count}:\n\"{query}\"";
-                return null;
+                throw new Exception($"Query returned {results.Count} elements instead of one");
             }
 
             var arr = new ManagementBaseObject[1];
@@ -49,14 +47,12 @@ internal static class WMIHelper
             var propertyData = baseObject.Properties[propertyName];
             if (propertyData.Type == CimType.String) return (string)propertyData.Value;
 
-            error = $"Property from query is not of type {nameof(CimType.String)} but {propertyData.Type}:\n\"{query}\"";
-            return null;
+            throw new Exception("Property from query is not of type {nameof(CimType.String)} but {propertyData.Type}");
 
         }
         catch (Exception e)
         {
-            error = $"Exception while getting property {propertyName} from class {className}:\n{e}";
-            return null;
+            throw new HardwareInfoProviderException($"Exception while getting property {propertyName} from class {className}", e);
         }
     }
 }

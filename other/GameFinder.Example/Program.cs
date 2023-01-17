@@ -112,12 +112,9 @@ public static class Program
             }
             else
             {
-                var decryptionKey = Decryption.CreateDecryptionKey(new HardwareInfoProvider(), out _);
-                if (decryptionKey is not null)
-                {
-                    var sDecryptionKey = Convert.ToHexString(decryptionKey).ToLower(CultureInfo.InvariantCulture);
-                    logger.LogDebug("EA Decryption Key: {}", sDecryptionKey);
-                }
+                var decryptionKey = Decryption.CreateDecryptionKey(new HardwareInfoProvider());
+                var sDecryptionKey = Convert.ToHexString(decryptionKey).ToLower(CultureInfo.InvariantCulture);
+                logger.LogDebug("EA Decryption Key: {}", sDecryptionKey);
 
                 var handler = new EADesktopHandler();
                 var results = handler.FindAllGames();

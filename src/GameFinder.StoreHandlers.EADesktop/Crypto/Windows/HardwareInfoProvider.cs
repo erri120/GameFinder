@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.Versioning;
 using JetBrains.Annotations;
 using static GameFinder.StoreHandlers.EADesktop.Crypto.Windows.WMIHelper;
@@ -10,13 +11,12 @@ namespace GameFinder.StoreHandlers.EADesktop.Crypto.Windows;
 /// </summary>
 [PublicAPI]
 [SupportedOSPlatform("windows")]
+[ExcludeFromCodeCoverage(Justification = "Only available on Windows.")]
 public sealed class HardwareInfoProvider : IHardwareInfoProvider
 {
     /// <inheritdoc/>
-    public string? GetVolumeSerialNumber(out string? error)
+    public string GetVolumeSerialNumber()
     {
-        error = null;
-
         var ok = Native.GetVolumeInformationW(
             "C:\\",
             null!,
@@ -28,55 +28,54 @@ public sealed class HardwareInfoProvider : IHardwareInfoProvider
             0);
 
         if (ok) return volumeSerialNumber.ToString("X", CultureInfo.InvariantCulture);
-        error = $"{nameof(Native.GetVolumeInformationW)} returned false";
-        return null;
+        throw new HardwareInfoProviderException($"{nameof(Native.GetVolumeInformationW)} returned false", null);
     }
 
     /// <inheritdoc/>
-    public string? GetBaseBoardManufacturer(out string? error)
+    public string GetBaseBoardManufacturer()
     {
-        return GetWMIProperty(Win32BaseBoardClass, ManufacturerPropertyName, out error);
+        return GetWMIProperty(Win32BaseBoardClass, ManufacturerPropertyName);
     }
 
     /// <inheritdoc/>
-    public string? GetBaseBoardSerialNumber(out string? error)
+    public string GetBaseBoardSerialNumber()
     {
-        return GetWMIProperty(Win32BaseBoardClass, SerialNumberPropertyName, out error);
+        return GetWMIProperty(Win32BaseBoardClass, SerialNumberPropertyName);
     }
 
     /// <inheritdoc/>
-    public string? GetBIOSManufacturer(out string? error)
+    public string GetBIOSManufacturer()
     {
-        return GetWMIProperty(Win32BIOSClass, ManufacturerPropertyName, out error);
+        return GetWMIProperty(Win32BIOSClass, ManufacturerPropertyName);
     }
 
     /// <inheritdoc/>
-    public string? GetBIOSSerialNumber(out string? error)
+    public string GetBIOSSerialNumber()
     {
-        return GetWMIProperty(Win32BIOSClass, SerialNumberPropertyName, out error);
+        return GetWMIProperty(Win32BIOSClass, SerialNumberPropertyName);
     }
 
     /// <inheritdoc/>
-    public string? GetVideoControllerDeviceId(out string? error)
+    public string GetVideoControllerDeviceId()
     {
-        return GetWMIProperty(Win32VideoControllerClass, PNPDeviceIDPropertyName, out error);
+        return GetWMIProperty(Win32VideoControllerClass, PNPDeviceIDPropertyName);
     }
 
     /// <inheritdoc/>
-    public string? GetProcessorManufacturer(out string? error)
+    public string GetProcessorManufacturer()
     {
-        return GetWMIProperty(Win32ProcessorClass, ManufacturerPropertyName, out error);
+        return GetWMIProperty(Win32ProcessorClass, ManufacturerPropertyName);
     }
 
     /// <inheritdoc/>
-    public string? GetProcessorId(out string? error)
+    public string GetProcessorId()
     {
-        return GetWMIProperty(Win32ProcessorClass, ProcessorIDPropertyName, out error);
+        return GetWMIProperty(Win32ProcessorClass, ProcessorIDPropertyName);
     }
 
     /// <inheritdoc/>
-    public string? GetProcessorName(out string? error)
+    public string GetProcessorName()
     {
-        return GetWMIProperty(Win32ProcessorClass, NamePropertyName, out error);
+        return GetWMIProperty(Win32ProcessorClass, NamePropertyName);
     }
 }

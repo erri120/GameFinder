@@ -1,22 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
 using System.Runtime.Versioning;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GameFinder.Common;
+using GameFinder.StoreHandlers.EADesktop.Crypto;
+using GameFinder.StoreHandlers.EADesktop.Crypto.Windows;
 using JetBrains.Annotations;
 
 namespace GameFinder.StoreHandlers.EADesktop;
 
+/// <summary>
+/// Handler for finding games installed with EA Desktop.
+/// </summary>
 [PublicAPI]
 public class EADesktopHandler : AHandler<EADesktopGame, string>
 {
-    public const int SupportedSchemaVersion = 21;
-    internal const string InstallInfoFileName = "IS.json";
+    internal const string AllUsersFolderName = "530c11479fe252fc5aabc24935b9776d4900eb3ba58fdc271e0d6229413ad40e";
+    internal const string InstallInfoFileName = "IS";
 
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
@@ -27,15 +30,27 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
     };
 
     private readonly IFileSystem _fileSystem;
+    private readonly IHardwareInfoProvider _hardwareInfoProvider;
 
+    /// <summary>
+    /// The supported schema version of this handler. You can change the schema policy with
+    /// <see cref="SchemaPolicy"/>.
+    /// </summary>
+    public const int SupportedSchemaVersion = 21;
+
+    /// <summary>
+    /// Policy to use when the schema version does not match <see cref="SupportedSchemaVersion"/>.
+    /// The default behavior is <see cref="EADesktop.SchemaPolicy.Warn"/>.
+    /// </summary>
     public SchemaPolicy SchemaPolicy { get; set; } = SchemaPolicy.Warn;
 
     [SupportedOSPlatform("windows")]
-    public EADesktopHandler() : this(new FileSystem()) { }
+    public EADesktopHandler() : this(new FileSystem(), new HardwareInfoProvider()) { }
 
-    public EADesktopHandler(IFileSystem fileSystem)
+    public EADesktopHandler(IFileSystem fileSystem, IHardwareInfoProvider hardwareInfoProvider)
     {
         _fileSystem = fileSystem;
+        _hardwareInfoProvider = hardwareInfoProvider;
     }
 
     /// <inheritdoc/>
@@ -48,14 +63,22 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
             yield break;
         }
 
-        var installInfoFile = FindInstallInfoFile(dataFolder);
-        if (installInfoFile is null)
+        var installInfoFile = GetInstallInfoFile(dataFolder);
+        if (!installInfoFile.Exists)
         {
-            yield return Result.FromError<EADesktopGame>($"Unable to find IS.json inside data folder {dataFolder}");
+            yield return Result.FromError<EADesktopGame>($"File does not exist: {installInfoFile.FullName}");
             yield break;
         }
 
-        foreach (var result in ParseInstallInfoFile(installInfoFile, SchemaPolicy))
+        var decryptionResult = DecryptInstallInfoFile(installInfoFile, _hardwareInfoProvider);
+        var (plaintext, decryptionError) = decryptionResult;
+        if (plaintext is null)
+        {
+            yield return Result.FromError<EADesktopGame>(decryptionError ?? $"Error decryption file {installInfoFile.FullName}");
+            yield break;
+        }
+
+        foreach (var result in ParseInstallInfoFile(plaintext, installInfoFile, SchemaPolicy))
         {
             yield return result;
         }
@@ -78,28 +101,39 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
         ));
     }
 
-    internal static IFileInfo GetInstallInfoFile(IDirectoryInfo parentFolder)
+    internal static IFileInfo GetInstallInfoFile(IDirectoryInfo dataFolder)
     {
-        var fileSystem = parentFolder.FileSystem;
+        var fileSystem = dataFolder.FileSystem;
 
         return fileSystem.FileInfo.New(fileSystem.Path.Combine(
-            parentFolder.FullName,
+            dataFolder.FullName,
+            AllUsersFolderName,
             InstallInfoFileName
         ));
     }
 
-    internal static IFileInfo? FindInstallInfoFile(IDirectoryInfo dataFolder)
-    {
-        return dataFolder
-            .EnumerateFiles(InstallInfoFileName, SearchOption.AllDirectories)
-            .FirstOrDefault();
-    }
-
-    internal static IEnumerable<Result<EADesktopGame>> ParseInstallInfoFile(IFileInfo installInfoFile, SchemaPolicy schemaPolicy)
+    internal static Result<string> DecryptInstallInfoFile(IFileInfo installInfoFile, IHardwareInfoProvider hardwareInfoProvider)
     {
         try
         {
-            return ParseInstallInfoFileInner(installInfoFile, schemaPolicy);
+            var cipherText = installInfoFile.FileSystem.File.ReadAllBytes(installInfoFile.FullName);
+            var key = Decryption.CreateDecryptionKey(hardwareInfoProvider);
+
+            var iv = Decryption.CreateDecryptionIV();
+            var plainText = Decryption.DecryptFile(cipherText, key, iv);
+            return Result.FromGame(plainText);
+        }
+        catch (Exception e)
+        {
+            return Result.FromException<string>($"Exception while decrypting file {installInfoFile.FullName}", e);
+        }
+    }
+
+    internal static IEnumerable<Result<EADesktopGame>> ParseInstallInfoFile(string plaintext, IFileInfo installInfoFile, SchemaPolicy schemaPolicy)
+    {
+        try
+        {
+            return ParseInstallInfoFileInner(plaintext, installInfoFile, schemaPolicy);
         }
         catch (Exception e)
         {
@@ -110,10 +144,9 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
         }
     }
 
-    private static IEnumerable<Result<EADesktopGame>> ParseInstallInfoFileInner(IFileInfo installInfoFile, SchemaPolicy schemaPolicy)
+    private static IEnumerable<Result<EADesktopGame>> ParseInstallInfoFileInner(string plaintext, IFileInfo installInfoFile, SchemaPolicy schemaPolicy)
     {
-        using var stream = installInfoFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
-        var installInfoFileContents = JsonSerializer.Deserialize<InstallInfoFile>(stream, JsonSerializerOptions);
+        var installInfoFileContents = JsonSerializer.Deserialize<InstallInfoFile>(plaintext, JsonSerializerOptions);
 
         if (installInfoFileContents is null)
         {
@@ -209,8 +242,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
             softwareId,
             baseSlug,
             baseInstallPath,
-            installInfo.InstallCheck,
-            installInfoFilePath);
+            installInfo.InstallCheck);
 
         return Result.FromGame(game);
     }

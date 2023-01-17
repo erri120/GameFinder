@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace GameFinder.StoreHandlers.EADesktop.Crypto;
 
@@ -12,63 +11,63 @@ public interface IHardwareInfoProvider
     /// <summary>
     /// Returns the Serial Number of the Volume that contains the Windows folder.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetVolumeSerialNumber(out string? error);
+    string GetVolumeSerialNumber();
 
     /// <summary>
     /// Returns the Manufacturer of the Motherboard.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetBaseBoardManufacturer(out string? error);
+    string GetBaseBoardManufacturer();
 
     /// <summary>
     /// Returns the Serial Number of the Motherboard.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetBaseBoardSerialNumber(out string? error);
+    string GetBaseBoardSerialNumber();
 
     /// <summary>
     /// Returns the Manufacturer of the BIOS.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetBIOSManufacturer(out string? error);
+    string GetBIOSManufacturer();
 
     /// <summary>
     /// Returns of Serial Number of the BIOS.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetBIOSSerialNumber(out string? error);
+    string GetBIOSSerialNumber();
 
     /// <summary>
     /// Returns the PNPDeviceId of the GPU.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetVideoControllerDeviceId(out string? error);
+    string GetVideoControllerDeviceId();
 
     /// <summary>
     /// Returns the Manufacturer of the CPU.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetProcessorManufacturer(out string? error);
+    string GetProcessorManufacturer();
 
     /// <summary>
     /// Returns the ProcessorId of the CPU.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetProcessorId(out string? error);
+    string GetProcessorId();
 
     /// <summary>
     /// Returns the name of the CPU.
     /// </summary>
-    /// <param name="error"></param>
+    /// <exception cref="HardwareInfoProviderException"></exception>
     /// <returns></returns>
-    string? GetProcessorName(out string? error);
+    string GetProcessorName();
 }
