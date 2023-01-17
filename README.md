@@ -8,10 +8,10 @@
 - [GOG Galaxy](#gog-galaxy) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.GOG)](https://www.nuget.org/packages/GameFinder.StoreHandlers.GOG)
 - [Epic Games Store](#epic-games-store) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.EGS)](https://www.nuget.org/packages/GameFinder.StoreHandlers.EGS)
 - [Origin](#origin) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.Origin)](https://www.nuget.org/packages/GameFinder.StoreHandlers.Origin)
+- [EA Desktop](#ea-desktop) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.EADesktop)](https://www.nuget.org/packages/GameFinder.StoreHandlers.EADesktop)
 
 The following launchers are not yet supported or support has been dropped:
 
-- [EA Desktop](#ea-desktop)
 - [Bethesda.net](#bethesdanet) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.BethNet?color=red&label=deprecated)](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet)
 - [Xbox Game Pass](#xbox-game-pass) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.Xbox?color=red&label=deprecated)](https://www.nuget.org/packages/GameFinder.StoreHandlers.Xbox)
 
@@ -141,7 +141,32 @@ OriginGame? game = handler.FindOneGameById("Origin.OFR.50.0001456", out string[]
 
 ### EA Desktop
 
-[EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app) and replacing it with EA Desktop or EA App or whatever you want to call this new fancy launcher. The "old way" of finding games for Origin does not work for EA Desktop. In fact, I haven't found a clean way of finding games installed with the new launcher. See [the wiki](https://github.com/erri120/GameFinder/wiki/EA-Desktop) for more information.
+EA Desktop is the replacement for [Origin](#origin): See [EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app). This is by far, the most complicated Store Handler. **You should read the [wiki entry](https://github.com/erri120/GameFinder/wiki/EA-Desktop).** My implementation decrypts the encrypted file, created by EA Desktop. You should be aware that the key used to encrypt the file is derived from hardware information. If the user changes their hardware, the decryption process might fail because they key has changed.
+
+**Usage:**
+
+```csharp
+var handler = new EADesktopHandler();
+
+// method 1: iterate over the game-error result
+foreach (var (game, error) in handler.FindAllGames())
+{
+    if (game is not null)
+    {
+        Console.WriteLine($"Found {game}");
+    }
+    else
+    {
+        Console.WriteLine($"Error: {error}");
+    }
+}
+
+// method 2: use the dictionary if you need to find games by id
+Dictionary<EADesktopGame, string> games = handler.FindAllGamesById(out string[] errors);
+
+// method 3: find a single game by id
+EADesktopGame? game = handler.FindOneGameById("Origin.SFT.50.0000532", out string[] errors);
+```
 
 ### Bethesda.net
 
