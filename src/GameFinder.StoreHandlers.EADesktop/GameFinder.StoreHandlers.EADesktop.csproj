@@ -31,6 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="GameFinder.Example" />
         <InternalsVisibleTo Include="GameFinder.StoreHandlers.EADesktop.Tests" />
     </ItemGroup>
 </Project>
