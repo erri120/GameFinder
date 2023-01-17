@@ -23,7 +23,7 @@ internal static class Decryption
         if (hardwareString is null) return null;
 
         var hardwareHash = Hashing.CalculateSHA1Hash(hardwareString);
-        var hashInput = AllUsersGenericId + hardwareHash;
+        var hashInput = AllUsersGenericId + IS + hardwareHash;
         var key = Hashing.CalculateSHA3_256Hash(hashInput);
 
         return key;
