@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
-using GameFinder.StoreHandlers.EADesktop.Crypto.Windows;
 
 namespace GameFinder.StoreHandlers.EADesktop.Crypto;
 

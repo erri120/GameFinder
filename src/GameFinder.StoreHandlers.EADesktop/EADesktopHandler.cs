@@ -44,9 +44,19 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
     /// </summary>
     public SchemaPolicy SchemaPolicy { get; set; } = SchemaPolicy.Warn;
 
+    /// <summary>
+    /// Default constructor that uses the real filesystem <see cref="FileSystem"/> and
+    /// real hardware information <see cref="HardwareInfoProvider"/>.
+    /// </summary>
     [SupportedOSPlatform("windows")]
     public EADesktopHandler() : this(new FileSystem(), new HardwareInfoProvider()) { }
 
+    /// <summary>
+    /// Constructor for specifying the <see cref="IFileSystem"/> and <see cref="IHardwareInfoProvider"/>.
+    /// Use this constructor if you want to run tests.
+    /// </summary>
+    /// <param name="fileSystem"></param>
+    /// <param name="hardwareInfoProvider"></param>
     public EADesktopHandler(IFileSystem fileSystem, IHardwareInfoProvider hardwareInfoProvider)
     {
         _fileSystem = fileSystem;

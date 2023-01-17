@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Released]
 
+## [2.5.0] - 2023-01-17
+
+Added support for EA Desktop. Read the [wiki entry](https://github.com/erri120/GameFinder/wiki/EA-Desktop) before using.
+
 ## [2.4.0] - 2023-01-13
 
 Although this release contains some API changes and a lot of internal changes, consumers will likely not be affected.
@@ -236,8 +240,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v2.4.0...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v2.5.0...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[2.5.0]: https://github.com/erri120/GameFinder/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/erri120/GameFinder/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/erri120/GameFinder/compare/v2.2.2...v2.3.0
 [2.2.2]: https://github.com/erri120/GameFinder/compare/v2.2.1...v2.2.2
