@@ -9,4 +9,10 @@
             <Link>Usings.cs</Link>
         </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="files\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 </Project>

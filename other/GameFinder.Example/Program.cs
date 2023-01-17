@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using CommandLine;
@@ -42,6 +43,7 @@ public static class Program
             .WithParsed(x => Run(x, logger));
     }
 
+    [SuppressMessage("Design", "MA0051:Method is too long")]
     private static void Run(Options options, ILogger logger)
     {
         if (File.Exists("log.log")) File.Delete("log.log");

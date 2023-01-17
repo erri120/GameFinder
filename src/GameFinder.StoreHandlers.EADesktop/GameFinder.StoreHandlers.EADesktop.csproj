@@ -13,7 +13,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="SHA3.Net" Version="2.0.0" />
         <PackageReference Include="System.IO.Abstractions" Version="19.1.5" />
+        <PackageReference Include="System.Management" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
