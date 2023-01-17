@@ -1,8 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <PackageReference Include="Vogen" Version="3.0.9" PrivateAssets="all" />
-    </ItemGroup>
-    <ItemGroup>
       <ProjectReference Include="..\..\src\GameFinder.Common\GameFinder.Common.csproj" />
     </ItemGroup>
 </Project>
