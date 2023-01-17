@@ -229,11 +229,6 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
             return Result.FromError<EADesktopGame>($"InstallInfo #{num} for {softwareId} ({baseSlug}) does not have the value \"baseInstallPath\"");
         }
 
-        if (string.IsNullOrEmpty(installInfo.InstallCheck))
-        {
-            return Result.FromError<EADesktopGame>($"InstallInfo #{num} for {softwareId} ({baseSlug}) does not have the value \"installCheck\"");
-        }
-
         var baseInstallPath = installInfo.BaseInstallPath;
         if (baseInstallPath.EndsWith('\\'))
             baseInstallPath = baseInstallPath[..^1];
@@ -241,8 +236,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
         var game = new EADesktopGame(
             softwareId,
             baseSlug,
-            baseInstallPath,
-            installInfo.InstallCheck);
+            baseInstallPath);
 
         return Result.FromGame(game);
     }

@@ -4,7 +4,6 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Security.Cryptography;
 using System.Text.Json;
 using AutoFixture.AutoMoq;
-using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EADesktop.Crypto;
 
 namespace GameFinder.StoreHandlers.EADesktop.Tests;
@@ -34,12 +33,9 @@ public partial class EADesktopTests
 
     [SuppressMessage("Design", "MA0051:Method is too long")]
     private static IEnumerable<EADesktopGame> SetupGames(
-        MockFileSystem fs, IHardwareInfoProvider hardwareInfoProvider,
-        InMemoryRegistry registry, string keyName, IDirectoryInfo dataFolder)
+        MockFileSystem fs, IHardwareInfoProvider hardwareInfoProvider, IDirectoryInfo dataFolder)
     {
         var fixture = new Fixture();
-
-        var baseKey = registry.AddKey(RegistryHive.LocalMachine, $"SOFTWARE\\{keyName}");
 
         var installInfoFile = EADesktopHandler.GetInstallInfoFile(dataFolder);
         installInfoFile.Directory!.Create();
@@ -53,11 +49,7 @@ public partial class EADesktopTests
                 fs.AddDirectory(baseInstallPath);
                 fs.AddFile(installerDataPath, new MockFileData(string.Empty));
 
-                var installCheckKey = baseKey.AddSubKey(baseSlug);
-                installCheckKey.AddValue("Install Dir", baseInstallPath + "\\");
-
-                var installCheck = $"[{installCheckKey.GetName()}\\Install Dir]__Installer\\installerdata.xml";
-                var game = new EADesktopGame(softwareID, baseSlug, baseInstallPath, installCheck);
+                var game = new EADesktopGame(softwareID, baseSlug, baseInstallPath);
 
                 return game;
             })
@@ -69,7 +61,6 @@ public partial class EADesktopTests
         {
             BaseSlug = game.BaseSlug,
             BaseInstallPath = game.BaseInstallPath + "\\",
-            InstallCheck = game.InstallCheck,
             SoftwareID = game.SoftwareID,
         }).ToList();
 
