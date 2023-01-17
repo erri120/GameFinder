@@ -236,8 +236,10 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v2.2.2...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v2.4.0...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[2.4.0]: https://github.com/erri120/GameFinder/compare/v2.3.0...v2.4.0
+[2.3.0]: https://github.com/erri120/GameFinder/compare/v2.2.2...v2.3.0
 [2.2.2]: https://github.com/erri120/GameFinder/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/erri120/GameFinder/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/erri120/GameFinder/compare/v2.1.0...v2.2.0
