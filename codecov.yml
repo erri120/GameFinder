@@ -9,6 +9,7 @@ comment:
   layout: "header, diff, flags, components"
   behavior: default
   require_changes: false
+  after_n_builds: 2
 
 component_management:
   default_rules:
