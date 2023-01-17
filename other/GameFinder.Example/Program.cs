@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using CommandLine;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
+using GameFinder.StoreHandlers.EADesktop;
+using GameFinder.StoreHandlers.EADesktop.Crypto;
+using GameFinder.StoreHandlers.EADesktop.Crypto.Windows;
 using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
 using GameFinder.StoreHandlers.Origin;
@@ -41,6 +47,7 @@ public static class Program
             .WithParsed(x => Run(x, logger));
     }
 
+    [SuppressMessage("Design", "MA0051:Method is too long")]
     private static void Run(Options options, ILogger logger)
     {
         if (File.Exists("log.log")) File.Delete("log.log");
@@ -92,6 +99,24 @@ public static class Program
             else
             {
                 var handler = new OriginHandler();
+                var results = handler.FindAllGames();
+                LogGamesAndErrors(results, logger);
+            }
+        }
+
+        if (options.EADesktop)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                logger.LogError("EA Desktop is only supported on Windows!");
+            }
+            else
+            {
+                var decryptionKey = Decryption.CreateDecryptionKey(new HardwareInfoProvider());
+                var sDecryptionKey = Convert.ToHexString(decryptionKey).ToLower(CultureInfo.InvariantCulture);
+                logger.LogDebug("EA Decryption Key: {}", sDecryptionKey);
+
+                var handler = new EADesktopHandler();
                 var results = handler.FindAllGames();
                 LogGamesAndErrors(results, logger);
             }

@@ -22,21 +22,7 @@ public sealed class InMemoryRegistry : IRegistry
             .GetValues<RegistryHive>()
             .ToDictionary(
                 hive => hive,
-                hive => new InMemoryRegistryKey(hive, HiveToKeyName(hive)));
-    }
-
-    internal static string HiveToKeyName(RegistryHive hive)
-    {
-        return hive switch
-        {
-            RegistryHive.ClassesRoot => "HKEY_CLASSES_ROOT",
-            RegistryHive.CurrentUser => "HKEY_CURRENT_USER",
-            RegistryHive.LocalMachine => "HKEY_LOCAL_MACHINE",
-            RegistryHive.Users => "HKEY_USERS",
-            RegistryHive.PerformanceData => "HKEY_PERFORMANCE_DATA",
-            RegistryHive.CurrentConfig => "HKEY_CURRENT_CONFIG",
-            _ => throw new ArgumentOutOfRangeException(nameof(hive), hive, message: null),
-        };
+                hive => new InMemoryRegistryKey(hive, hive.RegistryHiveToString()));
     }
 
     /// <summary>

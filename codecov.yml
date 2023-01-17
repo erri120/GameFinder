@@ -23,6 +23,10 @@ component_management:
       paths:
         - "src/GameFinder.Common/**"
         - "src/GameFinder.RegistryUtils/**"
+    - component_id: store_handler_ea_desktop
+      name: EA Desktop
+      paths:
+        - "src/GameFinder.StoreHandlers.EADesktop/**"
     - component_id: store_handler_egs
       name: EGS
       paths:

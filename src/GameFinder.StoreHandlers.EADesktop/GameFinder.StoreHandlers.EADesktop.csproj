@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Description>Library for finding games installed with EA Desktop.</Description>
+        <PackageTags>ea ea-desktop ea-app games</PackageTags>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.EADesktopxml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DocumentationFile>bin\Release\GameFinder.StoreHandlers.EADesktop.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SHA3.Net" Version="2.0.0" />
+        <PackageReference Include="System.IO.Abstractions" Version="19.1.5" />
+        <PackageReference Include="System.Management" Version="7.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="12.2.19">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFinder.Common\GameFinder.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="GameFinder.Example" />
+        <InternalsVisibleTo Include="GameFinder.StoreHandlers.EADesktop.Tests" />
+    </ItemGroup>
+</Project>

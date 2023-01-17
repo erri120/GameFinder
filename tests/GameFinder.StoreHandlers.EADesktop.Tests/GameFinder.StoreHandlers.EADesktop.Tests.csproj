@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.EADesktop\GameFinder.StoreHandlers.EADesktop.csproj" />
+        <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Usings.cs">
+            <Link>Usings.cs</Link>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="files\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+</Project>
