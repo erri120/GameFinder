@@ -24,6 +24,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
+    - name: Check formatting
+      run: dotnet format --no-restore --verify-no-changes --severity error
+
     - name: Build
       run: dotnet build --no-restore
 
