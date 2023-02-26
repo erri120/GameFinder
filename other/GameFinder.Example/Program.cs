@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -124,7 +124,7 @@ public static class Program
     }
 
     private static void LogGamesAndErrors<TGame>(IEnumerable<Result<TGame>> results, ILogger logger)
-        where TGame: class
+        where TGame : class
     {
         foreach (var (game, error) in results)
         {

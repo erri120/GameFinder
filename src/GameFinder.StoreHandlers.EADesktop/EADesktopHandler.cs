@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions;
@@ -100,7 +100,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;
 
-        return games.CustomToDictionary(game => game.SoftwareID, game => game,StringComparer.OrdinalIgnoreCase);
+        return games.CustomToDictionary(game => game.SoftwareID, game => game, StringComparer.OrdinalIgnoreCase);
     }
 
     internal static IDirectoryInfo GetDataFolder(IFileSystem fileSystem)

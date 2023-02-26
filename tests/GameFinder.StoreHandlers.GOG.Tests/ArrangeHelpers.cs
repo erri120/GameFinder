@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using GameFinder.RegistryUtils;
 
 namespace GameFinder.StoreHandlers.GOG.Tests;
@@ -8,7 +8,7 @@ public partial class GOGTests
     public static (GOGHandler handler, InMemoryRegistryKey gogKey) SetupHandler(InMemoryRegistry registry)
     {
         var gogKey = registry.AddKey(RegistryHive.LocalMachine, GOGHandler.GOGRegKey);
-        var handler =  new GOGHandler(registry);
+        var handler = new GOGHandler(registry);
         return (handler, gogKey);
     }
 

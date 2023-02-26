@@ -1,4 +1,4 @@
-﻿namespace GameFinder.RegistryUtils.Tests.AutoData;
+namespace GameFinder.RegistryUtils.Tests.AutoData;
 
 public class RegistryAutoDataAttribute : AutoDataAttribute
 {
@@ -7,5 +7,6 @@ public class RegistryAutoDataAttribute : AutoDataAttribute
         var ret = new Fixture();
         ret.Customizations.Add(new RegistryKeyBuilder());
         return ret;
-    }) { }
+    })
+    { }
 }

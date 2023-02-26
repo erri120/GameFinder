@@ -1,4 +1,4 @@
-﻿using GameFinder.RegistryUtils;
+using GameFinder.RegistryUtils;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.GOG.Tests;

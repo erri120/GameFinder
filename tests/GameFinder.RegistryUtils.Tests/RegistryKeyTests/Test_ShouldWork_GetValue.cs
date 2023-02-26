@@ -1,4 +1,4 @@
-﻿using GameFinder.RegistryUtils.Tests.AutoData;
+using GameFinder.RegistryUtils.Tests.AutoData;
 
 namespace GameFinder.RegistryUtils.Tests;
 

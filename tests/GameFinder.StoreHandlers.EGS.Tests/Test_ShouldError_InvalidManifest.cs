@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions.TestingHelpers;
+using System.IO.Abstractions.TestingHelpers;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS.Tests.AutoData;
 using TestUtils;

@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions.TestingHelpers;
+using System.IO.Abstractions.TestingHelpers;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EGS.Tests.AutoData;
 using TestUtils;
@@ -40,7 +40,7 @@ public partial class EGSTests
         var (handler, manifestDir) = SetupHandler(fs, registry);
 
         var manifest = fs.Path.Combine(manifestDir, $"{manifestItemName}.item");
-        fs.AddFile(manifest,$@"{{ ""CatalogItemId"": ""{value}"", ""DisplayName"": ""{value}"" }}");
+        fs.AddFile(manifest, $@"{{ ""CatalogItemId"": ""{value}"", ""DisplayName"": ""{value}"" }}");
 
         var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Manifest {manifest} does not have a value \"InstallLocation\"");

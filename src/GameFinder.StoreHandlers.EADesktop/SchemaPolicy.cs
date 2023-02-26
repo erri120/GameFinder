@@ -1,4 +1,4 @@
-﻿using GameFinder.Common;
+using GameFinder.Common;
 using JetBrains.Annotations;
 
 namespace GameFinder.StoreHandlers.EADesktop;

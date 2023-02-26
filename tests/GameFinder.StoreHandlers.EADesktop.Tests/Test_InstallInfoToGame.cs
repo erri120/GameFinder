@@ -1,4 +1,4 @@
-﻿namespace GameFinder.StoreHandlers.EADesktop.Tests;
+namespace GameFinder.StoreHandlers.EADesktop.Tests;
 
 public partial class EADesktopTests
 {

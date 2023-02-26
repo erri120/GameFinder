@@ -1,4 +1,4 @@
-﻿namespace GameFinder.RegistryUtils.Tests;
+namespace GameFinder.RegistryUtils.Tests;
 
 public partial class RegistryKeyTests
 {

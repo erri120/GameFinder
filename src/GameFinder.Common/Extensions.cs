@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -85,7 +85,7 @@ public static class Extensions
     public static IDictionary<TKey, TElement> CustomToDictionary<TSource, TKey, TElement>(
         [InstantHandle] this IEnumerable<TSource> source, Func<TSource, TKey> keySelector,
         Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer = null)
-        where TKey: notnull
+        where TKey : notnull
     {
         var dictionary = new Dictionary<TKey, TElement>(comparer);
 

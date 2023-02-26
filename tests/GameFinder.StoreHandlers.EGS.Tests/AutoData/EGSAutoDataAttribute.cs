@@ -1,4 +1,4 @@
-﻿namespace GameFinder.StoreHandlers.EGS.Tests.AutoData;
+namespace GameFinder.StoreHandlers.EGS.Tests.AutoData;
 
 public class EGSAutoDataAttribute : AutoDataAttribute
 {
@@ -7,5 +7,6 @@ public class EGSAutoDataAttribute : AutoDataAttribute
         var ret = new Fixture();
         ret.Customizations.Add(new FileSystemBuilder());
         return ret;
-    }) { }
+    })
+    { }
 }

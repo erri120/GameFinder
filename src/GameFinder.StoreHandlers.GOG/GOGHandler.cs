@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -49,7 +49,7 @@ public class GOGHandler : AHandler<GOGGame, long>
     {
         try
         {
-            var localMachine =_registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+            var localMachine = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
 
             using var gogKey = localMachine.OpenSubKey(GOGRegKey);
             if (gogKey is null)

@@ -1,4 +1,4 @@
-﻿using AutoFixture.Kernel;
+using AutoFixture.Kernel;
 using TestUtils;
 
 namespace GameFinder.RegistryUtils.Tests.AutoData;

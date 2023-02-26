@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 using TestUtils;
 
@@ -12,7 +12,7 @@ public partial class SteamTests
     {
         var (handler, basePath, _) = SetupHandler(fs);
 
-        var manifest = fs.Path.Combine(basePath,$"{id.ToString(CultureInfo.InvariantCulture)}.acf");
+        var manifest = fs.Path.Combine(basePath, $"{id.ToString(CultureInfo.InvariantCulture)}.acf");
         fs.AddFile(manifest, @$"
 ""AppState""
 {{
@@ -31,7 +31,7 @@ public partial class SteamTests
     {
         var (handler, basePath, _) = SetupHandler(fs);
 
-        var manifest = fs.Path.Combine(basePath,$"{id.ToString(CultureInfo.InvariantCulture)}.acf");
+        var manifest = fs.Path.Combine(basePath, $"{id.ToString(CultureInfo.InvariantCulture)}.acf");
         fs.AddFile(manifest, @$"
 ""{format}""
 {{
@@ -49,7 +49,7 @@ public partial class SteamTests
 
         var randomBytes = new byte[128];
 
-        var manifest = fs.Path.Combine(basePath,$"{id.ToString(CultureInfo.InvariantCulture)}.acf");
+        var manifest = fs.Path.Combine(basePath, $"{id.ToString(CultureInfo.InvariantCulture)}.acf");
         fs.AddFile(manifest, new MockFileData(randomBytes));
 
         var error = handler.ShouldOnlyBeOneError();

@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions.TestingHelpers;
+using System.IO.Abstractions.TestingHelpers;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.Steam.Tests;

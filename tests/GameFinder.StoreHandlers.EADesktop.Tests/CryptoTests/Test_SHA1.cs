@@ -1,4 +1,4 @@
-﻿using GameFinder.StoreHandlers.EADesktop.Crypto;
+using GameFinder.StoreHandlers.EADesktop.Crypto;
 
 namespace GameFinder.StoreHandlers.EADesktop.Tests;
 
