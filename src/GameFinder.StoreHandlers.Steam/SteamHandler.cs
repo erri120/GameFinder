@@ -211,21 +211,48 @@ public class SteamHandler : AHandler<SteamGame, int>
         {
             // steam on linux can be found in various places
 
-            // ~/.local/share/Steam (common)
+            // $XDG_DATA_HOME/Steam aka ~/.local/share/Steam
             // https://github.com/dotnet/runtime/blob/3b1df9396e2a7cc6797e76793e8547f8a7771953/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs#L124
             yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Steam"
             ));
 
-            // ~/.steam (common)
+            // ~/.steam/debian-installation
+            yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".steam",
+                "debian-installation"
+            ));
+
+            // ~/.var/app/com.valvesoftware.Steam/data/Steam (flatpak installation)
+            // https://github.com/flatpak/flatpak/wiki/Filesystem
+            yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".var",
+                "app",
+                "com.valvesoftware.Steam",
+                "data",
+                "Steam"
+            ));
+
+            // ~/.steam/steam
+            // this is a legacy installation directory and is often soft linked to
+            // the actual installation directory
+            yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".steam",
+                "steam"
+            ));
+
+            // ~/.steam
             // https://github.com/dotnet/runtime/blob/3b1df9396e2a7cc6797e76793e8547f8a7771953/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs#L90
             yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 ".steam"
             ));
 
-            // ~/.local/.steam (rare)
+            // ~/.local/.steam
             yield return fileSystem.DirectoryInfo.New(fileSystem.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 ".local",
