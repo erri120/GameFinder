@@ -10,9 +10,11 @@
         </Compile>
     </ItemGroup>
 
-    <ItemGroup>
-        <Content Include="files\**">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
+    <Target Name="CopyFiles" AfterTargets="PostBuildEvent">
+        <ItemGroup>
+            <_Files Include="files\**"/>
+        </ItemGroup>
+
+        <Copy SourceFiles="@(_Files)" DestinationFolder="$(TargetDir)\files"/>
+    </Target>
 </Project>
