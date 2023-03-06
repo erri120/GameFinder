@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using CommandLine;
 using GameFinder.Common;
@@ -14,6 +15,7 @@ using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
 using GameFinder.StoreHandlers.Origin;
 using GameFinder.StoreHandlers.Steam;
+using GameFinder.Wine;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Config;
@@ -119,6 +121,28 @@ public static class Program
                 var handler = new EADesktopHandler();
                 var results = handler.FindAllGames();
                 LogGamesAndErrors(results, logger);
+            }
+        }
+
+        if (options.Wine)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                logger.LogError("Wine is only supported on Linux!");
+            }
+            else
+            {
+                var prefixManager = new DefaultWinePrefixManager(new FileSystem());
+                foreach (var result in prefixManager.FindPrefixes())
+                {
+                    result.Switch(prefix =>
+                    {
+                        logger.LogInformation($"Found wine prefix at {prefix.ConfigurationDirectory}");
+                    }, error =>
+                    {
+                        logger.LogError(error.Value);
+                    });
+                }
             }
         }
     }

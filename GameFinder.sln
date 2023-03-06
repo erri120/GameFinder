@@ -38,6 +38,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EFB4E7DB-DE24-4BDE-B660-DAF1394ECC21}"
 	ProjectSection(SolutionItems) = preProject
 		src\Directory.Build.props = src\Directory.Build.props
+		src\System.IO.Abstractions.props = src\System.IO.Abstractions.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9C6671E1-A94D-4C76-9F61-78B491A62408}"
@@ -69,6 +70,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.StoreHandlers.EADesktop", "src\GameFinder.StoreHandlers.EADesktop\GameFinder.StoreHandlers.EADesktop.csproj", "{F7807045-BAA2-46F6-81A6-0127FA662AC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.StoreHandlers.EADesktop.Tests", "tests\GameFinder.StoreHandlers.EADesktop.Tests\GameFinder.StoreHandlers.EADesktop.Tests.csproj", "{519FD898-CFD1-4093-833F-510BE8BD9379}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Wine", "Wine", "{21F0CD9E-DC99-49E5-B451-A8A111664E6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.Wine", "src\GameFinder.Wine\GameFinder.Wine.csproj", "{F553AEEA-FD48-4C84-B5A1-7CC31F2F76D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.Wine.Tests", "tests\GameFinder.Wine.Tests\GameFinder.Wine.Tests.csproj", "{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -144,6 +151,14 @@ Global
 		{519FD898-CFD1-4093-833F-510BE8BD9379}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{519FD898-CFD1-4093-833F-510BE8BD9379}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{519FD898-CFD1-4093-833F-510BE8BD9379}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F553AEEA-FD48-4C84-B5A1-7CC31F2F76D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F553AEEA-FD48-4C84-B5A1-7CC31F2F76D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F553AEEA-FD48-4C84-B5A1-7CC31F2F76D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F553AEEA-FD48-4C84-B5A1-7CC31F2F76D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{58A62CC7-4A61-4218-9F93-CE85FDF00E15} = {B765999C-AB3D-495F-9F5E-9108F2D4FE33}
@@ -165,5 +180,8 @@ Global
 		{C26BCA96-CF68-41F5-AC55-B24EF0545E4A} = {9C6671E1-A94D-4C76-9F61-78B491A62408}
 		{F7807045-BAA2-46F6-81A6-0127FA662AC8} = {B765999C-AB3D-495F-9F5E-9108F2D4FE33}
 		{519FD898-CFD1-4093-833F-510BE8BD9379} = {9C6671E1-A94D-4C76-9F61-78B491A62408}
+		{21F0CD9E-DC99-49E5-B451-A8A111664E6E} = {EFB4E7DB-DE24-4BDE-B660-DAF1394ECC21}
+		{F553AEEA-FD48-4C84-B5A1-7CC31F2F76D5} = {21F0CD9E-DC99-49E5-B451-A8A111664E6E}
+		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE} = {9C6671E1-A94D-4C76-9F61-78B491A62408}
 	EndGlobalSection
 EndGlobal
