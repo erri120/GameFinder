@@ -17,6 +17,10 @@ The following launchers are not yet supported or support has been dropped:
 
 If you are interested in understanding _how_ GameFinder finds these games, check [the wiki](https://github.com/erri120/GameFinder/wiki) for more information.
 
+Additionally, the following Linux tools are supported:
+
+- [Wine](#wine) [![Nuget](https://img.shields.io/nuget/v/GameFinder.Wine)](https://www.nuget.org/packages/GameFinder.Wine)
+
 ## Supported Launchers
 
 ### Steam
@@ -179,6 +183,29 @@ The package [GameFinder.StoreHandlers.Xbox](https://www.nuget.org/packages/GameF
 The final issue is related to actual code: in order to find all UWP apps I used the Windows SDK, which was a pain to integrate. The CI had to be on Windows, the .NET target framework had to be a Windows specific version (`net6.0-windows-XXXXXXXXXX`), and it was overall not nice to use.
 
 The package is still available on [NuGet](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet/) and should still work, but it's marked as deprecated and won't receive any updates.
+
+## Linux tools
+
+### Wine
+
+`GameFinder.Wine` implements a `IWinePrefixManager` for finding [Wineprefixes](https://wiki.winehq.org/FAQ#Wineprefixes).
+
+**Usage**:
+
+```csharp
+var prefixManager = new DefaultWinePrefixManager(new FileSystem());
+
+foreach (var result in prefixManager.FindPrefixes())
+{
+    result.Switch(prefix =>
+    {
+        logger.LogInformation($"Found wine prefix at {prefix.ConfigurationDirectory}");
+    }, error =>
+    {
+        logger.LogError(error.Value);
+    });
+}
+```
 
 ## Contributing
 
