@@ -6,16 +6,16 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
-## 2.6.0
+## [Released]
+
+## [2.6.0] - 2023-03-07
 
 - removed support for `net6.0`
 - add support for finding Wine prefixes (check the [README](./README.md#linux-tools))
 - Steam: added new default installation directories:
-  - `~/.steam/debian-installation` (apparently used on Debian/Ubuntu systems)
-  - `~/.var/app/com.valvesoftware.Steam/data/Steam` (used by the flatpak installation)
-  - `~/.steam/steam` (legacy installation, links to another installation)
-
-## [Released]
+    - `~/.steam/debian-installation` (apparently used on Debian/Ubuntu systems)
+    - `~/.var/app/com.valvesoftware.Steam/data/Steam` (used by the flatpak installation)
+    - `~/.steam/steam` (legacy installation, links to another installation)
 
 ## [2.5.0] - 2023-01-17
 
@@ -249,8 +249,9 @@ All functions are now no-throw and return `Return<T>` for better error handling 
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
 
-[Unreleased]: https://github.com/erri120/GameFinder/compare/v2.5.0...master
+[Unreleased]: https://github.com/erri120/GameFinder/compare/v2.6.0...master
 [Released]: https://github.com/erri120/GameFinder/releases
+[2.6.0]: https://github.com/erri120/GameFinder/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/erri120/GameFinder/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/erri120/GameFinder/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/erri120/GameFinder/compare/v2.2.2...v2.3.0
