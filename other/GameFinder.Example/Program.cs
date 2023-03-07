@@ -19,8 +19,10 @@ using GameFinder.Wine;
 using GameFinder.Wine.Bottles;
 using Microsoft.Extensions.Logging;
 using NLog;
+using NLog.Conditions;
 using NLog.Config;
 using NLog.Extensions.Logging;
+using NLog.Layouts;
 using NLog.Targets;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -32,7 +34,26 @@ public static class Program
     {
         var config = new LoggingConfiguration();
 
-        var coloredConsoleTarget = new ColoredConsoleTarget("coloredConsole");
+        var coloredConsoleTarget = new ColoredConsoleTarget("coloredConsole")
+        {
+            EnableAnsiOutput = true,
+            UseDefaultRowHighlightingRules = false,
+            WordHighlightingRules =
+            {
+                new ConsoleWordHighlightingRule
+                {
+                    Regex = @"\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+",
+                    CompileRegex = true,
+                    ForegroundColor = ConsoleOutputColor.Gray,
+                },
+                new ConsoleWordHighlightingRule("DEBUG", ConsoleOutputColor.Gray, ConsoleOutputColor.NoChange),
+                new ConsoleWordHighlightingRule("INFO", ConsoleOutputColor.Cyan, ConsoleOutputColor.NoChange),
+                new ConsoleWordHighlightingRule("ERROR", ConsoleOutputColor.Red, ConsoleOutputColor.NoChange),
+                new ConsoleWordHighlightingRule("WARNING", ConsoleOutputColor.Yellow, ConsoleOutputColor.NoChange),
+            },
+            Layout = "${longdate}|${level:uppercase=true}|${message:withexception=true}"
+        };
+
         var fileTarget = new FileTarget("file")
         {
             FileName = "log.log",
