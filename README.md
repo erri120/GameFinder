@@ -207,6 +207,27 @@ foreach (var result in prefixManager.FindPrefixes())
 }
 ```
 
+### Bottles
+
+`GameFinder.Wine` implements a `IWinePrefixManager` for finding Wine prefixes managed by [Bottles](https://usebottles.com/).
+
+**Usage**:
+
+```csharp
+var prefixManager = new BottlesWinePrefixManager(new FileSystem());
+
+foreach (var result in prefixManager.FindPrefixes())
+{
+    result.Switch(prefix =>
+    {
+        logger.LogInformation($"Found wine prefix at {prefix.ConfigurationDirectory}");
+    }, error =>
+    {
+        logger.LogError(error.Value);
+    });
+}
+```
+
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for more information.
