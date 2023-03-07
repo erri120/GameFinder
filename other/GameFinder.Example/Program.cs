@@ -111,7 +111,12 @@ public static class Program
                 : new SteamHandler(registry: null);
 
             var results = handler.FindAllGames();
-            LogGamesAndErrors(results, logger);
+            LogGamesAndErrors(results, logger, game =>
+            {
+                var protonPrefixDirectory = game.GetProtonPrefixDirectory();
+                if (!Directory.Exists(protonPrefixDirectory)) return;
+                logger.LogInformation("Proton prefix directory: {}", protonPrefixDirectory);
+            });
         }
 
         if (options.Origin)
@@ -189,7 +194,7 @@ public static class Program
         }
     }
 
-    private static void LogGamesAndErrors<TGame>(IEnumerable<Result<TGame>> results, ILogger logger)
+    private static void LogGamesAndErrors<TGame>(IEnumerable<Result<TGame>> results, ILogger logger, Action<TGame>? action = null)
         where TGame : class
     {
         foreach (var (game, error) in results)
@@ -197,6 +202,7 @@ public static class Program
             if (game is not null)
             {
                 logger.LogInformation("Found {}", game);
+                action?.Invoke(game);
             }
             else
             {
