@@ -24,6 +24,10 @@ component_management:
       paths:
         - "src/GameFinder.Common/**"
         - "src/GameFinder.RegistryUtils/**"
+    - component_id: wine
+      name: Wine
+      paths:
+        - "src/GameFinder.Wine/**"
     - component_id: store_handler_ea_desktop
       name: EA Desktop
       paths:
