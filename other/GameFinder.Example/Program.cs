@@ -32,13 +32,13 @@ public static class Program
     {
         var config = new LoggingConfiguration();
 
-        var consoleTarget = new ConsoleTarget("console");
+        var coloredConsoleTarget = new ColoredConsoleTarget("coloredConsole");
         var fileTarget = new FileTarget("file")
         {
             FileName = "log.log",
         };
 
-        config.AddRuleForAllLevels(consoleTarget);
+        config.AddRuleForAllLevels(coloredConsoleTarget);
         config.AddRuleForAllLevels(fileTarget);
 
         LogManager.Configuration = config;
