@@ -30,14 +30,24 @@ public record SteamGame(int AppId, string Name, string Path)
     /// <summary>
     /// Returns the absolute path to the Wine prefix directory, managed by Proton.
     /// </summary>
-    /// <param name="path"></param>
+    /// <param name="fs"></param>
     /// <returns></returns>
-    public string GetProtonPrefixDirectory(IPath? path = null)
+    public ProtonWinePrefix GetProtonPrefix(IFileSystem? fs = null)
     {
-        return path switch
+        var path = fs switch
         {
-            not null => path.GetFullPath(path.Combine(Path, "..", "..", "compatdata", AppId.ToString(CultureInfo.InvariantCulture))),
-            null => System.IO.Path.GetFullPath(System.IO.Path.Combine(Path, "..", "..", "compatdata", AppId.ToString(CultureInfo.InvariantCulture)))
+            not null => fs.Path,
+            null => new FileSystem().Path
         };
+
+        var protonDirectory = path.GetFullPath(path.Combine(
+            Path,
+            "..",
+            "..",
+            "compatdata",
+            AppId.ToString(CultureInfo.InvariantCulture)));
+
+        var configurationDirectory = path.Combine(protonDirectory, "pfx");
+        return new ProtonWinePrefix(protonDirectory, configurationDirectory);
     }
 }

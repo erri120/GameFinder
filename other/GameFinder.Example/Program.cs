@@ -113,9 +113,9 @@ public static class Program
             var results = handler.FindAllGames();
             LogGamesAndErrors(results, logger, game =>
             {
-                var protonPrefixDirectory = game.GetProtonPrefixDirectory();
-                if (!Directory.Exists(protonPrefixDirectory)) return;
-                logger.LogInformation("Proton prefix directory: {}", protonPrefixDirectory);
+                var protonPrefix = game.GetProtonPrefix();
+                if (!Directory.Exists(protonPrefix.ProtonDirectory)) return;
+                logger.LogInformation("Proton prefix directory: {}", protonPrefix.ProtonDirectory);
             });
         }
 

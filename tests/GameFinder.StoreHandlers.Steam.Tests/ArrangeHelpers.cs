@@ -51,4 +51,15 @@ public partial class SteamTests
 
         return fixture.CreateMany<SteamGame>();
     }
+
+    private static (string protonDirectory, ProtonWinePrefix) SetupProtonPrefix(MockFileSystem fs, int appId, string name)
+    {
+        var gamePath = fs.Path.Combine(fs.Path.GetTempPath(), "common", name);
+        var protonDirectory = fs.Path.Combine(fs.Path.GetTempPath(), "compatdata", appId.ToString(CultureInfo.InvariantCulture));
+
+        var steamGame = new SteamGame(appId, name, gamePath);
+
+        var protonPrefix = steamGame.GetProtonPrefix(fs);
+        return (protonDirectory, protonPrefix);
+    }
 }

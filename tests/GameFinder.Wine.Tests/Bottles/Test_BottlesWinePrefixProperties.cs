@@ -10,7 +10,7 @@ public partial class BottlesTests
     {
         var bottleWinePrefix = new BottlesWinePrefix(prefixDirectory);
 
-        bottleWinePrefix.GetBottlesConfigFile(fs.Path).Should().Be(fs.Path.Combine(prefixDirectory, "bottle.yml"));
+        bottleWinePrefix.GetBottlesConfigFile(fs).Should().Be(fs.Path.Combine(prefixDirectory, "bottle.yml"));
         bottleWinePrefix.GetBottlesConfigFile().Should().Be(Path.Combine(prefixDirectory, "bottle.yml"));
     }
 }

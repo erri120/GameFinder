@@ -21,6 +21,7 @@
     <ItemGroup>
         <ProjectReference Include="..\GameFinder.Common\GameFinder.Common.csproj" />
         <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
+        <ProjectReference Include="..\GameFinder.Wine\GameFinder.Wine.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -18,14 +18,10 @@ public class BottlesWinePrefix : AWinePrefix
     /// <summary>
     /// Returns the absolute path to <c>bottle.yml</c>.
     /// </summary>
-    /// <param name="path"></param>
+    /// <param name="fs"></param>
     /// <returns></returns>
-    public string GetBottlesConfigFile(IPath? path = null)
+    public string GetBottlesConfigFile(IFileSystem? fs = null)
     {
-        return path switch
-        {
-            not null => path.Combine(ConfigurationDirectory, "bottle.yml"),
-            null => System.IO.Path.Combine(ConfigurationDirectory, "bottle.yml")
-        };
+        return GetFs(fs).Path.Combine(ConfigurationDirectory, "bottle.yml");
     }
 }

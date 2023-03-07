@@ -234,11 +234,12 @@ Valve's [Proton](https://github.com/ValveSoftware/Proton) is a compatibility too
 
 ```csharp
 SteamGame? steamGame = steamHandler.FindOneGameById(1237970, out var errors);
-string? protonPrefixDirectory = steamGame?.GetProtonPrefixDirectory();
+ProtonWinePrefix? protonPrefix = steamGame?.GetProtonPrefix();
+var protonPrefixDirectory = protonPrefix?.ProtonDirectory;
 
-if (protonPrefixDirectory is not null && Directory.Exists(protonPrefixDirectory))
+if (protonDirectory is not null && Directory.Exists(protonDirectory))
 {
-    Console.WriteLine($"Proton prefix is at {protonPrefixDirectory}");
+    Console.WriteLine($"Proton prefix is at {protonDirectory}");
 }
 ```
 

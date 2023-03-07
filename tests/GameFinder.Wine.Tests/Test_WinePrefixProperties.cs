@@ -9,7 +9,7 @@ public partial class WineTests
     {
         var winePrefix = new WinePrefix(prefixDirectory);
 
-        winePrefix.GetVirtualDrivePath(fs.Path).Should().Be(fs.Path.Combine(prefixDirectory, "drive_c"));
+        winePrefix.GetVirtualDrivePath(fs).Should().Be(fs.Path.Combine(prefixDirectory, "drive_c"));
         winePrefix.GetVirtualDrivePath().Should().Be(Path.Combine(prefixDirectory, "drive_c"));
     }
 
@@ -18,7 +18,7 @@ public partial class WineTests
     {
         var winePrefix = new WinePrefix(prefixDirectory);
 
-        winePrefix.GetSystemRegistryFile(fs.Path).Should().Be(fs.Path.Combine(prefixDirectory, "system.reg"));
+        winePrefix.GetSystemRegistryFile(fs).Should().Be(fs.Path.Combine(prefixDirectory, "system.reg"));
         winePrefix.GetSystemRegistryFile().Should().Be(Path.Combine(prefixDirectory, "system.reg"));
     }
 
@@ -27,7 +27,7 @@ public partial class WineTests
     {
         var winePrefix = new WinePrefix(prefixDirectory);
 
-        winePrefix.GetUserRegistryFile(fs.Path).Should().Be(fs.Path.Combine(prefixDirectory, "user.reg"));
+        winePrefix.GetUserRegistryFile(fs).Should().Be(fs.Path.Combine(prefixDirectory, "user.reg"));
         winePrefix.GetUserRegistryFile().Should().Be(Path.Combine(prefixDirectory, "user.reg"));
     }
 }
