@@ -16,6 +16,7 @@ using GameFinder.StoreHandlers.GOG;
 using GameFinder.StoreHandlers.Origin;
 using GameFinder.StoreHandlers.Steam;
 using GameFinder.Wine;
+using GameFinder.Wine.Bottles;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Config;
@@ -133,17 +134,37 @@ public static class Program
             else
             {
                 var prefixManager = new DefaultWinePrefixManager(new FileSystem());
-                foreach (var result in prefixManager.FindPrefixes())
-                {
-                    result.Switch(prefix =>
-                    {
-                        logger.LogInformation($"Found wine prefix at {prefix.ConfigurationDirectory}");
-                    }, error =>
-                    {
-                        logger.LogError(error.Value);
-                    });
-                }
+                LogWinePrefixes(prefixManager, logger);
             }
+        }
+
+        if (options.Bottles)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                logger.LogError("Bottles is only supported on Linux!");
+            }
+            else
+            {
+                var prefixManager = new BottlesWinePrefixManager(new FileSystem());
+                LogWinePrefixes(prefixManager, logger);
+            }
+        }
+    }
+
+    private static void LogWinePrefixes<TWinePrefix>(
+        IWinePrefixManager<TWinePrefix> prefixManager, ILogger logger)
+    where TWinePrefix : AWinePrefix
+    {
+        foreach (var result in prefixManager.FindPrefixes())
+        {
+            result.Switch(prefix =>
+            {
+                logger.LogInformation($"Found wine prefix at {prefix.ConfigurationDirectory}");
+            }, error =>
+            {
+                logger.LogError(error.Value);
+            });
         }
     }
 
