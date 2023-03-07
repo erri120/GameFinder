@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 ## 2.6.0
 
 - removed support for `net6.0`
+- add support for finding Wine prefixes (check the [README](./README.md#linux-tools))
 - Steam: added new default installation directories:
   - `~/.steam/debian-installation` (apparently used on Debian/Ubuntu systems)
   - `~/.var/app/com.valvesoftware.Steam/data/Steam` (used by the flatpak installation)
