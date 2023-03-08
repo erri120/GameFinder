@@ -19,10 +19,8 @@ using GameFinder.Wine;
 using GameFinder.Wine.Bottles;
 using Microsoft.Extensions.Logging;
 using NLog;
-using NLog.Conditions;
 using NLog.Config;
 using NLog.Extensions.Logging;
-using NLog.Layouts;
 using NLog.Targets;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -36,7 +34,8 @@ public static class Program
 
         var coloredConsoleTarget = new ColoredConsoleTarget("coloredConsole")
         {
-            EnableAnsiOutput = true,
+            DetectConsoleAvailable = true,
+            EnableAnsiOutput = false,
             UseDefaultRowHighlightingRules = false,
             WordHighlightingRules =
             {
@@ -51,7 +50,7 @@ public static class Program
                 new ConsoleWordHighlightingRule("ERROR", ConsoleOutputColor.Red, ConsoleOutputColor.NoChange),
                 new ConsoleWordHighlightingRule("WARNING", ConsoleOutputColor.Yellow, ConsoleOutputColor.NoChange),
             },
-            Layout = "${longdate}|${level:uppercase=true}|${message:withexception=true}"
+            Layout = "${longdate}|${level:uppercase=true}|${message:withexception=true}",
         };
 
         var fileTarget = new FileTarget("file")
