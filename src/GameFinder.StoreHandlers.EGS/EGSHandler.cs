@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.IO.Abstractions;
 using System.Linq;
-using System.Runtime.Versioning;
 using System.Text.Json;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
+using NexusMods.Paths;
 
 namespace GameFinder.StoreHandlers.EGS;
 
@@ -19,7 +16,7 @@ namespace GameFinder.StoreHandlers.EGS;
 /// <param name="DisplayName"></param>
 /// <param name="InstallLocation"></param>
 [PublicAPI]
-public record EGSGame(string CatalogItemId, string DisplayName, string InstallLocation);
+public record EGSGame(string CatalogItemId, string DisplayName, AbsolutePath InstallLocation);
 
 /// <summary>
 /// Handler for finding games installed with the Epic Games Store.
@@ -37,21 +34,8 @@ public class EGSHandler : AHandler<EGSGame, string>
         new()
         {
             AllowTrailingCommas = true,
+            Converters = { new AbsolutePathConverter() },
         };
-
-    /// <summary>
-    /// Default constructor. This uses the <see cref="WindowsRegistry"/> implementation of
-    /// <see cref="IRegistry"/> and the real file system with <see cref="FileSystem"/>.
-    /// </summary>
-    [SupportedOSPlatform("windows")]
-    public EGSHandler() : this(new WindowsRegistry(), new FileSystem()) { }
-
-    /// <summary>
-    /// Constructor for specifying the implementation of <see cref="IRegistry"/>. This uses
-    /// the real file system with <see cref="FileSystem"/>.
-    /// </summary>
-    /// <param name="registry"></param>
-    public EGSHandler(IRegistry registry) : this(registry, new FileSystem()) { }
 
     /// <summary>
     /// Constructor for specifying the implementation of <see cref="IRegistry"/> and
@@ -68,20 +52,20 @@ public class EGSHandler : AHandler<EGSGame, string>
     /// <inheritdoc/>
     public override IEnumerable<Result<EGSGame>> FindAllGames()
     {
-        var manifestDir = _fileSystem.DirectoryInfo.New(GetManifestDir());
-        if (!manifestDir.Exists)
+        var manifestDir = GetManifestDir();
+        if (!_fileSystem.DirectoryExists(manifestDir))
         {
-            yield return Result.FromError<EGSGame>($"The manifest directory {manifestDir.FullName} does not exist!");
+            yield return Result.FromError<EGSGame>($"The manifest directory {manifestDir.GetFullPath()} does not exist!");
             yield break;
         }
 
-        var itemFiles = manifestDir
-            .EnumerateFiles("*.item", SearchOption.TopDirectoryOnly)
+        var itemFiles = _fileSystem
+            .EnumerateFiles(manifestDir, "*.item")
             .ToArray();
 
         if (itemFiles.Length == 0)
         {
-            yield return Result.FromError<EGSGame>($"The manifest directory {manifestDir.FullName} does not contain any .item files");
+            yield return Result.FromError<EGSGame>($"The manifest directory {manifestDir.GetFullPath()} does not contain any .item files");
             yield break;
         }
 
@@ -100,9 +84,9 @@ public class EGSHandler : AHandler<EGSGame, string>
         return games.CustomToDictionary(game => game.CatalogItemId, game => game, StringComparer.OrdinalIgnoreCase);
     }
 
-    private Result<EGSGame> DeserializeGame(IFileInfo itemFile)
+    private Result<EGSGame> DeserializeGame(AbsolutePath itemFile)
     {
-        using var stream = itemFile.OpenRead();
+        using var stream = _fileSystem.ReadFile(itemFile);
 
         try
         {
@@ -110,53 +94,50 @@ public class EGSHandler : AHandler<EGSGame, string>
 
             if (game is null)
             {
-                return Result.FromError<EGSGame>($"Unable to deserialize file {itemFile.FullName}");
+                return Result.FromError<EGSGame>($"Unable to deserialize file {itemFile.GetFullPath()}");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (game.CatalogItemId is null)
             {
-                return Result.FromError<EGSGame>($"Manifest {itemFile.FullName} does not have a value \"CatalogItemId\"");
+                return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"CatalogItemId\"");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (game.DisplayName is null)
             {
-                return Result.FromError<EGSGame>($"Manifest {itemFile.FullName} does not have a value \"DisplayName\"");
+                return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"DisplayName\"");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (game.InstallLocation is null)
+            if (string.IsNullOrEmpty(game.InstallLocation.Directory))
             {
-                return Result.FromError<EGSGame>($"Manifest {itemFile.FullName} does not have a value \"InstallLocation\"");
+                return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"InstallLocation\"");
             }
 
             return Result.FromGame(game);
         }
         catch (Exception e)
         {
-            return Result.FromError<EGSGame>($"Unable to deserialize file {itemFile.FullName}:\n{e}");
+            return Result.FromError<EGSGame>($"Unable to deserialize file {itemFile.GetFullPath()}:\n{e}");
         }
     }
 
-    private string GetManifestDir()
+    private AbsolutePath GetManifestDir()
     {
         return TryGetManifestDirFromRegistry(out var manifestDir)
             ? manifestDir
             : GetDefaultManifestsPath(_fileSystem);
     }
 
-    internal static string GetDefaultManifestsPath(IFileSystem fileSystem)
+    internal static AbsolutePath GetDefaultManifestsPath(IFileSystem fileSystem)
     {
-        return fileSystem.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-            "Epic",
-            "EpicGamesLauncher",
-            "Data",
-            "Manifests");
+        return fileSystem
+            .FromFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
+            .CombineUnchecked("Epic/EpicGamesLauncher/Data/Manifest");
     }
 
-    private bool TryGetManifestDirFromRegistry([MaybeNullWhen(false)] out string manifestDir)
+    private bool TryGetManifestDirFromRegistry(out AbsolutePath manifestDir)
     {
         manifestDir = default;
 
@@ -165,7 +146,12 @@ public class EGSHandler : AHandler<EGSGame, string>
             var currentUser = _registry.OpenBaseKey(RegistryHive.CurrentUser);
             using var regKey = currentUser.OpenSubKey(RegKey);
 
-            return regKey is not null && regKey.TryGetString("ModSdkMetadataDir", out manifestDir);
+            if (regKey is null || !regKey.TryGetString("ModSdkMetadataDir",
+                    out var registryMetadataDir)) return false;
+
+            manifestDir = _fileSystem.FromFullPath(registryMetadataDir);
+            return true;
+
         }
         catch (Exception)
         {

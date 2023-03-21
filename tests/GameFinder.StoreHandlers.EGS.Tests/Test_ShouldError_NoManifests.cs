@@ -1,13 +1,14 @@
-using System.IO.Abstractions.TestingHelpers;
 using GameFinder.RegistryUtils;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.EGS.Tests;
 
 public partial class EGSTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldError_NoManifests(MockFileSystem fs, InMemoryRegistry registry)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_NoManifests(InMemoryFileSystem fs, InMemoryRegistry registry)
     {
         var (handler, manifestDir) = SetupHandler(fs, registry);
 

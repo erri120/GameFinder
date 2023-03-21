@@ -1,0 +1,5 @@
+<Project>
+    <ItemGroup>
+        <ProjectReference Include="..\..\extern\NexusMods.App\src\NexusMods.Paths\NexusMods.Paths.csproj" />
+    </ItemGroup>
+</Project>

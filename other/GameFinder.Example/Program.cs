@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
-using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using CommandLine;
 using GameFinder.Common;
@@ -18,10 +17,12 @@ using GameFinder.StoreHandlers.Steam;
 using GameFinder.Wine;
 using GameFinder.Wine.Bottles;
 using Microsoft.Extensions.Logging;
+using NexusMods.Paths;
 using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
+using FileSystem = System.IO.Abstractions.FileSystem;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace GameFinder.Example;
@@ -97,7 +98,7 @@ public static class Program
             }
             else
             {
-                var handler = new EGSHandler();
+                var handler = new EGSHandler(new WindowsRegistry(), new InMemoryFileSystem());
                 var results = handler.FindAllGames();
                 LogGamesAndErrors(results, logger);
             }
