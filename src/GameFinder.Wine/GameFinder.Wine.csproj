@@ -17,7 +17,7 @@
         <PackageReference Include="Vogen" Version="3.0.12" />
     </ItemGroup>
 
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('System.IO.Abstractions.props', '$(MSBuildThisFileDirectory)../'))" />
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <ItemGroup>
         <InternalsVisibleTo Include="GameFinder.Wine.Tests" />

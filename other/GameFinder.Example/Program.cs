@@ -114,7 +114,7 @@ public static class Program
             LogGamesAndErrors(results, logger, game =>
             {
                 var protonPrefix = game.GetProtonPrefix();
-                if (!Directory.Exists(protonPrefix.ProtonDirectory)) return;
+                if (!Directory.Exists(protonPrefix.ProtonDirectory.GetFullPath())) return;
                 logger.LogInformation("Proton prefix directory: {}", protonPrefix.ProtonDirectory);
             });
         }
@@ -159,7 +159,7 @@ public static class Program
             }
             else
             {
-                var prefixManager = new DefaultWinePrefixManager(new FileSystem());
+                var prefixManager = new DefaultWinePrefixManager(NexusMods.Paths.FileSystem.Shared);
                 LogWinePrefixes(prefixManager, logger);
             }
         }
@@ -172,7 +172,7 @@ public static class Program
             }
             else
             {
-                var prefixManager = new BottlesWinePrefixManager(new FileSystem());
+                var prefixManager = new BottlesWinePrefixManager(NexusMods.Paths.FileSystem.Shared);
                 LogWinePrefixes(prefixManager, logger);
             }
         }

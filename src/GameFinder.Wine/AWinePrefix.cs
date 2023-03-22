@@ -1,5 +1,5 @@
-using System.IO.Abstractions;
 using JetBrains.Annotations;
+using NexusMods.Paths;
 
 namespace GameFinder.Wine;
 
@@ -12,13 +12,13 @@ public abstract class AWinePrefix
     /// <summary>
     /// Absolute path to the Wine prefix directory.
     /// </summary>
-    public readonly string ConfigurationDirectory;
+    public readonly AbsolutePath ConfigurationDirectory;
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="configurationDirectory"></param>
-    protected AWinePrefix(string configurationDirectory)
+    protected AWinePrefix(AbsolutePath configurationDirectory)
     {
         ConfigurationDirectory = configurationDirectory;
     }
@@ -26,44 +26,27 @@ public abstract class AWinePrefix
     /// <summary>
     /// Returns the absolute path to the virtual drive directory of the prefix.
     /// </summary>
-    /// <param name="fs"></param>
     /// <returns></returns>
-    public string GetVirtualDrivePath(IFileSystem? fs = null)
+    public AbsolutePath GetVirtualDrivePath()
     {
-        return GetFs(fs).Path.Combine(ConfigurationDirectory, "drive_c");
+        return ConfigurationDirectory.CombineUnchecked("drive_c");
     }
 
     /// <summary>
     /// Returns the absolute path to the <c>system.reg</c> file of the prefix.
     /// </summary>
-    /// <param name="fs"></param>
     /// <returns></returns>
-    public string GetSystemRegistryFile(IFileSystem? fs = null)
+    public AbsolutePath GetSystemRegistryFile()
     {
-        return GetFs(fs).Path.Combine(ConfigurationDirectory, "system.reg");
+        return ConfigurationDirectory.CombineUnchecked("system.reg");
     }
 
     /// <summary>
     /// Returns the absolute path to the <c>user.reg</c> file of the prefix.
     /// </summary>
-    /// <param name="fs"></param>
     /// <returns></returns>
-    public string GetUserRegistryFile(IFileSystem? fs = null)
+    public AbsolutePath GetUserRegistryFile()
     {
-        return GetFs(fs).Path.Combine(ConfigurationDirectory, "user.reg");
-    }
-
-    /// <summary>
-    /// FS helper.
-    /// </summary>
-    /// <param name="fs"></param>
-    /// <returns></returns>
-    protected static IFileSystem GetFs(IFileSystem? fs)
-    {
-        return fs switch
-        {
-            not null => fs,
-            null => new FileSystem()
-        };
+        return ConfigurationDirectory.CombineUnchecked("user.reg");
     }
 }

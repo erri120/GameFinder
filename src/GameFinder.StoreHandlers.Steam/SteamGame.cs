@@ -1,6 +1,8 @@
 using System.Globalization;
-using System.IO.Abstractions;
 using JetBrains.Annotations;
+using NexusMods.Paths;
+using FileSystem = System.IO.Abstractions.FileSystem;
+using IFileSystem = System.IO.Abstractions.IFileSystem;
 
 namespace GameFinder.StoreHandlers.Steam;
 
@@ -48,6 +50,7 @@ public record SteamGame(int AppId, string Name, string Path)
             AppId.ToString(CultureInfo.InvariantCulture)));
 
         var configurationDirectory = path.Combine(protonDirectory, "pfx");
-        return new ProtonWinePrefix(protonDirectory, configurationDirectory);
+        // TODO: use NMA IFileSystem
+        return new ProtonWinePrefix(AbsolutePath.FromFullPath(protonDirectory), AbsolutePath.FromFullPath(configurationDirectory));
     }
 }
