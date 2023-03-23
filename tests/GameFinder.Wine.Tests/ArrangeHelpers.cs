@@ -18,8 +18,8 @@ public partial class WineTests
     {
         fs.AddDirectory(location);
         fs.AddDirectory(location.CombineUnchecked("drive_c"));
-        fs.AddDirectory(location.CombineUnchecked("system.reg"));
-        fs.AddDirectory(location.CombineUnchecked("user.reg"));
+        fs.AddEmptyFile(location.CombineUnchecked("system.reg"));
+        fs.AddEmptyFile(location.CombineUnchecked("user.reg"));
 
         return (location, new DefaultWinePrefixManager(fs));
     }

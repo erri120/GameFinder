@@ -26,9 +26,9 @@ public partial class BottlesTests
 
         fs.AddDirectory(prefixDirectory);
         fs.AddDirectory(prefixDirectory.CombineUnchecked("drive_c"));
-        fs.AddDirectory(prefixDirectory.CombineUnchecked("system.reg"));
-        fs.AddDirectory(prefixDirectory.CombineUnchecked("user.reg"));
-        fs.AddDirectory(prefixDirectory.CombineUnchecked("bottle.yml"));
+        fs.AddEmptyFile(prefixDirectory.CombineUnchecked("system.reg"));
+        fs.AddEmptyFile(prefixDirectory.CombineUnchecked("user.reg"));
+        fs.AddEmptyFile(prefixDirectory.CombineUnchecked("bottle.yml"));
 
         return (prefixDirectory, prefixManager);
     }
