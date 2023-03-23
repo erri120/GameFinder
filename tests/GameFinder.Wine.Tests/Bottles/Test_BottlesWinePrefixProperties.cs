@@ -1,16 +1,15 @@
-using System.IO.Abstractions.TestingHelpers;
 using GameFinder.Wine.Bottles;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 
 namespace GameFinder.Wine.Tests.Bottles;
 
 public partial class BottlesTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldWork_GetBottlesConfigurationFile(MockFileSystem fs, string prefixDirectory)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_GetBottlesConfigurationFile(AbsolutePath prefixDirectory)
     {
         var bottleWinePrefix = new BottlesWinePrefix(prefixDirectory);
-
-        bottleWinePrefix.GetBottlesConfigFile(fs).Should().Be(fs.Path.Combine(prefixDirectory, "bottle.yml"));
-        bottleWinePrefix.GetBottlesConfigFile().Should().Be(Path.Combine(prefixDirectory, "bottle.yml"));
+        bottleWinePrefix.GetBottlesConfigFile().Should().Be(prefixDirectory.CombineUnchecked("bottle.yml"));
     }
 }

@@ -1,11 +1,13 @@
-using System.IO.Abstractions.TestingHelpers;
+
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 
 namespace GameFinder.Wine.Tests;
 
 public partial class WineTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldWork_ValidPrefix(MockFileSystem fs)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_ValidPrefix(InMemoryFileSystem fs)
     {
         var (prefixDirectory, prefixManager) = SetupValidWinePrefix(fs, DefaultWinePrefixManager
             .GetDefaultWinePrefixLocations(fs)
@@ -18,6 +20,6 @@ public partial class WineTests
             .AsT0
             .ConfigurationDirectory
             .Should()
-            .Be(prefixDirectory.FullName);
+            .Be(prefixDirectory);
     }
 }

@@ -1,27 +1,26 @@
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
+using NexusMods.Paths;
 
 namespace GameFinder.Wine.Tests;
 
 public partial class WineTests
 {
-    private static (IDirectoryInfo prefixDirectory, DefaultWinePrefixManager prefixManager) SetupWinePrefix(IFileSystem fs)
+    private static (AbsolutePath prefixDirectory, DefaultWinePrefixManager prefixManager) SetupWinePrefix(InMemoryFileSystem fs)
     {
         var location = DefaultWinePrefixManager
             .GetDefaultWinePrefixLocations(fs)
             .First();
 
-        return (fs.Directory.CreateDirectory(location), new DefaultWinePrefixManager(fs));
+        fs.AddDirectory(location);
+        return (location, new DefaultWinePrefixManager(fs));
     }
 
-    private static (IDirectoryInfo prefixDirectory, DefaultWinePrefixManager
-        prefixManager) SetupValidWinePrefix(MockFileSystem fs, string location)
+    private static (AbsolutePath prefixDirectory, DefaultWinePrefixManager prefixManager) SetupValidWinePrefix(InMemoryFileSystem fs, AbsolutePath location)
     {
-        var prefix = fs.Directory.CreateDirectory(location);
-        fs.AddDirectory(fs.Path.Combine(prefix.FullName, "drive_c"));
-        fs.AddEmptyFile(fs.Path.Combine(prefix.FullName, "system.reg"));
-        fs.AddEmptyFile(fs.Path.Combine(prefix.FullName, "user.reg"));
+        fs.AddDirectory(location);
+        fs.AddDirectory(location.CombineUnchecked("drive_c"));
+        fs.AddDirectory(location.CombineUnchecked("system.reg"));
+        fs.AddDirectory(location.CombineUnchecked("user.reg"));
 
-        return (prefix, new DefaultWinePrefixManager(fs));
+        return (location, new DefaultWinePrefixManager(fs));
     }
 }

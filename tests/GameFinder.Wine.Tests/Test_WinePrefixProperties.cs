@@ -1,33 +1,28 @@
-using System.IO.Abstractions.TestingHelpers;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 
 namespace GameFinder.Wine.Tests;
 
 public partial class WineTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldWork_GetVirtualDrivePath(MockFileSystem fs, string prefixDirectory)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_GetVirtualDrivePath(AbsolutePath prefixDirectory)
     {
         var winePrefix = new WinePrefix(prefixDirectory);
-
-        winePrefix.GetVirtualDrivePath(fs).Should().Be(fs.Path.Combine(prefixDirectory, "drive_c"));
-        winePrefix.GetVirtualDrivePath().Should().Be(Path.Combine(prefixDirectory, "drive_c"));
+        winePrefix.GetVirtualDrivePath().Should().Be(prefixDirectory.CombineUnchecked("drive_c"));
     }
 
-    [Theory, AutoData]
-    public void Test_ShouldWork_GetSystemRegistryFile(MockFileSystem fs, string prefixDirectory)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_GetSystemRegistryFile(AbsolutePath prefixDirectory)
     {
         var winePrefix = new WinePrefix(prefixDirectory);
-
-        winePrefix.GetSystemRegistryFile(fs).Should().Be(fs.Path.Combine(prefixDirectory, "system.reg"));
-        winePrefix.GetSystemRegistryFile().Should().Be(Path.Combine(prefixDirectory, "system.reg"));
+        winePrefix.GetSystemRegistryFile().Should().Be(prefixDirectory.CombineUnchecked("system.reg"));
     }
 
-    [Theory, AutoData]
-    public void Test_ShouldWork_GetUserRegistryFile(MockFileSystem fs, string prefixDirectory)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_GetUserRegistryFile(AbsolutePath prefixDirectory)
     {
         var winePrefix = new WinePrefix(prefixDirectory);
-
-        winePrefix.GetUserRegistryFile(fs).Should().Be(fs.Path.Combine(prefixDirectory, "user.reg"));
-        winePrefix.GetUserRegistryFile().Should().Be(Path.Combine(prefixDirectory, "user.reg"));
+        winePrefix.GetUserRegistryFile().Should().Be(prefixDirectory.CombineUnchecked("user.reg"));
     }
 }

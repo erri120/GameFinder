@@ -18,20 +18,20 @@ public partial class SteamTests
     public void Test_ProtonPrefix_GetConfigInfoFile(MockFileSystem fs, int appId, string name)
     {
         var (protonDirectory, protonPrefix) = SetupProtonPrefix(fs, appId, name);
-        protonPrefix.GetConfigInfoFile(fs).Should().Be(fs.Path.Combine(protonDirectory, "config_info"));
+        protonPrefix.GetConfigInfoFile().Should().Be(fs.Path.Combine(protonDirectory, "config_info"));
     }
 
     [Theory, AutoData]
     public void Test_ProtonPrefix_GetVersionFile(MockFileSystem fs, int appId, string name)
     {
         var (protonDirectory, protonPrefix) = SetupProtonPrefix(fs, appId, name);
-        protonPrefix.GetVersionFile(fs).Should().Be(fs.Path.Combine(protonDirectory, "version"));
+        protonPrefix.GetVersionFile().Should().Be(fs.Path.Combine(protonDirectory, "version"));
     }
 
     [Theory, AutoData]
     public void Test_ProtonPrefix_GetLaunchCommand(MockFileSystem fs, int appId, string name)
     {
         var (protonDirectory, protonPrefix) = SetupProtonPrefix(fs, appId, name);
-        protonPrefix.GetLaunchCommandFile(fs).Should().Be(fs.Path.Combine(protonDirectory, "launch_command"));
+        protonPrefix.GetLaunchCommandFile().Should().Be(fs.Path.Combine(protonDirectory, "launch_command"));
     }
 }
