@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using NexusMods.Paths;
@@ -104,9 +107,58 @@ public abstract class AWinePrefix
     /// directory.
     /// </summary>
     /// <returns></returns>
-    public IRegistry CreateRegistry()
+    public IRegistry CreateRegistry(IFileSystem fileSystem)
     {
-        // TODO: this entire method
-        return new InMemoryRegistry();
+        var registry = new InMemoryRegistry();
+
+        using var stream = fileSystem.ReadFile(GetSystemRegistryFile());
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+
+        InMemoryRegistryKey? currentKey = null;
+
+        while (true)
+        {
+            var line = reader.ReadLine();
+            if (line is null) break;
+
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            if (line.StartsWith("WINE REGISTRY VERSION", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            if (line.StartsWith(";;", StringComparison.OrdinalIgnoreCase) ||
+                line.StartsWith('#'))
+                continue;
+
+            if (line.StartsWith('['))
+            {
+                var squareBracketIndex = line.IndexOf(']', StringComparison.OrdinalIgnoreCase);
+                var keyName = line.Substring(1, squareBracketIndex - 1);
+
+                currentKey = registry.AddKey(RegistryHive.LocalMachine, keyName);
+                continue;
+            }
+
+            if (line.StartsWith("@=", StringComparison.OrdinalIgnoreCase))
+            {
+                if (currentKey is null) throw new UnreachableException();
+                var endIndex = line.LastIndexOf('"');
+                var value = line.Substring(3, endIndex - 3);
+
+                currentKey.GetParent().AddValue(currentKey.GetKeyName(), value);
+            }
+
+            if (line.StartsWith('"'))
+            {
+                if (currentKey is null) throw new UnreachableException();
+                var split = line.Split('=');
+                var valueName = split[0][1..^1];
+                var value = split[1][1..^1];
+                currentKey.AddValue(valueName, value);
+            }
+        }
+
+        return registry;
     }
 }

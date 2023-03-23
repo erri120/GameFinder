@@ -85,6 +85,12 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     }
 
     /// <summary>
+    /// Gets the parent key.
+    /// </summary>
+    /// <returns></returns>
+    public InMemoryRegistryKey GetParent() => _parent;
+
+    /// <summary>
     /// Adds a sub-key to the current key.
     /// </summary>
     /// <param name="key"></param>
@@ -145,15 +151,20 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     }
 
     /// <inheritdoc/>
-    public string GetName()
-    {
-        return _name;
-    }
+    public string GetName() => _name;
+
+    /// <summary>
+    /// Gets the last part of the full key.
+    /// </summary>
+    /// <returns></returns>
+    public string GetKeyName() => _key;
 
     /// <inheritdoc/>
     public object? GetValue(string? valueName)
     {
-        _values.TryGetValue(valueName ?? string.Empty, out var value);
+        if (valueName is null) return _parent.GetValue(_key);
+
+        _values.TryGetValue(valueName, out var value);
         return value;
     }
 
