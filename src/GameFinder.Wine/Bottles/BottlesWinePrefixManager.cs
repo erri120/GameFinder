@@ -68,7 +68,7 @@ public class BottlesWinePrefixManager : IWinePrefixManager<BottlesWinePrefix>
     internal static IEnumerable<AbsolutePath> GetDefaultLocations(IFileSystem fs)
     {
         // $XDG_DATA_HOME/bottles aka ~/.local/share/bottles
-        yield return fs.GetKnownPath(KnownPath.LocalApplicationData)
+        yield return fs.GetKnownPath(KnownPath.LocalApplicationDataDirectory)
             .CombineUnchecked("bottles");
 
         // ~/.var/app/com.usebottles.bottles/data/bottles (flatpak installation)
