@@ -18,6 +18,8 @@ namespace GameFinder.StoreHandlers.EGS;
 [PublicAPI]
 public record EGSGame(string CatalogItemId, string DisplayName, AbsolutePath InstallLocation);
 
+record ManifestFile(string CatalogItemId, string DisplayName, string InstallLocation);
+
 /// <summary>
 /// Handler for finding games installed with the Epic Games Store.
 /// </summary>
@@ -34,7 +36,6 @@ public class EGSHandler : AHandler<EGSGame, string>
         new()
         {
             AllowTrailingCommas = true,
-            Converters = { new AbsolutePathConverter() },
         };
 
     /// <summary>
@@ -90,7 +91,7 @@ public class EGSHandler : AHandler<EGSGame, string>
 
         try
         {
-            var game = JsonSerializer.Deserialize<EGSGame>(stream, _jsonSerializerOptions);
+            var game = JsonSerializer.Deserialize<ManifestFile>(stream, _jsonSerializerOptions);
 
             if (game is null)
             {
@@ -109,13 +110,13 @@ public class EGSHandler : AHandler<EGSGame, string>
                 return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"DisplayName\"");
             }
 
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (string.IsNullOrEmpty(game.InstallLocation.Directory))
+            if (string.IsNullOrEmpty(game.InstallLocation))
             {
                 return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"InstallLocation\"");
             }
 
-            return Result.FromGame(game);
+            var res = new EGSGame(game.CatalogItemId, game.DisplayName, _fileSystem.FromFullPath(game.InstallLocation));
+            return Result.FromGame(res);
         }
         catch (Exception e)
         {
@@ -133,8 +134,8 @@ public class EGSHandler : AHandler<EGSGame, string>
     internal static AbsolutePath GetDefaultManifestsPath(IFileSystem fileSystem)
     {
         return fileSystem
-            .FromFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
-            .CombineUnchecked("Epic/EpicGamesLauncher/Data/Manifest");
+            .GetKnownPath(KnownPath.CommonApplicationDataDirectory)
+            .CombineUnchecked("Epic/EpicGamesLauncher/Data/Manifests");
     }
 
     private bool TryGetManifestDirFromRegistry(out AbsolutePath manifestDir)
