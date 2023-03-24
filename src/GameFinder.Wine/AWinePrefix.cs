@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using GameFinder.RegistryUtils;
@@ -143,10 +144,16 @@ public abstract class AWinePrefix
             if (line.StartsWith("@=", StringComparison.OrdinalIgnoreCase))
             {
                 if (currentKey is null) throw new UnreachableException();
-                var endIndex = line.LastIndexOf('"');
-                var value = line.Substring(3, endIndex - 3);
+                if (line[2] == '"')
+                {
+                    var endIndex = line.LastIndexOf('"');
+                    var value = line.Substring(3, endIndex - 3);
 
-                currentKey.GetParent().AddValue(currentKey.GetKeyName(), value);
+                    currentKey.GetParent().AddValue(currentKey.GetKeyName(), value);
+                    continue;
+                }
+
+                // TODO: handle other cases
             }
 
             if (line.StartsWith('"'))
@@ -156,7 +163,10 @@ public abstract class AWinePrefix
                 var valueName = split[0][1..^1];
                 var value = split[1][1..^1];
                 currentKey.AddValue(valueName, value);
+                continue;
             }
+
+            // TODO: handle other cases
         }
 
         return registry;
