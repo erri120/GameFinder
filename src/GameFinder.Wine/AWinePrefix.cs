@@ -159,9 +159,13 @@ public abstract class AWinePrefix
             if (line.StartsWith('"'))
             {
                 if (currentKey is null) throw new UnreachableException();
-                var split = line.Split('=');
-                var valueName = split[0][1..^1];
-                var value = split[1][1..^1];
+                var splitIndex = line.IndexOf("\"=\"", StringComparison.OrdinalIgnoreCase);
+
+                // TODO: handle more cases
+                if (splitIndex == -1) continue;
+
+                var valueName = line.Substring(1, splitIndex - 1);
+                var value = line.Substring(splitIndex + 3, line.Length - splitIndex - 4);
                 currentKey.AddValue(valueName, value);
                 continue;
             }

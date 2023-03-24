@@ -124,7 +124,6 @@ public sealed class InMemoryRegistryKey : IRegistryKey
 
         var names = name.Split('\\', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-
         if (_children.TryGetValue(names[0], out var child))
         {
             return names.Length == 1 ? child : child.OpenSubKey(names.Skip(1).Aggregate((a, b) => $"{a}\\{b}"));
