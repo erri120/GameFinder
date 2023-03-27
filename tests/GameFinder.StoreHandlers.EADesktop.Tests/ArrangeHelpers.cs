@@ -85,14 +85,19 @@ public partial class EADesktopTests
 
             var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
-            using var fileStream = fs.WriteFile(installInfoFile);
-            fileStream.Write(new byte[64]);
+            using var stream = new MemoryStream();
+            stream.Write(stackalloc byte[64]);
 
-            using var cryptoStream = new CryptoStream(fileStream, encryptor, CryptoStreamMode.Write);
-            JsonSerializer.Serialize(cryptoStream, installInfo, new JsonSerializerOptions
+            using (var cryptoStream = new CryptoStream(stream, encryptor, CryptoStreamMode.Write))
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            });
+                JsonSerializer.Serialize(cryptoStream, installInfo, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                });
+            }
+
+            var buffer = stream.ToArray();
+            fs.AddFile(installInfoFile, buffer);
         }
 
         return games;
