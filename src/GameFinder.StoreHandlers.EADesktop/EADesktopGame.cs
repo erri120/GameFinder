@@ -1,5 +1,5 @@
-using System.IO.Abstractions;
 using JetBrains.Annotations;
+using NexusMods.Paths;
 
 namespace GameFinder.StoreHandlers.EADesktop;
 
@@ -10,16 +10,17 @@ namespace GameFinder.StoreHandlers.EADesktop;
 /// <param name="BaseSlug">Slug name of the game.</param>
 /// <param name="BaseInstallPath">Absolute path to the game folder.</param>
 [PublicAPI]
-public record EADesktopGame(string SoftwareID, string BaseSlug, string BaseInstallPath)
+public record EADesktopGame(string SoftwareID, string BaseSlug, AbsolutePath BaseInstallPath)
 {
     /// <summary>
     /// Returns the absolute path to the installerdata.xml file inside the __Installer folder
     /// of the game folder.
     /// </summary>
-    /// <param name="fileSystem"></param>
     /// <returns></returns>
-    public string GetInstallerDataFile(IFileSystem fileSystem)
+    public AbsolutePath GetInstallerDataFile()
     {
-        return fileSystem.Path.Combine(BaseInstallPath, "__Installer", "installerdata.xml");
+        return BaseInstallPath
+            .CombineUnchecked("__Installer")
+            .CombineUnchecked("installerdata.xml");
     }
 }

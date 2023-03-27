@@ -1,31 +1,27 @@
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
+
 namespace GameFinder.StoreHandlers.EADesktop.Tests;
 
 public partial class EADesktopTests
 {
-    [Theory]
-    [InlineData(null, null, null, null, true)]
-    [InlineData("", "", "", "", true)]
-    [InlineData(nameof(baseSlug), nameof(installCheck), nameof(baseInstallPath), nameof(softwareID), false)]
-    public void Test_InstallInfoToGame(string? baseSlug, string? installCheck, string? baseInstallPath, string? softwareID, bool shouldBeError)
+    [Theory, AutoFileSystem]
+    public void Test_InstallInfoToGame(InMemoryFileSystem fileSystem, string baseSlug, string installCheck, string baseInstallPathName, string softwareID)
     {
+        var baseInstallPath = fileSystem.GetKnownPath(KnownPath.TempDirectory)
+            .CombineUnchecked(baseInstallPathName);
+
         var installInfo = new InstallInfo
         {
             BaseSlug = baseSlug,
             InstallCheck = installCheck,
-            BaseInstallPath = baseInstallPath,
+            BaseInstallPath = baseInstallPath.GetFullPath(),
             SoftwareID = softwareID,
         };
 
-        var (game, error) = EADesktopHandler.InstallInfoToGame(installInfo, 0, "");
-        if (shouldBeError)
-        {
-            error.Should().NotBeNull();
-            game.Should().BeNull();
-        }
-        else
-        {
-            error.Should().BeNull();
-            game.Should().NotBeNull();
-        }
+        var fs = new InMemoryFileSystem();
+        var (game, error) = EADesktopHandler.InstallInfoToGame(fs, installInfo, 0, fs.GetKnownPath(KnownPath.TempDirectory));
+        error.Should().BeNull();
+        game.Should().NotBeNull();
     }
 }

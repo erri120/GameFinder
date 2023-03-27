@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.EADesktopxml</DocumentationFile>
+        <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.EADesktop.xml</DocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -17,7 +17,7 @@
         <PackageReference Include="System.Management" Version="7.0.0" />
     </ItemGroup>
 
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('System.IO.Abstractions.props', '$(MSBuildThisFileDirectory)../'))" />
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <ItemGroup>
         <ProjectReference Include="..\GameFinder.Common\GameFinder.Common.csproj" />
