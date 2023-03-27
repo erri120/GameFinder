@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.Versioning;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
@@ -31,12 +30,10 @@ public class GOGHandler : AHandler<GOGGame, long>
     private readonly IFileSystem _fileSystem;
 
     /// <summary>
-    /// Default constructor. This uses the <see cref="WindowsRegistry"/> implementation
-    /// of <see cref="IRegistry"/>.
+    /// Constructor
     /// </summary>
-    [SupportedOSPlatform("windows")]
-    public GOGHandler() : this(new WindowsRegistry(), FileSystem.Shared) { }
-
+    /// <param name="registry"></param>
+    /// <param name="fileSystem"></param>
     public GOGHandler(IRegistry registry, IFileSystem fileSystem)
     {
         _registry = registry;

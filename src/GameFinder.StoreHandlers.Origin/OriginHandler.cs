@@ -27,11 +27,6 @@ public class OriginHandler : AHandler<OriginGame, string>
     private readonly IFileSystem _fileSystem;
 
     /// <summary>
-    /// Default constructor that uses the real filesystem <see cref="FileSystem"/>.
-    /// </summary>
-    public OriginHandler() : this(FileSystem.Shared) { }
-
-    /// <summary>
     /// Constructor for specifying the <see cref="IFileSystem"/> implementation to use.
     /// </summary>
     /// <param name="fileSystem"></param>
