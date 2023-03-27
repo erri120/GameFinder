@@ -1,15 +1,17 @@
 using System.Globalization;
 using GameFinder.RegistryUtils;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.GOG.Tests;
 
 public partial class GOGTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldError_MissingGameId(InMemoryRegistry registry, string keyName)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_MissingGameId(IFileSystem fileSystem, InMemoryRegistry registry, string keyName)
     {
-        var (handler, gogKey) = SetupHandler(registry);
+        var (handler, gogKey) = SetupHandler(fileSystem, registry);
 
         var invalidKey = gogKey.AddSubKey(keyName);
 
@@ -17,10 +19,10 @@ public partial class GOGTests
         error.Should().Be($"{invalidKey.GetName()} doesn't have a string value \"gameID\"");
     }
 
-    [Theory, AutoData]
-    public void Test_ShouldError_MissingGameName(InMemoryRegistry registry, string keyName, long gameId)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_MissingGameName(IFileSystem fileSystem, InMemoryRegistry registry, string keyName, long gameId)
     {
-        var (handler, gogKey) = SetupHandler(registry);
+        var (handler, gogKey) = SetupHandler(fileSystem, registry);
 
         var invalidKey = gogKey.AddSubKey(keyName);
         invalidKey.AddValue("gameId", gameId.ToString(CultureInfo.InvariantCulture));
@@ -29,10 +31,10 @@ public partial class GOGTests
         error.Should().Be($"{invalidKey.GetName()} doesn't have a string value \"gameName\"");
     }
 
-    [Theory, AutoData]
-    public void Test_ShouldError_MissingPath(InMemoryRegistry registry, string keyName, long gameId, string gameName)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_MissingPath(IFileSystem fileSystem, InMemoryRegistry registry, string keyName, long gameId, string gameName)
     {
-        var (handler, gogKey) = SetupHandler(registry);
+        var (handler, gogKey) = SetupHandler(fileSystem, registry);
 
         var invalidKey = gogKey.AddSubKey(keyName);
         invalidKey.AddValue("gameId", gameId.ToString(CultureInfo.InvariantCulture));

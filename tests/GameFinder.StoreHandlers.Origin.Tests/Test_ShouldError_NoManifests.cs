@@ -1,12 +1,13 @@
-using System.IO.Abstractions.TestingHelpers;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.Origin.Tests;
 
 public partial class OriginTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldError_NoManifests(MockFileSystem fs)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_NoManifests(InMemoryFileSystem fs)
     {
         var (handler, manifestDir) = SetupHandler(fs);
 
