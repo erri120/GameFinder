@@ -25,7 +25,7 @@ Additionally, the following Linux tools are supported:
 
 ### Steam
 
-Steam is supported on Windows and Linux. Use [SteamDB](https://steamdb.info/) to find the ID of a game.
+Steam is supported natively on Windows and Linux. Use [SteamDB](https://steamdb.info/) to find the ID of a game.
 
 **Usage:**
 
@@ -58,13 +58,29 @@ SteamGame? game = handler.FindOneGameById(570940, out string[] errors);
 
 ### GOG Galaxy
 
-GOG Galaxy is only supported on Windows. Use the [GOG Database](https://www.gogdb.org/) to find the ID of a game.
+GOG Galaxy is supported natively on Windows, and with [Wine](#wine) on Linux. Use the [GOG Database](https://www.gogdb.org/) to find the ID of a game.
 
-**Usage:**
+**Usage (native on Windows):**
 
 ```csharp
-var handler = new GOGHandler();
+var handler = new GOGHandler(new WindowsRegistry(), FileSystem.Shared);
+```
 
+**Usage (Wine on Linux):**
+
+See [Wine](#wine) for more information.
+
+```csharp
+// requires a valid prefix
+var wineFileSystem = winePrefix.CreateOverlayFileSystem(FileSystem.Shared);
+var wineRegistry = winePrefix.CreateRegistry(FileSystem.Shared);
+
+var handler = new GOGHandler(wineRegistry, wineFileSystem);
+```
+
+**Usage (regardless of platform):**
+
+```csharp
 // method 1: iterate over the game-error result
 foreach (var (game, error) in handler.FindAllGames())
 {
@@ -87,13 +103,29 @@ GOGGame? game = handler.FindOneGameById(1971477531, out string[] errors);
 
 ### Epic Games Store
 
-Epic Games Store is only supported on Windows.
+The Epic Games Store is supported natively on Windows, and with [Wine](#wine) on Linux.
 
-**Usage:**
+**Usage (native on Windows):**
 
 ```csharp
-var handler = new EGSHandler();
+var handler = new EGSHandler(new WindowsRegistry(), FileSystem.Shared);
+```
 
+**Usage (Wine on Linux):**
+
+See [Wine](#wine) for more information.
+
+```csharp
+// requires a valid prefix
+var wineFileSystem = winePrefix.CreateOverlayFileSystem(FileSystem.Shared);
+var wineRegistry = winePrefix.CreateRegistry(FileSystem.Shared);
+
+var handler = new EGSHandler(wineRegistry, wineFileSystem);
+```
+
+**Usage (regardless of platform):**
+
+```csharp
 // method 1: iterate over the game-error result
 foreach (var (game, error) in handler.FindAllGames())
 {
@@ -116,13 +148,28 @@ EGSGame? game = handler.FindOneGameById("3257e06c28764231acd93049f3774ed6", out 
 
 ### Origin
 
-Origin is only supported on Windows. **Note:** [EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app) and will replace it with [EA Desktop](#ea-desktop).
+Origin is supported natively on Windows, and with [Wine](#wine) on Linux. **Note:** [EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app) and will replace it with [EA Desktop](#ea-desktop).
 
-**Usage:**
+**Usage (native on Windows):**
 
 ```csharp
-var handler = new OriginHandler();
+var handler = new OriginHandler(FileSystem.Shared);
+```
 
+**Usage (Wine on Linux):**
+
+See [Wine](#wine) for more information.
+
+```csharp
+// requires a valid prefix
+var wineFileSystem = winePrefix.CreateOverlayFileSystem(FileSystem.Shared);
+
+var handler = new OriginHandler(wineFileSystem);
+```
+
+**Usage (regardless of platform):**
+
+```csharp
 // method 1: iterate over the game-error result
 foreach (var (game, error) in handler.FindAllGames())
 {
@@ -147,10 +194,12 @@ OriginGame? game = handler.FindOneGameById("Origin.OFR.50.0001456", out string[]
 
 EA Desktop is the replacement for [Origin](#origin): See [EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app). This is by far, the most complicated Store Handler. **You should read the [wiki entry](https://github.com/erri120/GameFinder/wiki/EA-Desktop).** My implementation decrypts the encrypted file, created by EA Desktop. You should be aware that the key used to encrypt the file is derived from hardware information. If the user changes their hardware, the decryption process might fail because they key has changed.
 
+EA Desktop is only supported on Windows.
+
 **Usage:**
 
 ```csharp
-var handler = new EADesktopHandler();
+var handler = new EADesktopHandler(FileSystem.Shared, new HardwareInfoProvider());
 
 // method 1: iterate over the game-error result
 foreach (var (game, error) in handler.FindAllGames())
@@ -184,16 +233,36 @@ The final issue is related to actual code: in order to find all UWP apps I used 
 
 The package is still available on [NuGet](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet/) and should still work, but it's marked as deprecated and won't receive any updates.
 
-## Linux tools
+## Wine
 
-### Wine
+[Wine](https://www.winehq.org/) is a compatibility layer capable of running Windows applications on Linux. Wine uses [prefixes](https://wiki.winehq.org/FAQ#Wineprefixes) to create and store virtual `C:` drives. A user can install and run Windows program inside these prefixes, and applications running inside the prefixes likely won't even notice they are not actually running on Windows.
 
-`GameFinder.Wine` implements a `IWinePrefixManager` for finding [Wineprefixes](https://wiki.winehq.org/FAQ#Wineprefixes).
+Since GameFinder is all about finding games, it also has to be able to find games inside Wine prefixes to provide good Linux support. The package `NexusMods.Paths` from [NexusMods.App](https://github.com/Nexus-Mods/NexusMods.App) provides a file system abstraction `IFileSystem` which enables path re-mappings:
+
+```csharp
+AWinePrefix prefix = //...
+
+// creates a new IFileSystem, with path mappings into the wine prefix
+IFileSystem wineFileSystem = prefix.CreateOverlayFileSystem(FileSystem.Shared);
+
+// this wineFileSystem can be used instead of FileSystem.Shared:
+var handler = new OriginHandler(wineFileSystem);
+
+// you can also create a new IRegistry:
+IRegistry wineRegistry = prefix.CreateRegistry(FileSystem.Shared);
+
+// and use both:
+var handler = new EGSHandler(wineRegistry, wineFileSystem);
+```
+
+### Default Prefix Manager
+
+`GameFinder.Wine` implements a `IWinePrefixManager` for finding Wine prefixes.
 
 **Usage**:
 
 ```csharp
-var prefixManager = new DefaultWinePrefixManager(new FileSystem());
+var prefixManager = new DefaultWinePrefixManager(FileSystem.Shared);
 
 foreach (var result in prefixManager.FindPrefixes())
 {
@@ -214,7 +283,7 @@ foreach (var result in prefixManager.FindPrefixes())
 **Usage**:
 
 ```csharp
-var prefixManager = new BottlesWinePrefixManager(new FileSystem());
+var prefixManager = new BottlesWinePrefixManager(FileSystem.Shared);
 
 foreach (var result in prefixManager.FindPrefixes())
 {
