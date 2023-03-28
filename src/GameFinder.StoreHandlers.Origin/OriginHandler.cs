@@ -27,7 +27,7 @@ public class OriginHandler : AHandler<OriginGame, string>
     private readonly IFileSystem _fileSystem;
 
     /// <summary>
-    /// Constructor for specifying the <see cref="IFileSystem"/> implementation to use.
+    /// Constructor.
     /// </summary>
     /// <param name="fileSystem"></param>
     public OriginHandler(IFileSystem fileSystem)

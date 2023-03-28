@@ -43,8 +43,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
     public SchemaPolicy SchemaPolicy { get; set; } = SchemaPolicy.Warn;
 
     /// <summary>
-    /// Constructor for specifying the <see cref="IFileSystem"/> and <see cref="IHardwareInfoProvider"/>.
-    /// Use this constructor if you want to run tests.
+    /// Constructor.
     /// </summary>
     /// <param name="fileSystem"></param>
     /// <param name="hardwareInfoProvider"></param>

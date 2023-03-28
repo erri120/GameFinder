@@ -39,8 +39,7 @@ public class EGSHandler : AHandler<EGSGame, string>
         };
 
     /// <summary>
-    /// Constructor for specifying the implementation of <see cref="IRegistry"/> and
-    /// <see cref="IFileSystem"/> when doing tests.
+    /// Constructor.
     /// </summary>
     /// <param name="registry"></param>
     /// <param name="fileSystem"></param>

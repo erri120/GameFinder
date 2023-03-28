@@ -30,7 +30,7 @@ public class GOGHandler : AHandler<GOGGame, long>
     private readonly IFileSystem _fileSystem;
 
     /// <summary>
-    /// Constructor
+    /// Constructor.
     /// </summary>
     /// <param name="registry"></param>
     /// <param name="fileSystem"></param>
