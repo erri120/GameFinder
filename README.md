@@ -27,15 +27,15 @@ Additionally, the following Linux tools are supported:
 
 Steam is supported natively on Windows and Linux. Use [SteamDB](https://steamdb.info/) to find the ID of a game.
 
-**Usage:**
+**Usage (cross-platform):**
 
 ```csharp
-// use the Windows registry on Windows
-// Linux doesn't have a registry
-var handler = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-    ? new SteamHandler(new WindowsRegistry())
-    : new SteamHandler(registry: null);
+var handler = new SteamHandler(FileSystem.Shared, OperatingSystem.IsWindows() ? new WindowsRegistry() : null);
+```
 
+**Usage (regardless of platform):**
+
+```csharp
 // method 1: iterate over the game-error result
 foreach (var (game, error) in handler.FindAllGames())
 {
@@ -303,10 +303,12 @@ Valve's [Proton](https://github.com/ValveSoftware/Proton) is a compatibility too
 
 ```csharp
 SteamGame? steamGame = steamHandler.FindOneGameById(1237970, out var errors);
-ProtonWinePrefix? protonPrefix = steamGame?.GetProtonPrefix();
-var protonPrefixDirectory = protonPrefix?.ProtonDirectory;
+if (steamGame is null) return;
 
-if (protonDirectory is not null && Directory.Exists(protonDirectory))
+ProtonWinePrefix protonPrefix = steamGame.GetProtonPrefix();
+var protonPrefixDirectory = protonPrefix.ProtonDirectory;
+
+if (protonDirectory != default && fileSystem.DirectoryExists(protonDirectory))
 {
     Console.WriteLine($"Proton prefix is at {protonDirectory}");
 }
