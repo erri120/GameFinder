@@ -35,7 +35,7 @@ public class BottlesWinePrefixManager : IWinePrefixManager<BottlesWinePrefix>
         }
 
         var bottles = defaultLocation.CombineUnchecked("bottles");
-        foreach (var bottle in _fileSystem.EnumerateDirectories(bottles, recursive:false))
+        foreach (var bottle in _fileSystem.EnumerateDirectories(bottles, recursive: false))
         {
             if (IsValidBottlesPrefix(_fileSystem, bottle, out var error))
             {
