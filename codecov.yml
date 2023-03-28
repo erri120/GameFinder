@@ -1,6 +1,7 @@
 ignore:
   - "tests/**/*"
   - "other/**/*"
+  - "extern/**/*"
 
 github_checks:
   annotations: true
