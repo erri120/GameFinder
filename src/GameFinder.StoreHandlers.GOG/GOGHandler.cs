@@ -114,6 +114,7 @@ public class GOGHandler : AHandler<GOGGame, long>
                 return Result.FromError<GOGGame>($"{subKey.GetName()} doesn't have a string value \"path\"");
             }
 
+            path = path.Replace("\\\\", "\\", StringComparison.Ordinal);
             var game = new GOGGame(id, name, _fileSystem.FromFullPath(path));
             return Result.FromGame(game);
         }
