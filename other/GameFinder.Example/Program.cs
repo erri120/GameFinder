@@ -85,7 +85,7 @@ public static class Program
         {
 
             var windowsRegistry = new WindowsRegistry();
-            if (options.Steam) RunSteamHandler(new System.IO.Abstractions.FileSystem(), windowsRegistry, logger);
+            if (options.Steam) RunSteamHandler(realFileSystem, windowsRegistry, logger);
             if (options.GOG) RunGOGHandler(windowsRegistry, realFileSystem, logger);
             if (options.EGS) RunEGSHandler(windowsRegistry, realFileSystem, logger);
             if (options.Origin) RunOriginHandler(realFileSystem, logger);
@@ -102,7 +102,7 @@ public static class Program
 
         if (OperatingSystem.IsLinux())
         {
-            if (options.Steam) RunSteamHandler(new System.IO.Abstractions.FileSystem(), registry: null, logger);
+            if (options.Steam) RunSteamHandler(realFileSystem, registry: null, logger);
             var winePrefixes = new List<AWinePrefix>();
 
             if (options.Wine)
@@ -157,14 +157,14 @@ public static class Program
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
-    private static void RunSteamHandler(System.IO.Abstractions.IFileSystem fileSystem, IRegistry? registry, ILogger logger)
+    private static void RunSteamHandler(IFileSystem fileSystem, IRegistry? registry, ILogger logger)
     {
         var handler = new SteamHandler(fileSystem, registry);
         LogGamesAndErrors(handler.FindAllGames(), logger, game =>
         {
             if (!OperatingSystem.IsLinux()) return;
             var protonPrefix = game.GetProtonPrefix();
-            if (!fileSystem.Directory.Exists(protonPrefix.ConfigurationDirectory.GetFullPath())) return;
+            if (!fileSystem.DirectoryExists(protonPrefix.ConfigurationDirectory)) return;
             logger.LogInformation("Proton Directory for this game: {}", protonPrefix.ProtonDirectory.GetFullPath());
         });
     }

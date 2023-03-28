@@ -1,37 +1,38 @@
-using System.IO.Abstractions.TestingHelpers;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 
 namespace GameFinder.StoreHandlers.Steam.Tests;
 
 public partial class SteamTests
 {
-    [Theory, AutoData]
-    public void Test_SteamGame_GetProtonPrefix(MockFileSystem fs, int appId, string name)
+    [Theory, AutoFileSystem]
+    public void Test_SteamGame_GetProtonPrefix(InMemoryFileSystem fs, int appId, string name)
     {
         var (protonDirectory, protonPrefix) = SetupProtonPrefix(fs, appId, name);
-        var wineDirectory = fs.Path.Combine(protonDirectory, "pfx");
+        var wineDirectory = protonDirectory.CombineUnchecked("pfx");
 
-        protonPrefix.ProtonDirectory.GetFullPath().Should().Be(protonDirectory);
-        protonPrefix.ConfigurationDirectory.GetFullPath().Should().Be(wineDirectory);
+        protonPrefix.ProtonDirectory.Should().Be(protonDirectory);
+        protonPrefix.ConfigurationDirectory.Should().Be(wineDirectory);
     }
 
-    [Theory, AutoData]
-    public void Test_ProtonPrefix_GetConfigInfoFile(MockFileSystem fs, int appId, string name)
+    [Theory, AutoFileSystem]
+    public void Test_ProtonPrefix_GetConfigInfoFile(InMemoryFileSystem fs, int appId, string name)
     {
         var (protonDirectory, protonPrefix) = SetupProtonPrefix(fs, appId, name);
-        protonPrefix.GetConfigInfoFile().GetFullPath().Should().Be(fs.Path.Combine(protonDirectory, "config_info"));
+        protonPrefix.GetConfigInfoFile().Should().Be(protonDirectory.CombineUnchecked("config_info"));
     }
 
-    [Theory, AutoData]
-    public void Test_ProtonPrefix_GetVersionFile(MockFileSystem fs, int appId, string name)
+    [Theory, AutoFileSystem]
+    public void Test_ProtonPrefix_GetVersionFile(InMemoryFileSystem fs, int appId, string name)
     {
         var (protonDirectory, protonPrefix) = SetupProtonPrefix(fs, appId, name);
-        protonPrefix.GetVersionFile().GetFullPath().Should().Be(fs.Path.Combine(protonDirectory, "version"));
+        protonPrefix.GetVersionFile().Should().Be(protonDirectory.CombineUnchecked("version"));
     }
 
-    [Theory, AutoData]
-    public void Test_ProtonPrefix_GetLaunchCommand(MockFileSystem fs, int appId, string name)
+    [Theory, AutoFileSystem]
+    public void Test_ProtonPrefix_GetLaunchCommand(InMemoryFileSystem fs, int appId, string name)
     {
         var (protonDirectory, protonPrefix) = SetupProtonPrefix(fs, appId, name);
-        protonPrefix.GetLaunchCommandFile().GetFullPath().Should().Be(fs.Path.Combine(protonDirectory, "launch_command"));
+        protonPrefix.GetLaunchCommandFile().Should().Be(protonDirectory.CombineUnchecked("launch_command"));
     }
 }

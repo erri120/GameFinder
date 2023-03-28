@@ -1,8 +1,6 @@
 using System.Globalization;
 using JetBrains.Annotations;
 using NexusMods.Paths;
-using FileSystem = System.IO.Abstractions.FileSystem;
-using IFileSystem = System.IO.Abstractions.IFileSystem;
 
 namespace GameFinder.StoreHandlers.Steam;
 
@@ -13,44 +11,31 @@ namespace GameFinder.StoreHandlers.Steam;
 /// <param name="Name">Name of the game</param>
 /// <param name="Path">Absolute path to the game installation folder</param>
 [PublicAPI]
-public record SteamGame(int AppId, string Name, string Path)
+public record SteamGame(int AppId, string Name, AbsolutePath Path)
 {
     /// <summary>
     /// Returns the absolute path of the manifest for this game.
     /// </summary>
-    /// <param name="fs"></param>
     /// <returns></returns>
-    public string GetManifestPath(IFileSystem? fs = null)
+    public AbsolutePath GetManifestPath()
     {
         var manifestName = $"{AppId.ToString(CultureInfo.InvariantCulture)}.acf";
-
-        return fs is null
-            ? System.IO.Path.GetFullPath(System.IO.Path.Combine(Path, "..", "..", manifestName))
-            : fs.Path.GetFullPath(fs.Path.Combine(Path, "..", "..", manifestName));
+        return Path.Parent.Parent.CombineUnchecked(manifestName);
     }
 
     /// <summary>
     /// Returns the absolute path to the Wine prefix directory, managed by Proton.
     /// </summary>
-    /// <param name="fs"></param>
     /// <returns></returns>
-    public ProtonWinePrefix GetProtonPrefix(IFileSystem? fs = null)
+    public ProtonWinePrefix GetProtonPrefix()
     {
-        var path = fs switch
-        {
-            not null => fs.Path,
-            null => new FileSystem().Path
-        };
+        var protonDirectory = Path
+            .Parent
+            .Parent
+            .CombineUnchecked("compatdata")
+            .CombineUnchecked(AppId.ToString(CultureInfo.InvariantCulture));
 
-        var protonDirectory = path.GetFullPath(path.Combine(
-            Path,
-            "..",
-            "..",
-            "compatdata",
-            AppId.ToString(CultureInfo.InvariantCulture)));
-
-        var configurationDirectory = path.Combine(protonDirectory, "pfx");
-        // TODO: use NMA IFileSystem
-        return new ProtonWinePrefix(AbsolutePath.FromFullPath(protonDirectory), AbsolutePath.FromFullPath(configurationDirectory));
+        var configurationDirectory = protonDirectory.CombineUnchecked("pfx");
+        return new ProtonWinePrefix(protonDirectory, configurationDirectory);
     }
 }

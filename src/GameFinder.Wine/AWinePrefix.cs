@@ -67,39 +67,17 @@ public abstract class AWinePrefix
     {
         var rootDirectory = GetVirtualDrivePath();
 
-        var pathMappings = new Dictionary<AbsolutePath, AbsolutePath>
-        {
-            { fileSystem.FromFullPath("/c"), rootDirectory },
-        };
-
         // TODO: the Wine user can be different, Proton uses "steamuser"
         var newHomeDirectory = rootDirectory
             .CombineUnchecked("Users")
             .CombineUnchecked(Environment.GetEnvironmentVariable("USER")!);
 
-        var knownPaths = Enum.GetValues<KnownPath>();
-        foreach (var knownPath in knownPaths)
-        {
-            var originalPath = fileSystem.GetKnownPath(knownPath);
-            var newPath = knownPath switch
-            {
-                KnownPath.EntryDirectory => originalPath,
-                KnownPath.CurrentDirectory => originalPath,
+        var pathMappings = BaseFileSystem.CreateWinePathMappings(
+            fileSystem,
+            rootDirectory,
+            newHomeDirectory);
 
-                KnownPath.CommonApplicationDataDirectory => rootDirectory.CombineUnchecked("ProgramData"),
-
-                KnownPath.HomeDirectory => newHomeDirectory,
-                KnownPath.MyDocumentsDirectory => newHomeDirectory.CombineUnchecked("Documents"),
-                KnownPath.MyGamesDirectory => newHomeDirectory.CombineUnchecked("Documents/My Games"),
-                KnownPath.LocalApplicationDataDirectory => newHomeDirectory.CombineUnchecked("AppData/Local"),
-                KnownPath.ApplicationDataDirectory => newHomeDirectory.CombineUnchecked("AppData/Roaming"),
-                KnownPath.TempDirectory => newHomeDirectory.CombineUnchecked("AppData/Local/Temp"),
-            };
-
-            pathMappings[originalPath] = newPath;
-        }
-
-        return fileSystem.CreateOverlayFileSystem(pathMappings, true);
+        return fileSystem.CreateOverlayFileSystem(pathMappings, convertCrossPlatformPaths: true);
     }
 
     /// <summary>

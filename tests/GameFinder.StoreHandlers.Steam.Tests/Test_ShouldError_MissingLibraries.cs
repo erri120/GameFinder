@@ -1,58 +1,60 @@
-using System.IO.Abstractions.TestingHelpers;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.Steam.Tests;
 
 public partial class SteamTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldError_MissingLibraries(MockFileSystem fs)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_MissingLibraries(InMemoryFileSystem fs)
     {
         var handler = new SteamHandler(fs, registry: null);
 
         var steamPath = SteamHandler.GetDefaultSteamDirectories(fs).First();
         var libraryFoldersFile = SteamHandler.GetLibraryFoldersFile(steamPath);
 
-        fs.AddDirectory(steamPath.FullName);
-        fs.AddFile(libraryFoldersFile.FullName, @"
+        fs.AddDirectory(steamPath);
+        fs.AddFile(libraryFoldersFile, @"
 ""libraryfolders""
 {
 }
 ");
 
         var error = handler.ShouldOnlyBeOneError();
-        error.Should().Be($"Found no Steam Libraries in {libraryFoldersFile.FullName}");
+        error.Should().Be($"Found no Steam Libraries in {libraryFoldersFile}");
     }
 
-    [Theory, AutoData]
-    public void Test_ShouldError_MissingLibrary(MockFileSystem fs, string libraryName)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_MissingLibrary(InMemoryFileSystem fs, string libraryName)
     {
         var handler = new SteamHandler(fs, registry: null);
 
         var steamPath = SteamHandler.GetDefaultSteamDirectories(fs).First();
         var libraryFoldersFile = SteamHandler.GetLibraryFoldersFile(steamPath);
 
-        var libraryPath = fs.Path.Combine(fs.Path.GetTempPath(), libraryName);
+        var libraryPath = fs.GetKnownPath(KnownPath.TempDirectory)
+            .CombineUnchecked(libraryName);
 
-        fs.AddDirectory(steamPath.FullName);
-        fs.AddFile(libraryFoldersFile.FullName, @$"
+        fs.AddDirectory(steamPath);
+        fs.AddFile(libraryFoldersFile, @$"
 ""libraryfolders""
 {{
     ""0""
     {{
-        ""path""    ""{libraryPath.ToEscapedString()}""
+        ""path""    ""{libraryPath.GetFullPath().ToEscapedString()}""
     }}
 }}
 ");
 
-        var steamAppsPath = fs.Path.Combine(libraryPath, "steamapps");
+        var steamAppsPath = libraryPath.CombineUnchecked("steamapps");
 
         var error = handler.ShouldOnlyBeOneError();
         error.Should().Be($"Steam Library {steamAppsPath} does not exist!");
     }
 
-    [Theory, AutoData]
-    public void Test_ShouldError_MissingManifests(MockFileSystem fs)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_MissingManifests(InMemoryFileSystem fs)
     {
         var (handler, basePath, _) = SetupHandler(fs);
 
