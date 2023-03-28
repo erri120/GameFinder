@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.Versioning;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
+using NexusMods.Paths;
 
 namespace GameFinder.StoreHandlers.GOG;
 
@@ -16,7 +16,7 @@ namespace GameFinder.StoreHandlers.GOG;
 /// <param name="Name"></param>
 /// <param name="Path"></param>
 [PublicAPI]
-public record GOGGame(long Id, string Name, string Path);
+public record GOGGame(long Id, string Name, AbsolutePath Path);
 
 /// <summary>
 /// Handler for finding games installed with GOG Galaxy.
@@ -27,21 +27,17 @@ public class GOGHandler : AHandler<GOGGame, long>
     internal const string GOGRegKey = @"Software\GOG.com\Games";
 
     private readonly IRegistry _registry;
+    private readonly IFileSystem _fileSystem;
 
     /// <summary>
-    /// Default constructor. This uses the <see cref="WindowsRegistry"/> implementation
-    /// of <see cref="IRegistry"/>.
-    /// </summary>
-    [SupportedOSPlatform("windows")]
-    public GOGHandler() : this(new WindowsRegistry()) { }
-
-    /// <summary>
-    /// Constructor for specifying the implementation of <see cref="IRegistry"/>.
+    /// Constructor.
     /// </summary>
     /// <param name="registry"></param>
-    public GOGHandler(IRegistry registry)
+    /// <param name="fileSystem"></param>
+    public GOGHandler(IRegistry registry, IFileSystem fileSystem)
     {
         _registry = registry;
+        _fileSystem = fileSystem;
     }
 
     /// <inheritdoc/>
@@ -88,7 +84,7 @@ public class GOGHandler : AHandler<GOGGame, long>
         return games.CustomToDictionary(game => game.Id, game => game);
     }
 
-    private static Result<GOGGame> ParseSubKey(IRegistryKey gogKey, string subKeyName)
+    private Result<GOGGame> ParseSubKey(IRegistryKey gogKey, string subKeyName)
     {
         try
         {
@@ -118,7 +114,7 @@ public class GOGHandler : AHandler<GOGGame, long>
                 return Result.FromError<GOGGame>($"{subKey.GetName()} doesn't have a string value \"path\"");
             }
 
-            var game = new GOGGame(id, name, path);
+            var game = new GOGGame(id, name, _fileSystem.FromFullPath(path));
             return Result.FromGame(game);
         }
         catch (Exception e)

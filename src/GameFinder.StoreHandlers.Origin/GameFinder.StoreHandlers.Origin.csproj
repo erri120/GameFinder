@@ -12,7 +12,7 @@
         <DocumentationFile>bin\Release\GameFinder.StoreHandlers.Origin.xml</DocumentationFile>
     </PropertyGroup>
 
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('System.IO.Abstractions.props', '$(MSBuildThisFileDirectory)../'))" />
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <ItemGroup>
         <ProjectReference Include="..\GameFinder.Common\GameFinder.Common.csproj" />

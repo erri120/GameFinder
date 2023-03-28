@@ -17,6 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: true
 
     - name: Print Debug Info
       run: dotnet --info
@@ -25,7 +27,7 @@ jobs:
       run: dotnet restore
 
     - name: Check formatting
-      run: dotnet format --no-restore --verify-no-changes --severity error
+      run: dotnet format --no-restore --verify-no-changes --severity error --exclude extern
 
     - name: Build
       run: dotnet build --no-restore

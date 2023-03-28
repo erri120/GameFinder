@@ -1,22 +1,23 @@
-using System.IO.Abstractions.TestingHelpers;
 using System.Web;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.Origin.Tests;
 
 public partial class OriginTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldWork_WithDuplicateKeys(MockFileSystem fs, string manifestName,
-        string id, string installPath)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_WithDuplicateKeys(InMemoryFileSystem fs, string manifestName,
+        string id, AbsolutePath installPath)
     {
         var (handler, manifestDir) = SetupHandler(fs);
 
-        var manifest = fs.Path.Combine(manifestDir, $"{manifestName}.mfst");
+        var manifest = manifestDir.CombineUnchecked($"{manifestName}.mfst");
         fs.AddFile(manifest, $"?id={HttpUtility.UrlEncode(id)}" +
                              $"&ID={HttpUtility.UrlEncode(id)}" +
-                             $"&dipInstallPath={HttpUtility.UrlEncode(installPath)}" +
-                             $"&dipinstallpath={HttpUtility.UrlEncode(installPath)}");
+                             $"&dipInstallPath={HttpUtility.UrlEncode(installPath.GetFullPath())}" +
+                             $"&dipinstallpath={HttpUtility.UrlEncode(installPath.GetFullPath())}");
 
         var results = handler.FindAllGames().ToArray();
 

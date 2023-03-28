@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using CommandLine;
 using GameFinder.Common;
@@ -18,10 +16,13 @@ using GameFinder.StoreHandlers.Steam;
 using GameFinder.Wine;
 using GameFinder.Wine.Bottles;
 using Microsoft.Extensions.Logging;
+using NexusMods.Paths;
 using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
+using FileSystem = NexusMods.Paths.FileSystem;
+using IFileSystem = NexusMods.Paths.IFileSystem;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace GameFinder.Example;
@@ -35,7 +36,7 @@ public static class Program
         var coloredConsoleTarget = new ColoredConsoleTarget("coloredConsole")
         {
             DetectConsoleAvailable = true,
-            EnableAnsiOutput = false,
+            EnableAnsiOutput = OperatingSystem.IsLinux(), // windows hates this
             UseDefaultRowHighlightingRules = false,
             WordHighlightingRules =
             {
@@ -73,124 +74,119 @@ public static class Program
     [SuppressMessage("Design", "MA0051:Method is too long")]
     private static void Run(Options options, ILogger logger)
     {
-        if (File.Exists("log.log")) File.Delete("log.log");
+        var realFileSystem = FileSystem.Shared;
 
-        if (options.GOG)
+        var logFile = realFileSystem.GetKnownPath(KnownPath.CurrentDirectory).CombineUnchecked("log.log");
+        if (realFileSystem.FileExists(logFile)) realFileSystem.DeleteFile(logFile);
+
+        logger.LogInformation($"Operating System: {RuntimeInformation.OSDescription}");
+
+        if (OperatingSystem.IsWindows())
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                logger.LogError("GOG Galaxy is only supported on Windows!");
-            }
-            else
-            {
-                var handler = new GOGHandler();
-                var results = handler.FindAllGames();
-                LogGamesAndErrors(results, logger);
-            }
-        }
 
-        if (options.EGS)
-        {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            var windowsRegistry = new WindowsRegistry();
+            if (options.Steam) RunSteamHandler(realFileSystem, windowsRegistry, logger);
+            if (options.GOG) RunGOGHandler(windowsRegistry, realFileSystem, logger);
+            if (options.EGS) RunEGSHandler(windowsRegistry, realFileSystem, logger);
+            if (options.Origin) RunOriginHandler(realFileSystem, logger);
+            if (options.EADesktop)
             {
-                logger.LogError("Epic Games Store is only supported on Windows!");
-            }
-            else
-            {
-                var handler = new EGSHandler();
-                var results = handler.FindAllGames();
-                LogGamesAndErrors(results, logger);
-            }
-        }
-
-        if (options.Steam)
-        {
-            var handler = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? new SteamHandler(new WindowsRegistry())
-                : new SteamHandler(registry: null);
-
-            var results = handler.FindAllGames();
-            LogGamesAndErrors(results, logger, game =>
-            {
-                var protonPrefix = game.GetProtonPrefix();
-                if (!Directory.Exists(protonPrefix.ProtonDirectory)) return;
-                logger.LogInformation("Proton prefix directory: {}", protonPrefix.ProtonDirectory);
-            });
-        }
-
-        if (options.Origin)
-        {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                logger.LogError("Origin is only supported on Windows!");
-            }
-            else
-            {
-                var handler = new OriginHandler();
-                var results = handler.FindAllGames();
-                LogGamesAndErrors(results, logger);
-            }
-        }
-
-        if (options.EADesktop)
-        {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                logger.LogError("EA Desktop is only supported on Windows!");
-            }
-            else
-            {
+                var hardwareInfoProvider = new HardwareInfoProvider();
                 var decryptionKey = Decryption.CreateDecryptionKey(new HardwareInfoProvider());
                 var sDecryptionKey = Convert.ToHexString(decryptionKey).ToLower(CultureInfo.InvariantCulture);
                 logger.LogDebug("EA Decryption Key: {}", sDecryptionKey);
 
-                var handler = new EADesktopHandler();
-                var results = handler.FindAllGames();
-                LogGamesAndErrors(results, logger);
+                RunEADesktopHandler(realFileSystem, hardwareInfoProvider, logger);
             }
         }
 
-        if (options.Wine)
+        if (OperatingSystem.IsLinux())
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                logger.LogError("Wine is only supported on Linux!");
-            }
-            else
-            {
-                var prefixManager = new DefaultWinePrefixManager(new FileSystem());
-                LogWinePrefixes(prefixManager, logger);
-            }
-        }
+            if (options.Steam) RunSteamHandler(realFileSystem, registry: null, logger);
+            var winePrefixes = new List<AWinePrefix>();
 
-        if (options.Bottles)
-        {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (options.Wine)
             {
-                logger.LogError("Bottles is only supported on Linux!");
+                var prefixManager = new DefaultWinePrefixManager(realFileSystem);
+                winePrefixes.AddRange(LogWinePrefixes(prefixManager, logger));
             }
-            else
+
+            if (options.Bottles)
             {
-                var prefixManager = new BottlesWinePrefixManager(new FileSystem());
-                LogWinePrefixes(prefixManager, logger);
+                var prefixManager = new BottlesWinePrefixManager(realFileSystem);
+                winePrefixes.AddRange(LogWinePrefixes(prefixManager, logger));
+            }
+
+            foreach (var winePrefix in winePrefixes)
+            {
+                var wineFileSystem = winePrefix.CreateOverlayFileSystem(realFileSystem);
+                var wineRegistry = winePrefix.CreateRegistry(realFileSystem);
+
+                if (options.GOG) RunGOGHandler(wineRegistry, wineFileSystem, logger);
+                if (options.EGS) RunEGSHandler(wineRegistry, wineFileSystem, logger);
+                if (options.Origin) RunOriginHandler(wineFileSystem, logger);
             }
         }
     }
 
-    private static void LogWinePrefixes<TWinePrefix>(
-        IWinePrefixManager<TWinePrefix> prefixManager, ILogger logger)
+    private static void RunGOGHandler(IRegistry registry, IFileSystem fileSystem, ILogger logger)
+    {
+        var handler = new GOGHandler(registry, fileSystem);
+        LogGamesAndErrors(handler.FindAllGames(), logger);
+    }
+
+    private static void RunEGSHandler(IRegistry registry,
+        IFileSystem fileSystem, ILogger logger)
+    {
+        var handler = new EGSHandler(registry, fileSystem);
+        LogGamesAndErrors(handler.FindAllGames(), logger);
+    }
+
+    private static void RunOriginHandler(IFileSystem fileSystem, ILogger logger)
+    {
+        var handler = new OriginHandler(fileSystem);
+        LogGamesAndErrors(handler.FindAllGames(), logger);
+    }
+
+    private static void RunEADesktopHandler(
+        IFileSystem fileSystem,
+        IHardwareInfoProvider hardwareInfoProvider,
+        ILogger logger)
+    {
+        var handler = new EADesktopHandler(fileSystem, hardwareInfoProvider);
+        LogGamesAndErrors(handler.FindAllGames(), logger);
+    }
+
+    private static void RunSteamHandler(IFileSystem fileSystem, IRegistry? registry, ILogger logger)
+    {
+        var handler = new SteamHandler(fileSystem, registry);
+        LogGamesAndErrors(handler.FindAllGames(), logger, game =>
+        {
+            if (!OperatingSystem.IsLinux()) return;
+            var protonPrefix = game.GetProtonPrefix();
+            if (!fileSystem.DirectoryExists(protonPrefix.ConfigurationDirectory)) return;
+            logger.LogInformation("Proton Directory for this game: {}", protonPrefix.ProtonDirectory.GetFullPath());
+        });
+    }
+
+    private static List<AWinePrefix> LogWinePrefixes<TWinePrefix>(IWinePrefixManager<TWinePrefix> prefixManager, ILogger logger)
     where TWinePrefix : AWinePrefix
     {
+        var res = new List<AWinePrefix>();
+
         foreach (var result in prefixManager.FindPrefixes())
         {
             result.Switch(prefix =>
             {
                 logger.LogInformation($"Found wine prefix at {prefix.ConfigurationDirectory}");
+                res.Add(prefix);
             }, error =>
             {
                 logger.LogError(error.Value);
             });
         }
+
+        return res;
     }
 
     private static void LogGamesAndErrors<TGame>(IEnumerable<Result<TGame>> results, ILogger logger, Action<TGame>? action = null)

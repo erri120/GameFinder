@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EFB4E7DB-DE2
 	ProjectSection(SolutionItems) = preProject
 		src\Directory.Build.props = src\Directory.Build.props
 		src\System.IO.Abstractions.props = src\System.IO.Abstractions.props
+		src\NexusMods.Paths.props = src\NexusMods.Paths.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9C6671E1-A94D-4C76-9F61-78B491A62408}"
@@ -76,6 +77,17 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.Wine", "src\GameFinder.Wine\GameFinder.Wine.csproj", "{F553AEEA-FD48-4C84-B5A1-7CC31F2F76D5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.Wine.Tests", "tests\GameFinder.Wine.Tests\GameFinder.Wine.Tests.csproj", "{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extern", "extern", "{98904D69-42EC-4E1D-AFD8-E502E3C3CE6F}"
+	ProjectSection(SolutionItems) = preProject
+		extern\Directory.Build.targets = extern\Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexusMods.Paths", "extern\NexusMods.App\src\NexusMods.Paths\NexusMods.Paths.csproj", "{A82FD5DF-1E82-4755-B10B-C1207FD24129}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexusMods.Paths.TestingHelpers", "extern\NexusMods.App\src\NexusMods.Paths.TestingHelpers\NexusMods.Paths.TestingHelpers.csproj", "{8AD8AF6B-5615-4D9F-BEED-99DAC5A7F50C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexusMods.Paths.Tests", "extern\NexusMods.App\tests\NexusMods.Paths.Tests\NexusMods.Paths.Tests.csproj", "{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,6 +171,18 @@ Global
 		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A82FD5DF-1E82-4755-B10B-C1207FD24129}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A82FD5DF-1E82-4755-B10B-C1207FD24129}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A82FD5DF-1E82-4755-B10B-C1207FD24129}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A82FD5DF-1E82-4755-B10B-C1207FD24129}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AD8AF6B-5615-4D9F-BEED-99DAC5A7F50C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AD8AF6B-5615-4D9F-BEED-99DAC5A7F50C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AD8AF6B-5615-4D9F-BEED-99DAC5A7F50C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AD8AF6B-5615-4D9F-BEED-99DAC5A7F50C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{58A62CC7-4A61-4218-9F93-CE85FDF00E15} = {B765999C-AB3D-495F-9F5E-9108F2D4FE33}
@@ -183,5 +207,8 @@ Global
 		{21F0CD9E-DC99-49E5-B451-A8A111664E6E} = {EFB4E7DB-DE24-4BDE-B660-DAF1394ECC21}
 		{F553AEEA-FD48-4C84-B5A1-7CC31F2F76D5} = {21F0CD9E-DC99-49E5-B451-A8A111664E6E}
 		{C1FA1F2C-8CC2-4EFF-8206-8B52A1B4FBFE} = {9C6671E1-A94D-4C76-9F61-78B491A62408}
+		{A82FD5DF-1E82-4755-B10B-C1207FD24129} = {98904D69-42EC-4E1D-AFD8-E502E3C3CE6F}
+		{8AD8AF6B-5615-4D9F-BEED-99DAC5A7F50C} = {98904D69-42EC-4E1D-AFD8-E502E3C3CE6F}
+		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02} = {98904D69-42EC-4E1D-AFD8-E502E3C3CE6F}
 	EndGlobalSection
 EndGlobal

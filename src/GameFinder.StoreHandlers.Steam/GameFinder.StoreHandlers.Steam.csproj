@@ -16,8 +16,8 @@
         <PackageReference Include="ValveKeyValue" Version="0.8.2.162" />
     </ItemGroup>
 
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('System.IO.Abstractions.props', '$(MSBuildThisFileDirectory)../'))" />
-    
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
+
     <ItemGroup>
         <ProjectReference Include="..\GameFinder.Common\GameFinder.Common.csproj" />
         <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />

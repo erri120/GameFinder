@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## [Unreleased]
 
+## 3.0.0 - TBD
+
+This is a major release, featuring Wine, Bottles and Proton support for GOG, EGS and Origin. This release also replaces [`System.IO.Abstraction`](https://github.com/TestableIO/System.IO.Abstractions) with `NexusMods.Paths` from the new [Nexus Mods App](https://github.com/Nexus-Mods/NexusMods.App).
+
+**How to upgrade:**
+
+Store handlers, like `GOGHandler`, now require an implementation of `NexusMods.Paths.IFileSystem`, instead of `System.IO.Abstraction.IFileSystem`. You can use the shared instance at `NexusMods.Path.FileSystem.Shared`, if you want to use the real file system.
+
+For testing, you can either mock `NexusMods.Paths.IFileSystem`, or use `NexusMods.Paths.InMemoryFileSystem`. If you need to do more in-depth testing, you can also use the `NexusMods.Paths.TestingHelpers` package.
+
+**How to use with Wine on Linux**:
+
+See the updated [README](./README.md).
+
 ## [Released]
 
 ## [2.6.0] - 2023-03-07

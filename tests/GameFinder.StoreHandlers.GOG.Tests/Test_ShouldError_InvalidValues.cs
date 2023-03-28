@@ -1,14 +1,16 @@
 using GameFinder.RegistryUtils;
+using NexusMods.Paths;
+using NexusMods.Paths.TestingHelpers;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.GOG.Tests;
 
 public partial class GOGTests
 {
-    [Theory, AutoData]
-    public void Test_ShouldError_InvalidGameId(InMemoryRegistry registry, string keyName, string gameId)
+    [Theory, AutoFileSystem]
+    public void Test_ShouldError_InvalidGameId(IFileSystem fileSystem, InMemoryRegistry registry, string keyName, string gameId)
     {
-        var (handler, gogKey) = SetupHandler(registry);
+        var (handler, gogKey) = SetupHandler(fileSystem, registry);
 
         var invalidKey = gogKey.AddSubKey(keyName);
         invalidKey.AddValue("gameId", gameId);

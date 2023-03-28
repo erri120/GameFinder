@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <ProjectReference Include="..\..\extern\NexusMods.App\src\NexusMods.Paths.TestingHelpers\NexusMods.Paths.TestingHelpers.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.EADesktop\GameFinder.StoreHandlers.EADesktop.csproj" />
         <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>
@@ -12,9 +13,9 @@
 
     <Target Name="CopyFiles" AfterTargets="PostBuildEvent">
         <ItemGroup>
-            <_Files Include="files\**"/>
+            <_Files Include="files\**" />
         </ItemGroup>
 
-        <Copy SourceFiles="@(_Files)" DestinationFolder="$(TargetDir)\files"/>
+        <Copy SourceFiles="@(_Files)" DestinationFolder="$(TargetDir)\files" />
     </Target>
 </Project>

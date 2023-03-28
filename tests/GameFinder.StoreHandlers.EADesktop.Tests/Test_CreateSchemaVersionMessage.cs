@@ -1,3 +1,5 @@
+using NexusMods.Paths;
+
 namespace GameFinder.StoreHandlers.EADesktop.Tests;
 
 public partial class EADesktopTests
@@ -14,7 +16,7 @@ public partial class EADesktopTests
         var (message, isError) = EADesktopHandler.CreateSchemaVersionMessage(
             schemaPolicy,
             schemaVersion,
-            "");
+            new InMemoryFileSystem().GetKnownPath(KnownPath.TempDirectory));
 
         if (shouldMessageBeNull)
             message.Should().BeNull();

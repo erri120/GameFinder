@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO.Abstractions;
 using JetBrains.Annotations;
+using NexusMods.Paths;
 using OneOf;
 
 namespace GameFinder.Wine;
@@ -31,7 +31,7 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
     {
         foreach (var defaultWinePrefixLocation in GetDefaultWinePrefixLocations(_fileSystem))
         {
-            if (!_fileSystem.Directory.Exists(defaultWinePrefixLocation)) continue;
+            if (!_fileSystem.DirectoryExists(defaultWinePrefixLocation)) continue;
 
             if (IsValidPrefix(_fileSystem, defaultWinePrefixLocation, out var error))
             {
@@ -44,25 +44,25 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
         }
     }
 
-    internal static bool IsValidPrefix(IFileSystem fileSystem, string directory,
+    internal static bool IsValidPrefix(IFileSystem fileSystem, AbsolutePath directory,
         [MaybeNullWhen(true)] out PrefixDiscoveryError error)
     {
-        var virtualDrive = fileSystem.Path.Combine(directory, "drive_c");
-        if (!fileSystem.Directory.Exists(virtualDrive))
+        var virtualDrive = directory.CombineUnchecked("drive_c");
+        if (!fileSystem.DirectoryExists(virtualDrive))
         {
             error = PrefixDiscoveryError.From($"Virtual C: drive does not exist at {virtualDrive}");
             return false;
         }
 
-        var systemRegistryFile = fileSystem.Path.Combine(directory, "system.reg");
-        if (!fileSystem.File.Exists(systemRegistryFile))
+        var systemRegistryFile = directory.CombineUnchecked("system.reg");
+        if (!fileSystem.FileExists(systemRegistryFile))
         {
             error = PrefixDiscoveryError.From($"System registry file does not exist at {systemRegistryFile}");
             return false;
         }
 
-        var userRegistryFile = fileSystem.Path.Combine(directory, "user.reg");
-        if (!fileSystem.File.Exists(userRegistryFile))
+        var userRegistryFile = directory.CombineUnchecked("user.reg");
+        if (!fileSystem.FileExists(userRegistryFile))
         {
             error = PrefixDiscoveryError.From($"User registry file does not exist at {userRegistryFile}");
             return false;
@@ -72,42 +72,27 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
         return true;
     }
 
-    internal static IEnumerable<string> GetDefaultWinePrefixLocations(IFileSystem fileSystem)
+    internal static IEnumerable<AbsolutePath> GetDefaultWinePrefixLocations(IFileSystem fileSystem)
     {
         // from the docs: https://wiki.winehq.org/FAQ#Wineprefixes
 
         // ~/.wine is the default prefix
-        yield return fileSystem.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            ".wine"
-        );
+        yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory).CombineUnchecked(".wine");
 
         var winePrefixEnvVariable = Environment.GetEnvironmentVariable("WINEPREFIX");
         if (winePrefixEnvVariable is not null)
         {
-            yield return winePrefixEnvVariable;
+            yield return fileSystem.FromFullPath(winePrefixEnvVariable);
         }
 
         // WINEPREFIX0, WINEPREFIX1, ...
         foreach (var numberedEnvVariable in GetNumberedEnvironmentVariables())
         {
-            yield return numberedEnvVariable;
+            yield return fileSystem.FromFullPath(numberedEnvVariable);
         }
 
         // Bottling standards: https://wiki.winehq.org/Bottling_Standards
-        // not sure which 3rd party applications actually use this
-
-        // $XDG_DATA_HOME/wineprefixes
-        var prefixesDirectory = fileSystem.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "wineprefixes"
-        );
-
-        if (!fileSystem.Directory.Exists(prefixesDirectory)) yield break;
-        foreach (var prefix in fileSystem.Directory.EnumerateDirectories(prefixesDirectory))
-        {
-            yield return prefix;
-        }
+        // TODO: not sure which 3rd party applications actually use this
     }
 
     internal static IEnumerable<string> GetNumberedEnvironmentVariables()

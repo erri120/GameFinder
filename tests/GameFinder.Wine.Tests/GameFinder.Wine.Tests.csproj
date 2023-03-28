@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <ProjectReference Include="..\..\extern\NexusMods.App\src\NexusMods.Paths.TestingHelpers\NexusMods.Paths.TestingHelpers.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.Wine\GameFinder.Wine.csproj" />
         <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>

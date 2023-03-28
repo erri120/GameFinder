@@ -85,6 +85,12 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     }
 
     /// <summary>
+    /// Gets the parent key.
+    /// </summary>
+    /// <returns></returns>
+    public InMemoryRegistryKey GetParent() => _parent;
+
+    /// <summary>
     /// Adds a sub-key to the current key.
     /// </summary>
     /// <param name="key"></param>
@@ -123,6 +129,15 @@ public sealed class InMemoryRegistryKey : IRegistryKey
             return names.Length == 1 ? child : child.OpenSubKey(names.Skip(1).Aggregate((a, b) => $"{a}\\{b}"));
         }
 
+        // TODO: this is only a stop-gag measure
+        if (string.Equals(_key, "Software", StringComparison.OrdinalIgnoreCase))
+        {
+            if (_children.TryGetValue("Wow6432Node", out var wowNode))
+            {
+                return wowNode.OpenSubKey(name);
+            }
+        }
+
         return null;
     }
 
@@ -145,15 +160,20 @@ public sealed class InMemoryRegistryKey : IRegistryKey
     }
 
     /// <inheritdoc/>
-    public string GetName()
-    {
-        return _name;
-    }
+    public string GetName() => _name;
+
+    /// <summary>
+    /// Gets the last part of the full key.
+    /// </summary>
+    /// <returns></returns>
+    public string GetKeyName() => _key;
 
     /// <inheritdoc/>
     public object? GetValue(string? valueName)
     {
-        _values.TryGetValue(valueName ?? string.Empty, out var value);
+        if (valueName is null) return _parent.GetValue(_key);
+
+        _values.TryGetValue(valueName, out var value);
         return value;
     }
 

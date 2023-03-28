@@ -1,42 +1,42 @@
 using System.Globalization;
-using System.IO.Abstractions.TestingHelpers;
+using NexusMods.Paths;
 using TestUtils;
 
 namespace GameFinder.StoreHandlers.Steam.Tests;
 
 public partial class SteamTests
 {
-    private static (SteamHandler handler, string basePath, string commonPath) SetupHandler(MockFileSystem fs)
+    private static (SteamHandler handler, AbsolutePath basePath, AbsolutePath commonPath) SetupHandler(InMemoryFileSystem fs)
     {
         var defaultSteamDir = SteamHandler.GetDefaultSteamDirectories(fs).First();
         var libraryFoldersFile = SteamHandler.GetLibraryFoldersFile(defaultSteamDir);
 
-        fs.AddFile(libraryFoldersFile.FullName, $@"
+        fs.AddFile(libraryFoldersFile, $@"
 ""libraryfolders""
 {{
     ""0""
     {{
-        ""path""        ""{defaultSteamDir.FullName.ToEscapedString()}""
+        ""path""        ""{defaultSteamDir.GetFullPath().ToEscapedString()}""
     }}
 }}");
 
-        var basePath = fs.Path.Combine(defaultSteamDir.FullName, "steamapps");
-        var commonPath = fs.Path.Combine(basePath, "common");
+        var basePath = defaultSteamDir.CombineUnchecked("steamapps");
+        var commonPath = basePath.CombineUnchecked("common");
 
         var handler = new SteamHandler(fs, registry: null);
         return (handler, basePath, commonPath);
     }
 
-    private static IEnumerable<SteamGame> SetupGames(MockFileSystem fs, string basePath, string commonPath)
+    private static IEnumerable<SteamGame> SetupGames(InMemoryFileSystem fs, AbsolutePath basePath, AbsolutePath commonPath)
     {
         var fixture = new Fixture();
 
         fixture.Customize<SteamGame>(composer => composer
             .FromFactory<int, string>((appId, name) =>
             {
-                var path = fs.Path.Combine(commonPath, name);
+                var path = commonPath.CombineUnchecked(name);
 
-                var manifest = fs.Path.Combine(basePath, $"{appId.ToString(CultureInfo.InvariantCulture)}.acf");
+                var manifest = basePath.CombineUnchecked($"{appId.ToString(CultureInfo.InvariantCulture)}.acf");
                 fs.AddFile(manifest, @$"
 ""AppState""
 {{
@@ -52,14 +52,19 @@ public partial class SteamTests
         return fixture.CreateMany<SteamGame>();
     }
 
-    private static (string protonDirectory, ProtonWinePrefix) SetupProtonPrefix(MockFileSystem fs, int appId, string name)
+    private static (AbsolutePath protonDirectory, ProtonWinePrefix) SetupProtonPrefix(InMemoryFileSystem fs, int appId, string name)
     {
-        var gamePath = fs.Path.Combine(fs.Path.GetTempPath(), "common", name);
-        var protonDirectory = fs.Path.Combine(fs.Path.GetTempPath(), "compatdata", appId.ToString(CultureInfo.InvariantCulture));
+        var gamePath = fs.GetKnownPath(KnownPath.TempDirectory)
+            .CombineUnchecked("common")
+            .CombineUnchecked(name);
+
+        var protonDirectory = fs.GetKnownPath(KnownPath.TempDirectory)
+            .CombineUnchecked("compatdata")
+            .CombineUnchecked(appId.ToString(CultureInfo.InvariantCulture));
 
         var steamGame = new SteamGame(appId, name, gamePath);
 
-        var protonPrefix = steamGame.GetProtonPrefix(fs);
+        var protonPrefix = steamGame.GetProtonPrefix();
         return (protonDirectory, protonPrefix);
     }
 }
