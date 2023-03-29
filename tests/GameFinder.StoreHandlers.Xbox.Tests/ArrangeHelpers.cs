@@ -40,7 +40,7 @@ public partial class XboxTests
 
     private static XboxHandler SetupHandler(InMemoryFileSystem fs, AbsolutePath appFolder)
     {
-        fs.AddDirectory(fs.FromFullPath("/"));
+        fs.AddDirectory(OperatingSystem.IsLinux() ? fs.FromFullPath("/") : fs.FromFullPath("C:\\"));
 
         var gamingRootFileContents = CreateGamingRootFile(new[] { appFolder });
         var gamingRootFilePath = fs
