@@ -89,6 +89,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexusMods.Paths.TestingHelp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexusMods.Paths.Tests", "extern\NexusMods.App\tests\NexusMods.Paths.Tests\NexusMods.Paths.Tests.csproj", "{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.StoreHandlers.Xbox", "src\GameFinder.StoreHandlers.Xbox\GameFinder.StoreHandlers.Xbox.csproj", "{2F75FCA7-DCE5-4162-B2AE-24994D14FC03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFinder.StoreHandlers.Xbox.Tests", "tests\GameFinder.StoreHandlers.Xbox.Tests\GameFinder.StoreHandlers.Xbox.Tests.csproj", "{7D04AF8D-E8AE-44DB-AB36-5452594DC789}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +187,14 @@ Global
 		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F75FCA7-DCE5-4162-B2AE-24994D14FC03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F75FCA7-DCE5-4162-B2AE-24994D14FC03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F75FCA7-DCE5-4162-B2AE-24994D14FC03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F75FCA7-DCE5-4162-B2AE-24994D14FC03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D04AF8D-E8AE-44DB-AB36-5452594DC789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D04AF8D-E8AE-44DB-AB36-5452594DC789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D04AF8D-E8AE-44DB-AB36-5452594DC789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D04AF8D-E8AE-44DB-AB36-5452594DC789}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{58A62CC7-4A61-4218-9F93-CE85FDF00E15} = {B765999C-AB3D-495F-9F5E-9108F2D4FE33}
@@ -210,5 +222,7 @@ Global
 		{A82FD5DF-1E82-4755-B10B-C1207FD24129} = {98904D69-42EC-4E1D-AFD8-E502E3C3CE6F}
 		{8AD8AF6B-5615-4D9F-BEED-99DAC5A7F50C} = {98904D69-42EC-4E1D-AFD8-E502E3C3CE6F}
 		{22B2CE9B-089B-418C-AEF9-5EDA9E96AD02} = {98904D69-42EC-4E1D-AFD8-E502E3C3CE6F}
+		{2F75FCA7-DCE5-4162-B2AE-24994D14FC03} = {B765999C-AB3D-495F-9F5E-9108F2D4FE33}
+		{7D04AF8D-E8AE-44DB-AB36-5452594DC789} = {9C6671E1-A94D-4C76-9F61-78B491A62408}
 	EndGlobalSection
 EndGlobal

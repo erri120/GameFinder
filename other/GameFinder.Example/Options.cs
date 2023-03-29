@@ -19,6 +19,9 @@ public class Options
     [Option("ea_desktop", HelpText = "Search for EA Desktop games")]
     public bool EADesktop { get; set; } = true;
 
+    [Option("xbox", HelpText = "Search for Xbox Games Pass games")]
+    public bool Xbox { get; set; } = true;
+
     [Option("wine", HelpText = "Search for wine prefixes")]
     public bool Wine { get; set; } = true;
 
