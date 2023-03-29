@@ -5,6 +5,7 @@
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.GOG\GameFinder.StoreHandlers.GOG.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.Origin\GameFinder.StoreHandlers.Origin.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.Steam\GameFinder.StoreHandlers.Steam.csproj" />
+        <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.Xbox\GameFinder.StoreHandlers.Xbox.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.Wine\GameFinder.Wine.csproj" />
     </ItemGroup>
 

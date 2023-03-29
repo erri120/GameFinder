@@ -72,12 +72,12 @@ public abstract class AWinePrefix
             .CombineUnchecked("Users")
             .CombineUnchecked(Environment.GetEnvironmentVariable("USER")!);
 
-        var pathMappings = BaseFileSystem.CreateWinePathMappings(
+        var (pathMappings, knownPathMappings) = BaseFileSystem.CreateWinePathMappings(
             fileSystem,
             rootDirectory,
             newHomeDirectory);
 
-        return fileSystem.CreateOverlayFileSystem(pathMappings, convertCrossPlatformPaths: true);
+        return fileSystem.CreateOverlayFileSystem(pathMappings, knownPathMappings, convertCrossPlatformPaths: true);
     }
 
     /// <summary>

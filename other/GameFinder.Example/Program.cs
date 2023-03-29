@@ -13,6 +13,7 @@ using GameFinder.StoreHandlers.EGS;
 using GameFinder.StoreHandlers.GOG;
 using GameFinder.StoreHandlers.Origin;
 using GameFinder.StoreHandlers.Steam;
+using GameFinder.StoreHandlers.Xbox;
 using GameFinder.Wine;
 using GameFinder.Wine.Bottles;
 using Microsoft.Extensions.Logging;
@@ -89,6 +90,7 @@ public static class Program
             if (options.GOG) RunGOGHandler(windowsRegistry, realFileSystem, logger);
             if (options.EGS) RunEGSHandler(windowsRegistry, realFileSystem, logger);
             if (options.Origin) RunOriginHandler(realFileSystem, logger);
+            if (options.Xbox) RunXboxHandler(realFileSystem, logger);
             if (options.EADesktop)
             {
                 var hardwareInfoProvider = new HardwareInfoProvider();
@@ -125,6 +127,7 @@ public static class Program
                 if (options.GOG) RunGOGHandler(wineRegistry, wineFileSystem, logger);
                 if (options.EGS) RunEGSHandler(wineRegistry, wineFileSystem, logger);
                 if (options.Origin) RunOriginHandler(wineFileSystem, logger);
+                if (options.Xbox) RunXboxHandler(wineFileSystem, logger);
             }
         }
     }
@@ -154,6 +157,12 @@ public static class Program
         ILogger logger)
     {
         var handler = new EADesktopHandler(fileSystem, hardwareInfoProvider);
+        LogGamesAndErrors(handler.FindAllGames(), logger);
+    }
+
+    private static void RunXboxHandler(IFileSystem fileSystem, ILogger logger)
+    {
+        var handler = new XboxHandler(fileSystem);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
