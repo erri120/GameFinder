@@ -52,7 +52,8 @@ public class XboxHandler : AHandler<XboxGame, string>
                 if (game is not null)
                 {
                     yield return Result.FromGame(game);
-                } else if (error is not null)
+                }
+                else if (error is not null)
                 {
                     yield return Result.FromError<XboxGame>(error);
                 }
