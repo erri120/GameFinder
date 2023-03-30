@@ -4,6 +4,10 @@
         <PackageTags>gog gog-galaxy games</PackageTags>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IsTrimmable>true</IsTrimmable>
+    </PropertyGroup>
+
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.GOG.xml</DocumentationFile>
     </PropertyGroup>
