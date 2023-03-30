@@ -1,6 +1,6 @@
 <Project>
     <ItemGroup>
-        <PackageReference Include="System.IO.Abstractions" Version="19.2.1" />
+        <PackageReference Include="System.IO.Abstractions" Version="19.2.4" />
     </ItemGroup>
 
     <ItemGroup>
