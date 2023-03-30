@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="OneOf" Version="3.0.223" />
+        <PackageReference Include="OneOf" Version="3.0.243" />
         <PackageReference Include="Vogen" Version="3.0.12" />
     </ItemGroup>
 
