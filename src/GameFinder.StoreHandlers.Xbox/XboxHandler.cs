@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
@@ -39,14 +40,32 @@ public class XboxHandler : AHandler<XboxGame, string>
             yield return Result.FromError<XboxGame>(error);
         }
 
+        if (paths.Count == 0)
+        {
+            yield return Result.FromError<XboxGame>("Unable to find any app folders!");
+        }
+
         foreach (var path in paths)
         {
             if (!_fileSystem.DirectoryExists(path)) continue;
-            var directories = _fileSystem.EnumerateDirectories(path, recursive: false);
+            var directories = _fileSystem
+                .EnumerateDirectories(path, recursive: false)
+                .ToArray();
+
+            if (directories.Length == 0)
+            {
+                yield return Result.FromError<XboxGame>($"App folder {path} does not contain any sub directories!");
+                continue;
+            }
+
             foreach (var directory in directories)
             {
-                var appManifestFilePath = directory.CombineUnchecked("appmanifest.xml");
-                if (!_fileSystem.FileExists(appManifestFilePath)) continue;
+                var appManifestFilePath = directory.CombineUnchecked("appxmanifest.xml");
+                if (!_fileSystem.FileExists(appManifestFilePath))
+                {
+                    yield return Result.FromError<XboxGame>($"Manifest file {appManifestFilePath} does not exist!");
+                    continue;
+                }
 
                 var (game, error) = ParseAppManifest(_fileSystem, appManifestFilePath);
                 if (game is not null)
@@ -75,15 +94,29 @@ public class XboxHandler : AHandler<XboxGame, string>
         var paths = new List<AbsolutePath>();
         var errors = new List<string>();
 
-        var programFilesDirectory = fileSystem.GetKnownPath(KnownPath.ProgramFilesDirectory);
-        if (programFilesDirectory != default)
-            paths.Add(programFilesDirectory.CombineUnchecked("ModifiableWindowsApps"));
-
         foreach (var rootDirectory in fileSystem.EnumerateRootDirectories())
         {
+            if (!fileSystem.DirectoryExists(rootDirectory)) continue;
+
+            var modifiableWindowsAppsPath = rootDirectory
+                .CombineUnchecked("Program Files")
+                .CombineUnchecked("ModifiableWindowsApps");
+
             var gamingRootFilePath = rootDirectory.CombineUnchecked(".GamingRoot");
 
-            if (!fileSystem.FileExists(gamingRootFilePath)) continue;
+            var modifiableWindowsAppsDirectoryExists = fileSystem.DirectoryExists(modifiableWindowsAppsPath);
+            var gamingRootFileExists = fileSystem.FileExists(gamingRootFilePath);
+
+            if (modifiableWindowsAppsDirectoryExists) paths.Add(modifiableWindowsAppsPath);
+
+            if (!modifiableWindowsAppsDirectoryExists && !gamingRootFileExists)
+            {
+                errors.Add($"Neither {modifiableWindowsAppsPath} nor {gamingRootFilePath} exist on the current drive.");
+                continue;
+            }
+
+            if (!gamingRootFileExists) continue;
+
             var (additionalPaths, error) = ParseGamingRootFile(fileSystem, gamingRootFilePath);
             if (additionalPaths is not null)
             {

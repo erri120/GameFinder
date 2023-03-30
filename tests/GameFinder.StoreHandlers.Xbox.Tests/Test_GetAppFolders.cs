@@ -6,19 +6,22 @@ namespace GameFinder.StoreHandlers.Xbox.Tests;
 public partial class XboxTests
 {
     [Theory, AutoFileSystem]
-    public void Test_GetAppFolders(InMemoryFileSystem fs, AbsolutePath programFilesDirectory)
+    public void Test_GetAppFolders(InMemoryFileSystem fs)
     {
-        var overlayFileSystem = fs.CreateOverlayFileSystem(new Dictionary<AbsolutePath, AbsolutePath>(),
-            new Dictionary<KnownPath, AbsolutePath>
+        var expectedPaths = fs
+            .EnumerateRootDirectories()
+            .Select(rootDirectory =>
             {
-                { KnownPath.ProgramFilesDirectory, programFilesDirectory },
-            });
+                var modifiableWindowsAppsPath = rootDirectory
+                    .CombineUnchecked("Program Files")
+                    .CombineUnchecked("ModifiableWindowsApps");
+                fs.AddDirectory(modifiableWindowsAppsPath);
+                return modifiableWindowsAppsPath;
+            })
+            .ToArray();
 
-        var expectedPath = programFilesDirectory.CombineUnchecked("ModifiableWindowsApps");
-        overlayFileSystem.CreateDirectory(expectedPath);
-
-        var (paths, errors) = XboxHandler.GetAppFolders(overlayFileSystem);
+        var (paths, errors) = XboxHandler.GetAppFolders(fs);
         errors.Should().BeEmpty();
-        paths.Should().ContainSingle(x => x == expectedPath);
+        paths.Should().BeEquivalentTo(expectedPaths);
     }
 }

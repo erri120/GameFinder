@@ -60,7 +60,7 @@ public partial class XboxTests
             .FromFactory<string, string>((id, displayName) =>
             {
                 var gamePath = appFolder.CombineUnchecked(id);
-                var appManifestPath = gamePath.CombineUnchecked("appmanifest.xml");
+                var appManifestPath = gamePath.CombineUnchecked("appxmanifest.xml");
                 var appManifestContents = CreateAppManifestFile(id, displayName);
 
                 fs.AddDirectory(gamePath);
