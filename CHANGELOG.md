@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## 3.0.0 - TBD
 
-This is a major release, featuring Wine, Bottles and Proton support for GOG, EGS and Origin. This release also replaces [`System.IO.Abstraction`](https://github.com/TestableIO/System.IO.Abstractions) with `NexusMods.Paths` from the new [Nexus Mods App](https://github.com/Nexus-Mods/NexusMods.App).
+This is a major release, featuring Wine, Bottles and Proton support for GOG, EGS and Origin. This release also replaces [`System.IO.Abstraction`](https://github.com/TestableIO/System.IO.Abstractions) with `NexusMods.Paths` from the new [Nexus Mods App](https://github.com/Nexus-Mods/NexusMods.App) and re-adds [Xbox Game Pass](./README.md#xbox-game-pass) support.
 
 **How to upgrade:**
 
@@ -18,7 +18,7 @@ For testing, you can either mock `NexusMods.Paths.IFileSystem`, or use `NexusMod
 
 **How to use with Wine on Linux**:
 
-See the updated [README](./README.md).
+See the updated [README](./README.md#wine).
 
 ## [Released]
 

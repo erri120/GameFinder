@@ -9,11 +9,11 @@
 - [Epic Games Store](#epic-games-store) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.EGS)](https://www.nuget.org/packages/GameFinder.StoreHandlers.EGS)
 - [Origin](#origin) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.Origin)](https://www.nuget.org/packages/GameFinder.StoreHandlers.Origin)
 - [EA Desktop](#ea-desktop) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.EADesktop)](https://www.nuget.org/packages/GameFinder.StoreHandlers.EADesktop)
+- [Xbox Game Pass](#xbox-game-pass) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.Xbox?color=red&label=deprecated)](https://www.nuget.org/packages/GameFinder.StoreHandlers.Xbox)
 
 The following launchers are not yet supported or support has been dropped:
 
 - [Bethesda.net](#bethesdanet) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.BethNet?color=red&label=deprecated)](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet)
-- [Xbox Game Pass](#xbox-game-pass) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.Xbox?color=red&label=deprecated)](https://www.nuget.org/packages/GameFinder.StoreHandlers.Xbox)
 
 If you are interested in understanding _how_ GameFinder finds these games, check [the wiki](https://github.com/erri120/GameFinder/wiki) for more information.
 
@@ -221,17 +221,41 @@ Dictionary<EADesktopGame, string> games = handler.FindAllGamesById(out string[] 
 EADesktopGame? game = handler.FindOneGameById("Origin.SFT.50.0000532", out string[] errors);
 ```
 
+### Xbox Game Pass
+
+This package used to be deprecated, but I've re-added support in GameFinder 3.0.0. Xbox Game Pass used to install games inside a `SYSTEM` protected folder, making modding not feasible for the average user. You can read more about this [here](https://github.com/Nexus-Mods/NexusMods.App/issues/175).
+
+Xbox Game Pass is only supported on Windows.
+
+**Usage:**
+
+```csharp
+var handler = new XboxHandler(FileSystem.Shared);
+
+// method 1: iterate over the game-error result
+foreach (var (game, error) in handler.FindAllGames())
+{
+    if (game is not null)
+    {
+        Console.WriteLine($"Found {game}");
+    }
+    else
+    {
+        Console.WriteLine($"Error: {error}");
+    }
+}
+
+// method 2: use the dictionary if you need to find games by id
+Dictionary<XboxGame, string> games = handler.FindAllGamesById(out string[] errors);
+
+// method 3: find a single game by id
+XboxGame? game = handler.FindOneGameById("Distractionware.DiceyDungeons", out string[] errors);
+```
+
 ### Bethesda.net
 
 [As of May 11, 2022, the Bethesda.net launcher is no longer in use](https://bethesda.net/en/article/2RXxG1y000NWupPalzLblG/sunsetting-the-bethesda-net-launcher-and-migrating-to-steam). The package [GameFinder.StoreHandlers.BethNet](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet/) has been deprecated and marked as _legacy_.
 
-### Xbox Game Pass
-
-The package [GameFinder.StoreHandlers.Xbox](https://www.nuget.org/packages/GameFinder.StoreHandlers.Xbox/) has been deprecated and marked as _legacy_. I no longer maintain this package because it never got used. I initially made GameFinder for [Wabbajack](https://github.com/wabbajack-tools/wabbajack) and other modding tools however, you can't mod games installed with the Xbox App on Windows. These games are installed as UWP apps, which makes them protected and hard to modify. Another issue is the fact that you can't distinguish between normal UWP apps and Xbox games, meaning your calculator will show up as an Xbox game.
-
-The final issue is related to actual code: in order to find all UWP apps I used the Windows SDK, which was a pain to integrate. The CI had to be on Windows, the .NET target framework had to be a Windows specific version (`net6.0-windows-XXXXXXXXXX`), and it was overall not nice to use.
-
-The package is still available on [NuGet](https://www.nuget.org/packages/GameFinder.StoreHandlers.BethNet/) and should still work, but it's marked as deprecated and won't receive any updates.
 
 ## Wine
 
