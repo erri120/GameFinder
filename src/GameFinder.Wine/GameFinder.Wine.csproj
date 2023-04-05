@@ -13,8 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="OneOf" Version="3.0.223" />
-        <PackageReference Include="Vogen" Version="3.0.12" />
+        <PackageReference Include="OneOf" Version="3.0.243" />
     </ItemGroup>
 
     <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
@@ -24,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
+        <ProjectReference Include="..\GameFinder.Common\GameFinder.Common.csproj" />
+        <ProjectReference Include="..\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
     </ItemGroup>
 </Project>
