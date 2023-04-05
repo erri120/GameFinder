@@ -50,7 +50,7 @@ foreach (var (game, error) in handler.FindAllGames())
 }
 
 // method 2: use the dictionary if you need to find games by id
-Dictionary<SteamGame, int> games = handler.FindAllGamesById(out string[] errors);
+Dictionary<SteamGame, SteamGameId> games = handler.FindAllGamesById(out string[] errors);
 
 // method 3: find a single game by id
 SteamGame? game = handler.FindOneGameById(570940, out string[] errors);
@@ -95,7 +95,7 @@ foreach (var (game, error) in handler.FindAllGames())
 }
 
 // method 2: use the dictionary if you need to find games by id
-Dictionary<GOGGame, long> games = handler.FindAllGamesById(out string[] errors);
+Dictionary<GOGGame, GOGGameId> games = handler.FindAllGamesById(out string[] errors);
 
 // method 3: find a single game by id
 GOGGame? game = handler.FindOneGameById(1971477531, out string[] errors);
@@ -140,7 +140,7 @@ foreach (var (game, error) in handler.FindAllGames())
 }
 
 // method 2: use the dictionary if you need to find games by id
-Dictionary<EGSGame, string> games = handler.FindAllGamesById(out string[] errors);
+Dictionary<EGSGame, EGSGameId> games = handler.FindAllGamesById(out string[] errors);
 
 // method 3: find a single game by id
 EGSGame? game = handler.FindOneGameById("3257e06c28764231acd93049f3774ed6", out string[] errors);
@@ -184,7 +184,7 @@ foreach (var (game, error) in handler.FindAllGames())
 }
 
 // method 2: use the dictionary if you need to find games by id
-Dictionary<OriginGame, string> games = handler.FindAllGamesById(out string[] errors);
+Dictionary<OriginGame, OriginGameId> games = handler.FindAllGamesById(out string[] errors);
 
 // method 3: find a single game by id
 OriginGame? game = handler.FindOneGameById("Origin.OFR.50.0001456", out string[] errors);
@@ -215,7 +215,7 @@ foreach (var (game, error) in handler.FindAllGames())
 }
 
 // method 2: use the dictionary if you need to find games by id
-Dictionary<EADesktopGame, string> games = handler.FindAllGamesById(out string[] errors);
+Dictionary<EADesktopGame, EADesktopGameId> games = handler.FindAllGamesById(out string[] errors);
 
 // method 3: find a single game by id
 EADesktopGame? game = handler.FindOneGameById("Origin.SFT.50.0000532", out string[] errors);
@@ -246,7 +246,7 @@ foreach (var (game, error) in handler.FindAllGames())
 }
 
 // method 2: use the dictionary if you need to find games by id
-Dictionary<XboxGame, string> games = handler.FindAllGamesById(out string[] errors);
+Dictionary<XboxGame, XboxGameId> games = handler.FindAllGamesById(out string[] errors);
 
 // method 3: find a single game by id
 XboxGame? game = handler.FindOneGameById("Distractionware.DiceyDungeons", out string[] errors);

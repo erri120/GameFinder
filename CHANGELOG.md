@@ -10,11 +10,20 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 This is a major release, featuring Wine, Bottles and Proton support for GOG, EGS and Origin. This release also replaces [`System.IO.Abstraction`](https://github.com/TestableIO/System.IO.Abstractions) with `NexusMods.Paths` from the new [Nexus Mods App](https://github.com/Nexus-Mods/NexusMods.App) and re-adds [Xbox Game Pass](./README.md#xbox-game-pass) support.
 
-**How to upgrade:**
+**Changes**:
+
+- re-added Xbox Game Pass
+- replaced `System.IO.Abstraction` with `NexusMods.Path.IFileSystem`
+- changed `AHandler<TGame, TId>` to require `TId : notnull`
+- changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen)
+
+**How to upgrade**:
 
 Store handlers, like `GOGHandler`, now require an implementation of `NexusMods.Paths.IFileSystem`, instead of `System.IO.Abstraction.IFileSystem`. You can use the shared instance at `NexusMods.Path.FileSystem.Shared`, if you want to use the real file system.
 
 For testing, you can either mock `NexusMods.Paths.IFileSystem`, or use `NexusMods.Paths.InMemoryFileSystem`. If you need to do more in-depth testing, you can also use the `NexusMods.Paths.TestingHelpers` package.
+
+Since `AHandler<TGame, TId>` has changed, you might need to update the constraints for `TId`, if you use generics. Simply add `where TId : notnull` to the constraints. All Ids have been replaced to using value objects. For example: instead of having `long id` for `GOGGame`, it's now `GOGGameId id`. You can still get the value using `id.Value`, which is still a `long`.
 
 **How to use with Wine on Linux**:
 
