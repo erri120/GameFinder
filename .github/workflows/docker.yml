@@ -1,0 +1,15 @@
+name: CI (container)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Run container
+        run: docker run --rm -v ${{ github.workspace }}:C:\app -w C:\app mcr.microsoft.com/dotnet/sdk:7.0 dotnet test
