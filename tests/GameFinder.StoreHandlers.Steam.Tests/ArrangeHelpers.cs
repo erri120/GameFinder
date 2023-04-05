@@ -45,7 +45,7 @@ public partial class SteamTests
     ""installdir""      ""{name}""
 }}");
 
-                return new SteamGame(appId, name, path);
+                return new SteamGame(SteamGameId.From(appId), name, path);
             })
             .OmitAutoProperties());
 
@@ -62,7 +62,7 @@ public partial class SteamTests
             .CombineUnchecked("compatdata")
             .CombineUnchecked(appId.ToString(CultureInfo.InvariantCulture));
 
-        var steamGame = new SteamGame(appId, name, gamePath);
+        var steamGame = new SteamGame(SteamGameId.From(appId), name, gamePath);
 
         var protonPrefix = steamGame.GetProtonPrefix();
         return (protonDirectory, protonPrefix);

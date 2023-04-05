@@ -11,18 +11,10 @@ using NexusMods.Paths;
 namespace GameFinder.StoreHandlers.Origin;
 
 /// <summary>
-/// Represents a game installed with Origin.
-/// </summary>
-/// <param name="Id"></param>
-/// <param name="InstallPath"></param>
-[PublicAPI]
-public record OriginGame(string Id, AbsolutePath InstallPath);
-
-/// <summary>
 /// Handler for finding games install with Origin.
 /// </summary>
 [PublicAPI]
-public class OriginHandler : AHandler<OriginGame, string>
+public class OriginHandler : AHandler<OriginGame, OriginGameId>
 {
     private readonly IFileSystem _fileSystem;
 
@@ -41,6 +33,12 @@ public class OriginHandler : AHandler<OriginGame, string>
             .CombineUnchecked("Origin")
             .CombineUnchecked("LocalContent");
     }
+
+    /// <inheritdoc/>
+    public override Func<OriginGame, OriginGameId> IdSelector => game => game.Id;
+
+    /// <inheritdoc/>
+    protected override IEqualityComparer<OriginGameId>? IdEqualityComparer => OriginGameIdComparer.Default;
 
     /// <inheritdoc/>
     public override IEnumerable<Result<OriginGame>> FindAllGames()
@@ -75,15 +73,6 @@ public class OriginHandler : AHandler<OriginGame, string>
         }
     }
 
-    /// <inheritdoc/>
-    public override IDictionary<string, OriginGame> FindAllGamesById(out string[] errors)
-    {
-        var (games, allErrors) = FindAllGames().SplitResults();
-        errors = allErrors;
-
-        return games.CustomToDictionary(game => game.Id, game => game, StringComparer.OrdinalIgnoreCase);
-    }
-
     private Result<OriginGame> ParseMfstFile(AbsolutePath filePath)
     {
         try
@@ -115,7 +104,7 @@ public class OriginHandler : AHandler<OriginGame, string>
                 .OrderByDescending(x => x.Length)
                 .First();
 
-            var game = new OriginGame(id, _fileSystem.FromFullPath(path));
+            var game = new OriginGame(OriginGameId.From(id), _fileSystem.FromFullPath(path));
             return Result.FromGame(game);
         }
         catch (Exception e)

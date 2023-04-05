@@ -25,7 +25,7 @@ public partial class OriginTests
         games.Should().HaveCount(1);
 
         var game = games[0];
-        game.Id.Should().Be(id);
+        game.Id.Should().Be(OriginGameId.From(id));
         game.InstallPath.Should().Be(installPath);
     }
 }

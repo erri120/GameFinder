@@ -19,6 +19,6 @@ public partial class EADesktopTests
     {
         var (handler, hardwareInfoProvider, dataFolder) = SetupHandler(fs);
         var expectedGames = SetupGames(fs, hardwareInfoProvider, dataFolder).ToArray();
-        handler.ShouldFindAllGamesById(expectedGames, game => game.SoftwareID);
+        handler.ShouldFindAllGamesById(expectedGames, game => game.EADesktopGameId);
     }
 }

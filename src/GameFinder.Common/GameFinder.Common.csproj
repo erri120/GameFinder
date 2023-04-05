@@ -14,4 +14,8 @@
     <ItemGroup>
         <InternalsVisibleTo Include="GameFinder.Common.Tests" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Vogen" Version="3.0.13" />
+    </ItemGroup>
 </Project>

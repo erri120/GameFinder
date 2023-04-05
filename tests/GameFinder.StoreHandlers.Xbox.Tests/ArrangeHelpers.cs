@@ -66,7 +66,7 @@ public partial class XboxTests
                 fs.AddDirectory(gamePath);
                 fs.AddFile(appManifestPath, appManifestContents);
 
-                var game = new XboxGame(id, displayName, gamePath);
+                var game = new XboxGame(XboxGameId.From(id), displayName, gamePath);
                 return game;
             })
             .OmitAutoProperties());

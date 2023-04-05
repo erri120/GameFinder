@@ -30,14 +30,14 @@ public static class AssertionHelpers
     }
 
     public static string ShouldOnlyBeOneError<TGame, TId>(
-        this AHandler<TGame, TId> handler) where TGame : class
+        this AHandler<TGame, TId> handler) where TGame : class where TId : notnull
     {
         var results = handler.FindAllGames().ToArray();
         return results.ShouldOnlyBeOneError();
     }
 
     public static void ShouldFindAllGames<TGame, TId>(this AHandler<TGame, TId> handler,
-        IEnumerable<TGame> expectedGames) where TGame : class
+        IEnumerable<TGame> expectedGames) where TGame : class where TId : notnull
     {
         var results = handler.FindAllGames().ToArray();
         var games = results.ShouldOnlyBeGames();
@@ -48,7 +48,7 @@ public static class AssertionHelpers
     public static void ShouldFindAllGamesById<TGame, TId>(
         this AHandler<TGame, TId> handler,
         ICollection<TGame> expectedGames,
-        Func<TGame, TId> keySelector) where TGame : class
+        Func<TGame, TId> keySelector) where TGame : class where TId : notnull
     {
         var results = handler.FindAllGamesById(out var errors);
         errors.Should().BeEmpty();

@@ -29,7 +29,7 @@ public partial class GOGTests
                 gameKey.AddValue("gameName", name);
                 gameKey.AddValue("path", path.GetFullPath());
 
-                return new GOGGame(id, name, path);
+                return new GOGGame(GOGGameId.From(id), name, path);
             })
             .OmitAutoProperties());
 

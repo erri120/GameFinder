@@ -14,7 +14,7 @@ namespace GameFinder.StoreHandlers.EADesktop;
 /// Handler for finding games installed with EA Desktop.
 /// </summary>
 [PublicAPI]
-public class EADesktopHandler : AHandler<EADesktopGame, string>
+public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
 {
     internal const string AllUsersFolderName = "530c11479fe252fc5aabc24935b9776d4900eb3ba58fdc271e0d6229413ad40e";
     internal const string InstallInfoFileName = "IS";
@@ -54,6 +54,12 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
     }
 
     /// <inheritdoc/>
+    protected override IEqualityComparer<EADesktopGameId> IdEqualityComparer => EADesktopGameIdComparer.Default;
+
+    /// <inheritdoc/>
+    public override Func<EADesktopGame, EADesktopGameId> IdSelector => game => game.EADesktopGameId;
+
+    /// <inheritdoc/>
     public override IEnumerable<Result<EADesktopGame>> FindAllGames()
     {
         var dataFolder = GetDataFolder(_fileSystem);
@@ -82,15 +88,6 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
         {
             yield return result;
         }
-    }
-
-    /// <inheritdoc/>
-    public override IDictionary<string, EADesktopGame> FindAllGamesById(out string[] errors)
-    {
-        var (games, allErrors) = FindAllGames().SplitResults();
-        errors = allErrors;
-
-        return games.CustomToDictionary(game => game.SoftwareID, game => game, StringComparer.OrdinalIgnoreCase);
     }
 
     internal static AbsolutePath GetDataFolder(IFileSystem fileSystem)
@@ -208,12 +205,12 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
     {
         var num = i.ToString(CultureInfo.InvariantCulture);
 
-        if (string.IsNullOrEmpty(installInfo.SoftwareID))
+        if (string.IsNullOrEmpty(installInfo.SoftwareId))
         {
             return Result.FromError<EADesktopGame>($"InstallInfo #{num} does not have the value \"softwareId\"");
         }
 
-        var softwareId = installInfo.SoftwareID;
+        var softwareId = installInfo.SoftwareId;
 
         if (string.IsNullOrEmpty(installInfo.BaseSlug))
         {
@@ -232,7 +229,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, string>
             baseInstallPath = baseInstallPath[..^1];
 
         var game = new EADesktopGame(
-            softwareId,
+            EADesktopGameId.From(softwareId),
             baseSlug,
             fileSystem.FromFullPath(baseInstallPath));
 

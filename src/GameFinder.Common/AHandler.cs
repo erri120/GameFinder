@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
@@ -11,7 +12,21 @@ namespace GameFinder.Common;
 [PublicAPI]
 public abstract class AHandler<TGame, TId>
     where TGame : class
+    where TId : notnull
 {
+    /// <summary>
+    /// Method that accepts a <typeparamref name="TGame"/> and returns the
+    /// <typeparamref name="TId"/> of it. This is useful for constructing
+    /// key-based data types like <see cref="IDictionary{TKey,TValue}"/>.
+    /// </summary>
+    public abstract Func<TGame, TId> IdSelector { get; }
+
+    /// <summary>
+    /// Custom equality comparer for <typeparamref name="TId"/>. This is useful
+    /// for constructing key-based data types like <see cref="IDictionary{TKey,TValue}"/>.
+    /// </summary>
+    protected abstract IEqualityComparer<TId>? IdEqualityComparer { get; }
+
     /// <summary>
     /// Finds all games installed with this store. The return type <see cref="Result{TGame}"/>
     /// will always be a non-null game or a non-null error message.
@@ -27,7 +42,13 @@ public abstract class AHandler<TGame, TId>
     /// <param name="errors"></param>
     /// <returns></returns>
     [MustUseReturnValue]
-    public abstract IDictionary<TId, TGame> FindAllGamesById(out string[] errors);
+    public IDictionary<TId, TGame> FindAllGamesById(out string[] errors)
+    {
+        var (games, allErrors) = FindAllGames().SplitResults();
+        errors = allErrors;
+
+        return games.CustomToDictionary(IdSelector, game => game, IdEqualityComparer ?? EqualityComparer<TId>.Default);
+    }
 
     /// <summary>
     /// Wrapper around <see cref="FindAllGamesById"/> if you just need to find one game.

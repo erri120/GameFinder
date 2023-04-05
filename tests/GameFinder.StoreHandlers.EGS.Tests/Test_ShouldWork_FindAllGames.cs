@@ -22,6 +22,6 @@ public partial class EGSTests
         var (handler, manifestDir) = SetupHandler(fs, registry);
         var expectedGames = SetupGames(fs, manifestDir).ToArray();
 
-        handler.ShouldFindAllGamesById(expectedGames, game => game.CatalogItemId);
+        handler.ShouldFindAllGamesById(expectedGames, game => game.EGSGameId);
     }
 }

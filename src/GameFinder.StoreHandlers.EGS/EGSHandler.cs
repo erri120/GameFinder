@@ -9,22 +9,13 @@ using NexusMods.Paths;
 
 namespace GameFinder.StoreHandlers.EGS;
 
-/// <summary>
-/// Represents a game installed with the Epic Games Store.
-/// </summary>
-/// <param name="CatalogItemId"></param>
-/// <param name="DisplayName"></param>
-/// <param name="InstallLocation"></param>
-[PublicAPI]
-public record EGSGame(string CatalogItemId, string DisplayName, AbsolutePath InstallLocation);
-
 record ManifestFile(string CatalogItemId, string DisplayName, string InstallLocation);
 
 /// <summary>
 /// Handler for finding games installed with the Epic Games Store.
 /// </summary>
 [PublicAPI]
-public class EGSHandler : AHandler<EGSGame, string>
+public class EGSHandler : AHandler<EGSGame, EGSGameId>
 {
     internal const string RegKey = @"Software\Epic Games\EOS";
     internal const string ModSdkMetadataDir = "ModSdkMetadataDir";
@@ -50,6 +41,12 @@ public class EGSHandler : AHandler<EGSGame, string>
     }
 
     /// <inheritdoc/>
+    protected override IEqualityComparer<EGSGameId> IdEqualityComparer => EGSGameIdComparer.Default;
+
+    /// <inheritdoc/>
+    public override Func<EGSGame, EGSGameId> IdSelector => game => game.EGSGameId;
+
+    /// <inheritdoc/>
     public override IEnumerable<Result<EGSGame>> FindAllGames()
     {
         var manifestDir = GetManifestDir();
@@ -73,15 +70,6 @@ public class EGSHandler : AHandler<EGSGame, string>
         {
             yield return DeserializeGame(itemFile);
         }
-    }
-
-    /// <inheritdoc/>
-    public override IDictionary<string, EGSGame> FindAllGamesById(out string[] errors)
-    {
-        var (games, allErrors) = FindAllGames().SplitResults();
-        errors = allErrors;
-
-        return games.CustomToDictionary(game => game.CatalogItemId, game => game, StringComparer.OrdinalIgnoreCase);
     }
 
     private Result<EGSGame> DeserializeGame(AbsolutePath itemFile)
@@ -114,7 +102,7 @@ public class EGSHandler : AHandler<EGSGame, string>
                 return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"InstallLocation\"");
             }
 
-            var res = new EGSGame(game.CatalogItemId, game.DisplayName, _fileSystem.FromFullPath(game.InstallLocation));
+            var res = new EGSGame(EGSGameId.From(game.CatalogItemId), game.DisplayName, _fileSystem.FromFullPath(game.InstallLocation));
             return Result.FromGame(res);
         }
         catch (Exception e)

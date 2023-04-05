@@ -15,7 +15,7 @@ public partial class XboxTests
         error.Should().BeNull();
         game.Should().NotBeNull();
 
-        game!.Id.Should().Be(id);
+        game!.Id.Should().Be(XboxGameId.From(id));
         game.DisplayName.Should().Be(displayName);
         game.Path.Should().Be(appManifestPath.Parent);
     }

@@ -25,7 +25,7 @@ public partial class OriginTests
                 var manifest = manifestDir.CombineUnchecked($"{id}.mfst");
 
                 fs.AddFile(manifest, $"?id={HttpUtility.UrlEncode(id)}&dipInstallPath={HttpUtility.UrlEncode(installPath.GetFullPath())}");
-                return new OriginGame(id, installPath);
+                return new OriginGame(OriginGameId.From(id), installPath);
             })
             .OmitAutoProperties());
 

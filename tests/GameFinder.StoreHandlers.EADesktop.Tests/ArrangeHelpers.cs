@@ -40,7 +40,7 @@ public partial class EADesktopTests
         fs.AddDirectory(installInfoFile.Parent);
 
         fixture.Customize<EADesktopGame>(composer => composer
-            .FromFactory<string, string>((softwareID, baseSlug) =>
+            .FromFactory<string, string>((softwareId, baseSlug) =>
             {
                 var baseInstallPath = fs
                     .GetKnownPath(KnownPath.TempDirectory)
@@ -53,7 +53,7 @@ public partial class EADesktopTests
                 fs.AddDirectory(baseInstallPath);
                 fs.AddFile(installerDataPath, "");
 
-                var game = new EADesktopGame(softwareID, baseSlug, baseInstallPath);
+                var game = new EADesktopGame(EADesktopGameId.From(softwareId), baseSlug, baseInstallPath);
                 return game;
             })
             .OmitAutoProperties());
@@ -64,7 +64,7 @@ public partial class EADesktopTests
         {
             BaseSlug = game.BaseSlug,
             BaseInstallPath = game.BaseInstallPath + "\\",
-            SoftwareID = game.SoftwareID,
+            SoftwareId = game.EADesktopGameId.Value,
         }).ToList();
 
         var installInfo = new InstallInfoFile

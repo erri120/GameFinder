@@ -6,7 +6,7 @@ namespace GameFinder.StoreHandlers.EADesktop.Tests;
 public partial class EADesktopTests
 {
     [Theory, AutoFileSystem]
-    public void Test_InstallInfoToGame(InMemoryFileSystem fileSystem, string baseSlug, string installCheck, string baseInstallPathName, string softwareID)
+    public void Test_InstallInfoToGame(InMemoryFileSystem fileSystem, string baseSlug, string installCheck, string baseInstallPathName, string softwareId)
     {
         var baseInstallPath = fileSystem.GetKnownPath(KnownPath.TempDirectory)
             .CombineUnchecked(baseInstallPathName);
@@ -16,7 +16,7 @@ public partial class EADesktopTests
             BaseSlug = baseSlug,
             InstallCheck = installCheck,
             BaseInstallPath = baseInstallPath.GetFullPath(),
-            SoftwareID = softwareID,
+            SoftwareId = softwareId,
         };
 
         var fs = new InMemoryFileSystem();

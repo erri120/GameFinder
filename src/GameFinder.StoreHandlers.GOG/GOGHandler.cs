@@ -10,19 +10,10 @@ using NexusMods.Paths;
 namespace GameFinder.StoreHandlers.GOG;
 
 /// <summary>
-/// Represents a game installed with GOG Galaxy.
-/// </summary>
-/// <param name="Id"></param>
-/// <param name="Name"></param>
-/// <param name="Path"></param>
-[PublicAPI]
-public record GOGGame(long Id, string Name, AbsolutePath Path);
-
-/// <summary>
 /// Handler for finding games installed with GOG Galaxy.
 /// </summary>
 [PublicAPI]
-public class GOGHandler : AHandler<GOGGame, long>
+public class GOGHandler : AHandler<GOGGame, GOGGameId>
 {
     internal const string GOGRegKey = @"Software\GOG.com\Games";
 
@@ -39,6 +30,12 @@ public class GOGHandler : AHandler<GOGGame, long>
         _registry = registry;
         _fileSystem = fileSystem;
     }
+
+    /// <inheritdoc/>
+    public override Func<GOGGame, GOGGameId> IdSelector => game => game.Id;
+
+    /// <inheritdoc/>
+    protected override IEqualityComparer<GOGGameId>? IdEqualityComparer => null;
 
     /// <inheritdoc/>
     public override IEnumerable<Result<GOGGame>> FindAllGames()
@@ -75,15 +72,6 @@ public class GOGHandler : AHandler<GOGGame, long>
         }
     }
 
-    /// <inheritdoc/>
-    public override IDictionary<long, GOGGame> FindAllGamesById(out string[] errors)
-    {
-        var (games, allErrors) = FindAllGames().SplitResults();
-        errors = allErrors;
-
-        return games.CustomToDictionary(game => game.Id, game => game);
-    }
-
     private Result<GOGGame> ParseSubKey(IRegistryKey gogKey, string subKeyName)
     {
         try
@@ -115,7 +103,7 @@ public class GOGHandler : AHandler<GOGGame, long>
             }
 
             path = path.Replace("\\\\", "\\", StringComparison.Ordinal);
-            var game = new GOGGame(id, name, _fileSystem.FromFullPath(path));
+            var game = new GOGGame(GOGGameId.From(id), name, _fileSystem.FromFullPath(path));
             return Result.FromGame(game);
         }
         catch (Exception e)

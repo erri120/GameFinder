@@ -18,7 +18,7 @@ namespace GameFinder.StoreHandlers.Xbox;
 /// Handler for finding games installed with Xbox Game Pass.
 /// </summary>
 [PublicAPI]
-public class XboxHandler : AHandler<XboxGame, string>
+public class XboxHandler : AHandler<XboxGame, XboxGameId>
 {
     private readonly IFileSystem _fileSystem;
 
@@ -30,6 +30,12 @@ public class XboxHandler : AHandler<XboxGame, string>
     {
         _fileSystem = fileSystem;
     }
+
+    /// <inheritdoc/>
+    public override Func<XboxGame, XboxGameId> IdSelector => game => game.Id;
+
+    /// <inheritdoc/>
+    protected override IEqualityComparer<XboxGameId> IdEqualityComparer => XboxGameIdComparer.Default;
 
     /// <inheritdoc/>
     public override IEnumerable<Result<XboxGame>> FindAllGames()
@@ -78,15 +84,6 @@ public class XboxHandler : AHandler<XboxGame, string>
                 }
             }
         }
-    }
-
-    /// <inheritdoc/>
-    public override IDictionary<string, XboxGame> FindAllGamesById(out string[] errors)
-    {
-        var (games, allErrors) = FindAllGames().SplitResults();
-        errors = allErrors;
-
-        return games.CustomToDictionary(game => game.Id, game => game);
     }
 
     internal static (List<AbsolutePath> paths, List<string> errors) GetAppFolders(IFileSystem fileSystem)
@@ -157,7 +154,7 @@ public class XboxHandler : AHandler<XboxGame, string>
 
             var displayName = appManifest.Properties.DisplayName;
             var id = appManifest.Identity.Name;
-            var game = new XboxGame(id, displayName, manifestFilePath.Parent);
+            var game = new XboxGame(XboxGameId.From(id), displayName, manifestFilePath.Parent);
             return Result.FromGame(game);
         }
         catch (Exception e)

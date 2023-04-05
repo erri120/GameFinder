@@ -18,7 +18,7 @@ internal class InstallInfo
     public string? BaseSlug { get; init; }
     public string? InstallCheck { get; init; }
     [JsonPropertyName("softwareId")]
-    public string? SoftwareID { get; init; }
+    public string? SoftwareId { get; init; }
 }
 
 [UsedImplicitly]

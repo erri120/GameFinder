@@ -17,7 +17,7 @@ namespace GameFinder.StoreHandlers.Steam;
 /// Handler for finding games installed with Steam.
 /// </summary>
 [PublicAPI]
-public class SteamHandler : AHandler<SteamGame, int>
+public class SteamHandler : AHandler<SteamGame, SteamGameId>
 {
     internal const string RegKey = @"Software\Valve\Steam";
 
@@ -78,6 +78,12 @@ public class SteamHandler : AHandler<SteamGame, int>
     }
 
     /// <inheritdoc/>
+    public override Func<SteamGame, SteamGameId> IdSelector => game => game.AppId;
+
+    /// <inheritdoc/>
+    protected override IEqualityComparer<SteamGameId>? IdEqualityComparer => null;
+
+    /// <inheritdoc/>
     public override IEnumerable<Result<SteamGame>> FindAllGames()
     {
         var (libraryFoldersFile, steamSearchError) = FindSteam();
@@ -117,15 +123,6 @@ public class SteamHandler : AHandler<SteamGame, int>
                 yield return ParseAppManifestFile(acfFile, libraryFolderPath);
             }
         }
-    }
-
-    /// <inheritdoc/>
-    public override IDictionary<int, SteamGame> FindAllGamesById(out string[] errors)
-    {
-        var (games, allErrors) = FindAllGames().SplitResults();
-        errors = allErrors;
-
-        return games.CustomToDictionary(game => game.AppId, game => game);
     }
 
     private (AbsolutePath libraryFoldersFile, string? error) FindSteam()
@@ -321,7 +318,7 @@ public class SteamHandler : AHandler<SteamGame, int>
                 .CombineUnchecked("common")
                 .CombineUnchecked(installDir);
 
-            var game = new SteamGame(appId, name, gamePath);
+            var game = new SteamGame(SteamGameId.From(appId), name, gamePath);
             return Result.FromGame(game);
         }
         catch (Exception e)

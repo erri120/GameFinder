@@ -11,7 +11,7 @@ namespace GameFinder.StoreHandlers.Steam;
 /// <param name="Name">Name of the game</param>
 /// <param name="Path">Absolute path to the game installation folder</param>
 [PublicAPI]
-public record SteamGame(int AppId, string Name, AbsolutePath Path)
+public record SteamGame(SteamGameId AppId, string Name, AbsolutePath Path)
 {
     /// <summary>
     /// Returns the absolute path of the manifest for this game.
@@ -19,7 +19,7 @@ public record SteamGame(int AppId, string Name, AbsolutePath Path)
     /// <returns></returns>
     public AbsolutePath GetManifestPath()
     {
-        var manifestName = $"{AppId.ToString(CultureInfo.InvariantCulture)}.acf";
+        var manifestName = $"{AppId.Value.ToString(CultureInfo.InvariantCulture)}.acf";
         return Path.Parent.Parent.CombineUnchecked(manifestName);
     }
 
@@ -33,7 +33,7 @@ public record SteamGame(int AppId, string Name, AbsolutePath Path)
             .Parent
             .Parent
             .CombineUnchecked("compatdata")
-            .CombineUnchecked(AppId.ToString(CultureInfo.InvariantCulture));
+            .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
 
         var configurationDirectory = protonDirectory.CombineUnchecked("pfx");
         return new ProtonWinePrefix(protonDirectory, configurationDirectory);
