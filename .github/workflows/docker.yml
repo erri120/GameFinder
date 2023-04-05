@@ -11,5 +11,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
       - name: Run container
-        run: docker run --rm -v ${{ github.workspace }}:C:\app -w C:\app mcr.microsoft.com/dotnet/sdk:7.0 powershell -Command "Get-ChildItem -Path C:\app -Recurse"
+        run: docker run --rm -v ${{ github.workspace }}:C:\app -w C:\app mcr.microsoft.com/dotnet/sdk:7.0 dotnet test
