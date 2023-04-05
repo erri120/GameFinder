@@ -30,6 +30,8 @@ namespace GameFinder.Example;
 
 public static class Program
 {
+    private static NLogLoggerProvider _provider = null!;
+
     public static void Main(string[] args)
     {
         var config = new LoggingConfiguration();
@@ -52,7 +54,7 @@ public static class Program
                 new ConsoleWordHighlightingRule("ERROR", ConsoleOutputColor.Red, ConsoleOutputColor.NoChange),
                 new ConsoleWordHighlightingRule("WARNING", ConsoleOutputColor.Yellow, ConsoleOutputColor.NoChange),
             },
-            Layout = "${longdate}|${level:uppercase=true}|${message:withexception=true}",
+            Layout = "${longdate}|${level:uppercase=true}|${logger}|${message:withexception=true}",
         };
 
         var fileTarget = new FileTarget("file")
@@ -64,8 +66,9 @@ public static class Program
         config.AddRuleForAllLevels(fileTarget);
 
         LogManager.Configuration = config;
+        _provider = new NLogLoggerProvider();
 
-        var logger = new NLogLoggerProvider().CreateLogger(nameof(Program));
+        var logger = _provider.CreateLogger(nameof(Program));
 
         Parser.Default
             .ParseArguments<Options>(args)
@@ -86,11 +89,11 @@ public static class Program
         {
 
             var windowsRegistry = new WindowsRegistry();
-            if (options.Steam) RunSteamHandler(realFileSystem, windowsRegistry, logger);
-            if (options.GOG) RunGOGHandler(windowsRegistry, realFileSystem, logger);
-            if (options.EGS) RunEGSHandler(windowsRegistry, realFileSystem, logger);
-            if (options.Origin) RunOriginHandler(realFileSystem, logger);
-            if (options.Xbox) RunXboxHandler(realFileSystem, logger);
+            if (options.Steam) RunSteamHandler(realFileSystem, windowsRegistry);
+            if (options.GOG) RunGOGHandler(windowsRegistry, realFileSystem);
+            if (options.EGS) RunEGSHandler(windowsRegistry, realFileSystem);
+            if (options.Origin) RunOriginHandler(realFileSystem);
+            if (options.Xbox) RunXboxHandler(realFileSystem);
             if (options.EADesktop)
             {
                 var hardwareInfoProvider = new HardwareInfoProvider();
@@ -98,25 +101,25 @@ public static class Program
                 var sDecryptionKey = Convert.ToHexString(decryptionKey).ToLower(CultureInfo.InvariantCulture);
                 logger.LogDebug("EA Decryption Key: {}", sDecryptionKey);
 
-                RunEADesktopHandler(realFileSystem, hardwareInfoProvider, logger);
+                RunEADesktopHandler(realFileSystem, hardwareInfoProvider);
             }
         }
 
         if (OperatingSystem.IsLinux())
         {
-            if (options.Steam) RunSteamHandler(realFileSystem, registry: null, logger);
+            if (options.Steam) RunSteamHandler(realFileSystem, registry: null);
             var winePrefixes = new List<AWinePrefix>();
 
             if (options.Wine)
             {
                 var prefixManager = new DefaultWinePrefixManager(realFileSystem);
-                winePrefixes.AddRange(LogWinePrefixes(prefixManager, logger));
+                winePrefixes.AddRange(LogWinePrefixes(prefixManager, _provider.CreateLogger("Wine")));
             }
 
             if (options.Bottles)
             {
                 var prefixManager = new BottlesWinePrefixManager(realFileSystem);
-                winePrefixes.AddRange(LogWinePrefixes(prefixManager, logger));
+                winePrefixes.AddRange(LogWinePrefixes(prefixManager, _provider.CreateLogger("Bottles")));
             }
 
             foreach (var winePrefix in winePrefixes)
@@ -124,50 +127,54 @@ public static class Program
                 var wineFileSystem = winePrefix.CreateOverlayFileSystem(realFileSystem);
                 var wineRegistry = winePrefix.CreateRegistry(realFileSystem);
 
-                if (options.GOG) RunGOGHandler(wineRegistry, wineFileSystem, logger);
-                if (options.EGS) RunEGSHandler(wineRegistry, wineFileSystem, logger);
-                if (options.Origin) RunOriginHandler(wineFileSystem, logger);
-                if (options.Xbox) RunXboxHandler(wineFileSystem, logger);
+                if (options.GOG) RunGOGHandler(wineRegistry, wineFileSystem);
+                if (options.EGS) RunEGSHandler(wineRegistry, wineFileSystem);
+                if (options.Origin) RunOriginHandler(wineFileSystem);
+                if (options.Xbox) RunXboxHandler(wineFileSystem);
             }
         }
     }
 
-    private static void RunGOGHandler(IRegistry registry, IFileSystem fileSystem, ILogger logger)
+    private static void RunGOGHandler(IRegistry registry, IFileSystem fileSystem)
     {
+        var logger = _provider.CreateLogger(nameof(GOGHandler));
         var handler = new GOGHandler(registry, fileSystem);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
-    private static void RunEGSHandler(IRegistry registry,
-        IFileSystem fileSystem, ILogger logger)
+    private static void RunEGSHandler(IRegistry registry, IFileSystem fileSystem)
     {
+        var logger = _provider.CreateLogger(nameof(EGSHandler));
         var handler = new EGSHandler(registry, fileSystem);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
-    private static void RunOriginHandler(IFileSystem fileSystem, ILogger logger)
+    private static void RunOriginHandler(IFileSystem fileSystem)
     {
+        var logger = _provider.CreateLogger(nameof(OriginHandler));
         var handler = new OriginHandler(fileSystem);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
     private static void RunEADesktopHandler(
         IFileSystem fileSystem,
-        IHardwareInfoProvider hardwareInfoProvider,
-        ILogger logger)
+        IHardwareInfoProvider hardwareInfoProvider)
     {
+        var logger = _provider.CreateLogger(nameof(EADesktopHandler));
         var handler = new EADesktopHandler(fileSystem, hardwareInfoProvider);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
-    private static void RunXboxHandler(IFileSystem fileSystem, ILogger logger)
+    private static void RunXboxHandler(IFileSystem fileSystem)
     {
+        var logger = _provider.CreateLogger(nameof(XboxHandler));
         var handler = new XboxHandler(fileSystem);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
-    private static void RunSteamHandler(IFileSystem fileSystem, IRegistry? registry, ILogger logger)
+    private static void RunSteamHandler(IFileSystem fileSystem, IRegistry? registry)
     {
+        var logger = _provider.CreateLogger(nameof(SteamHandler));
         var handler = new SteamHandler(fileSystem, registry);
         LogGamesAndErrors(handler.FindAllGames(), logger, game =>
         {
