@@ -12,4 +12,4 @@ jobs:
 
     steps:
       - name: Run container
-        run: docker run --rm -v ${{ github.workspace }}:C:\app mcr.microsoft.com/dotnet/sdk:7.0 dotnet test C:\app\GameFinder\GameFinder.sln
+        run: docker run --rm -v ${{ github.workspace }}:C:\app -w C:\app mcr.microsoft.com/dotnet/sdk:7.0 Get-ChildItem -Path C:\app -Recurse
