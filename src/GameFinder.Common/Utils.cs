@@ -50,7 +50,7 @@ public static class Utils
         }
 
         var rootLength = GetRootLength(sb, currentDirectorySeparator);
-        if (rootLength == 0 || rootLength != i + 1) return sb.ToString(0, i + 1);
+        if (rootLength == 0 || rootLength != i + 2) return sb.ToString(0, i + 1);
         return sb.ToString(0, rootLength);
     }
 
