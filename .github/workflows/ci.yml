@@ -46,3 +46,18 @@ jobs:
         fail_ci_if_error: false
         env_vars: OS
         flags: ${{ env.OS }}
+
+    - name: Publish (Linux)
+      if: runner.os == 'Linux'
+      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -r linux-x64 -o ${{ github.workspace }}/bin/${{ runner.os }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true
+
+    - name: Publish (Windows)
+      if: runner.os == 'Windows'
+      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -r win-x64 -o ${{ github.workspace }}/bin/${{ runner.os }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: GameFinder.Example-${{ runner.os }}-${{ github.sha }}
+        path: ${{ github.workspace }}/bin/${{ runner.os }}/GameFinder*
+        if-no-files-found: error
