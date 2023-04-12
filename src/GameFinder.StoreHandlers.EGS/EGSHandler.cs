@@ -7,6 +7,7 @@ using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using NexusMods.Paths;
+using OneOf;
 
 namespace GameFinder.StoreHandlers.EGS;
 
@@ -50,12 +51,12 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
     public override Func<EGSGame, EGSGameId> IdSelector => game => game.EGSGameId;
 
     /// <inheritdoc/>
-    public override IEnumerable<Result<EGSGame>> FindAllGames()
+    public override IEnumerable<OneOf<EGSGame, ErrorMessage>> FindAllGames()
     {
         var manifestDir = GetManifestDir();
         if (!_fileSystem.DirectoryExists(manifestDir))
         {
-            yield return Result.FromError<EGSGame>($"The manifest directory {manifestDir.GetFullPath()} does not exist!");
+            yield return new ErrorMessage($"The manifest directory {manifestDir.GetFullPath()} does not exist!");
             yield break;
         }
 
@@ -65,7 +66,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
 
         if (itemFiles.Length == 0)
         {
-            yield return Result.FromError<EGSGame>($"The manifest directory {manifestDir.GetFullPath()} does not contain any .item files");
+            yield return new ErrorMessage($"The manifest directory {manifestDir.GetFullPath()} does not contain any .item files");
             yield break;
         }
 
@@ -75,7 +76,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
         }
     }
 
-    private Result<EGSGame> DeserializeGame(AbsolutePath itemFile)
+    private OneOf<EGSGame, ErrorMessage> DeserializeGame(AbsolutePath itemFile)
     {
         using var stream = _fileSystem.ReadFile(itemFile);
 
@@ -85,24 +86,24 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
 
             if (game is null)
             {
-                return Result.FromError<EGSGame>($"Unable to deserialize file {itemFile.GetFullPath()}");
+                return new ErrorMessage($"Unable to deserialize file {itemFile.GetFullPath()}");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (game.CatalogItemId is null)
             {
-                return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"CatalogItemId\"");
+                return new ErrorMessage($"Manifest {itemFile.GetFullPath()} does not have a value \"CatalogItemId\"");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (game.DisplayName is null)
             {
-                return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"DisplayName\"");
+                return new ErrorMessage($"Manifest {itemFile.GetFullPath()} does not have a value \"DisplayName\"");
             }
 
             if (string.IsNullOrEmpty(game.InstallLocation))
             {
-                return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"InstallLocation\"");
+                return new ErrorMessage($"Manifest {itemFile.GetFullPath()} does not have a value \"InstallLocation\"");
             }
 
             var res = new EGSGame(
@@ -111,11 +112,11 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
                 _fileSystem.FromFullPath(SanitizeInputPath(game.InstallLocation))
             );
 
-            return Result.FromGame(res);
+            return res;
         }
         catch (Exception e)
         {
-            return Result.FromError<EGSGame>($"Unable to deserialize file {itemFile.GetFullPath()}:\n{e}");
+            return new ErrorMessage(e, $"Unable to deserialize file {itemFile.GetFullPath()}");
         }
     }
 

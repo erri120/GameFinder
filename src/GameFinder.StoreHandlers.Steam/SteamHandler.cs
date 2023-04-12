@@ -9,6 +9,7 @@ using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
 using NexusMods.Paths;
+using OneOf;
 using ValveKeyValue;
 
 namespace GameFinder.StoreHandlers.Steam;
@@ -84,19 +85,21 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
     protected override IEqualityComparer<SteamGameId>? IdEqualityComparer => null;
 
     /// <inheritdoc/>
-    public override IEnumerable<Result<SteamGame>> FindAllGames()
+    public override IEnumerable<OneOf<SteamGame, ErrorMessage>> FindAllGames()
     {
-        var (libraryFoldersFile, steamSearchError) = FindSteam();
-        if (libraryFoldersFile == default)
+        var steamSearchResult = FindSteam();
+        if (steamSearchResult.TryGetError(out var error))
         {
-            yield return Result.FromError<SteamGame>(steamSearchError ?? "Unable to find Steam!");
+            yield return error;
             yield break;
         }
+
+        var libraryFoldersFile = steamSearchResult.AsT0;
 
         var libraryFolderPaths = ParseLibraryFoldersFile(libraryFoldersFile);
         if (libraryFolderPaths is null || libraryFolderPaths.Count == 0)
         {
-            yield return Result.FromError<SteamGame>($"Found no Steam Libraries in {libraryFoldersFile}");
+            yield return new ErrorMessage($"Found no Steam Libraries in {libraryFoldersFile}");
             yield break;
         }
 
@@ -104,7 +107,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         {
             if (!_fileSystem.DirectoryExists(libraryFolderPath))
             {
-                yield return Result.FromError<SteamGame>($"Steam Library {libraryFolderPath} does not exist!");
+                yield return new ErrorMessage($"Steam Library {libraryFolderPath} does not exist!");
                 continue;
             }
 
@@ -114,7 +117,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
             if (acfFiles.Length == 0)
             {
-                yield return Result.FromError<SteamGame>($"Library folder {libraryFolderPath} does not contain any manifests");
+                yield return new ErrorMessage($"Library folder {libraryFolderPath} does not contain any manifests");
                 continue;
             }
 
@@ -125,11 +128,11 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         }
     }
 
-    private (AbsolutePath libraryFoldersFile, string? error) FindSteam()
+    private OneOf<AbsolutePath, ErrorMessage> FindSteam()
     {
         if (_customSteamPath != default)
         {
-            return (GetLibraryFoldersFile(_customSteamPath), null);
+            return GetLibraryFoldersFile(_customSteamPath);
         }
 
         try
@@ -143,36 +146,36 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
             if (libraryFoldersFile != default)
             {
-                return (libraryFoldersFile, null);
+                return libraryFoldersFile;
             }
 
             if (_registry is null)
             {
-                return (default, "Unable to find Steam in one of the default paths");
+                return new ErrorMessage("Unable to find Steam in one of the default paths");
             }
 
             var steamDir = FindSteamInRegistry(_registry);
             if (steamDir == default)
             {
-                return (default, "Unable to find Steam in the registry and one of the default paths");
+                return new ErrorMessage("Unable to find Steam in the registry and one of the default paths");
             }
 
             if (!_fileSystem.DirectoryExists(steamDir))
             {
-                return (default, $"Unable to find Steam in one of the default paths and the path from the registry does not exist: {steamDir}");
+                return new ErrorMessage($"Unable to find Steam in one of the default paths and the path from the registry does not exist: {steamDir}");
             }
 
             libraryFoldersFile = GetLibraryFoldersFile(steamDir);
             if (!_fileSystem.DirectoryExists(libraryFoldersFile))
             {
-                return (default, $"Unable to find Steam in one of the default paths and the path from the registry is not a valid Steam installation because {libraryFoldersFile} does not exist");
+                return new ErrorMessage($"Unable to find Steam in one of the default paths and the path from the registry is not a valid Steam installation because {libraryFoldersFile} does not exist");
             }
 
-            return (libraryFoldersFile, null);
+            return libraryFoldersFile;
         }
         catch (Exception e)
         {
-            return (default, $"Exception while searching for Steam:\n{e}");
+            return new ErrorMessage(e, "Exception while searching for Steam");
         }
     }
 
@@ -278,7 +281,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         }
     }
 
-    private Result<SteamGame> ParseAppManifestFile(AbsolutePath manifestFile, AbsolutePath libraryFolder)
+    private OneOf<SteamGame, ErrorMessage> ParseAppManifestFile(AbsolutePath manifestFile, AbsolutePath libraryFolder)
     {
         try
         {
@@ -289,25 +292,25 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
             if (!data.Name.Equals("AppState", StringComparison.OrdinalIgnoreCase))
             {
-                return Result.FromError<SteamGame>($"Manifest {manifestFile.GetFullPath()} is not a valid format!");
+                return new ErrorMessage($"Manifest {manifestFile.GetFullPath()} is not a valid format!");
             }
 
             var appIdValue = data["appid"];
             if (appIdValue is null)
             {
-                return Result.FromError<SteamGame>($"Manifest {manifestFile.GetFullPath()} does not have the value \"appid\"");
+                return new ErrorMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"appid\"");
             }
 
             var nameValue = data["name"];
             if (nameValue is null)
             {
-                return Result.FromError<SteamGame>($"Manifest {manifestFile.GetFullPath()} does not have the value \"name\"");
+                return new ErrorMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"name\"");
             }
 
             var installDirValue = data["installdir"];
             if (installDirValue is null)
             {
-                return Result.FromError<SteamGame>($"Manifest {manifestFile.GetFullPath()} does not have the value \"installdir\"");
+                return new ErrorMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"installdir\"");
             }
 
             var appId = appIdValue.ToInt32(NumberFormatInfo.InvariantInfo);
@@ -319,11 +322,11 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
                 .CombineUnchecked(installDir);
 
             var game = new SteamGame(SteamGameId.From(appId), name, gamePath);
-            return Result.FromGame(game);
+            return game;
         }
         catch (Exception e)
         {
-            return Result.FromException<SteamGame>($"Exception while parsing file {manifestFile.GetFullPath()}", e);
+            return new ErrorMessage(e, $"Exception while parsing file {manifestFile.GetFullPath()}");
         }
     }
 }

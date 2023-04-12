@@ -1,4 +1,3 @@
-using BenchmarkDotNet.Running;
-using GameFinder.Benchmarks;
+using System;
 
-BenchmarkRunner.Run<LinqBenchmarks>();
+Console.WriteLine("Nothing to see.");

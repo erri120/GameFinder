@@ -21,6 +21,86 @@ Additionally, the following Linux tools are supported:
 
 - [Wine](#wine) [![Nuget](https://img.shields.io/nuget/v/GameFinder.Wine)](https://www.nuget.org/packages/GameFinder.Wine)
 
+## Usage
+
+All store handlers inherit from `AHandler<TGame, TId>` and implement `FindAllGames()` which returns `IEnumerable<OneOf<TGame, ErrorMessage>>`. The [`OneOf`](https://github.com/mcintyre321/OneOf) struct is a F# style union and is guaranteed to only contain _one of_ the following: a `TGame` or an `ErrorMessage`. I recommended checking out the [OneOf library](https://github.com/mcintyre321/OneOf), if you want to learn more.
+
+Some **important** things to remember:
+
+- All store handler methods are _pure_, meaning they do not change the internal state of the store handler because they don't have any. This also means that the **results are not cached** and you **shouldn't call the same method multiple times**. It's up to the library consumer to cache the results somewhere.
+- Ids are **store dependent**. Each store handler has their own type of id and figuring out the right id for your game might require some testing. You can find useful resources in this README for some store handlers.
+
+### Basic Usage
+
+```csharp
+var results = handler.FindAllGames();
+
+foreach (var result in results)
+{
+    // using the switch method
+    result.Switch(game =>
+    {
+        Console.WriteLine($"Found {game}");
+    }, error =>
+    {
+        Console.WriteLine(error);
+    });
+
+    // using the provided extension functions
+    if (result.TryGetGame(out var game))
+    {
+        Console.WriteLine($"Found {game}");
+    } else
+    {
+        Console.WriteLine(result.AsError());
+    }
+}
+```
+
+### Finding a single game
+
+If you're working on an application that only needs to find **1** game, then you can use the `FindOneGameById` method instead. **IMPORTANT NOTE:** the store handlers **do not cache the result**. If you call this method multiple, the store handler will do the same thing multiple times, which is search for every game installed. Do not call this method if you need to [find multiple games](#finding-multiple-games).
+
+```csharp
+var game = handler.FindOneGameById(someId, out var errors);
+
+// I highly recommend logging errors regardless of whether or not the game was found.
+foreach (var error in errors)
+{
+    Console.WriteLine(error);
+}
+
+if (game is null)
+{
+    Console.WriteLine("Unable to find game");
+} else
+{
+    Console.WriteLine($"Found {game}");
+}
+```
+
+### Finding multiple games
+
+If you need to find multiple games at once, you can use the `FindAllGamesById` method instead. This returns an `IDictionary<TId, TGame>` which you can use to lookup games by id. **IMPORTANT NOTE:** the store handlers **do not cache the result**. You have to do that yourself.
+
+```csharp
+var games = handler.FindAllGamesById(out var errors);
+
+// I highly recommend always logging errors.
+foreach (var error in errors)
+{
+    Console.WriteLine(error);
+}
+
+if (games.TryGetValue(someId, out var game))
+{
+    Console.WriteLine($"Found {game}");
+} else
+{
+    Console.WriteLine($"Unable to find game with the id {someId}");
+}
+```
+
 ## Supported Launchers
 
 ### Steam
@@ -31,29 +111,6 @@ Steam is supported natively on Windows and Linux. Use [SteamDB](https://steamdb.
 
 ```csharp
 var handler = new SteamHandler(FileSystem.Shared, OperatingSystem.IsWindows() ? new WindowsRegistry() : null);
-```
-
-**Usage (regardless of platform):**
-
-```csharp
-// method 1: iterate over the game-error result
-foreach (var (game, error) in handler.FindAllGames())
-{
-    if (game is not null)
-    {
-        Console.WriteLine($"Found {game}");
-    }
-    else
-    {
-        Console.WriteLine($"Error: {error}");
-    }
-}
-
-// method 2: use the dictionary if you need to find games by id
-Dictionary<SteamGame, SteamGameId> games = handler.FindAllGamesById(out string[] errors);
-
-// method 3: find a single game by id
-SteamGame? game = handler.FindOneGameById(570940, out string[] errors);
 ```
 
 ### GOG Galaxy
@@ -78,29 +135,6 @@ var wineRegistry = winePrefix.CreateRegistry(FileSystem.Shared);
 var handler = new GOGHandler(wineRegistry, wineFileSystem);
 ```
 
-**Usage (regardless of platform):**
-
-```csharp
-// method 1: iterate over the game-error result
-foreach (var (game, error) in handler.FindAllGames())
-{
-    if (game is not null)
-    {
-        Console.WriteLine($"Found {game}");
-    }
-    else
-    {
-        Console.WriteLine($"Error: {error}");
-    }
-}
-
-// method 2: use the dictionary if you need to find games by id
-Dictionary<GOGGame, GOGGameId> games = handler.FindAllGamesById(out string[] errors);
-
-// method 3: find a single game by id
-GOGGame? game = handler.FindOneGameById(1971477531, out string[] errors);
-```
-
 ### Epic Games Store
 
 The Epic Games Store is supported natively on Windows, and with [Wine](#wine) on Linux.
@@ -121,29 +155,6 @@ var wineFileSystem = winePrefix.CreateOverlayFileSystem(FileSystem.Shared);
 var wineRegistry = winePrefix.CreateRegistry(FileSystem.Shared);
 
 var handler = new EGSHandler(wineRegistry, wineFileSystem);
-```
-
-**Usage (regardless of platform):**
-
-```csharp
-// method 1: iterate over the game-error result
-foreach (var (game, error) in handler.FindAllGames())
-{
-    if (game is not null)
-    {
-        Console.WriteLine($"Found {game}");
-    }
-    else
-    {
-        Console.WriteLine($"Error: {error}");
-    }
-}
-
-// method 2: use the dictionary if you need to find games by id
-Dictionary<EGSGame, EGSGameId> games = handler.FindAllGamesById(out string[] errors);
-
-// method 3: find a single game by id
-EGSGame? game = handler.FindOneGameById("3257e06c28764231acd93049f3774ed6", out string[] errors);
 ```
 
 ### Origin
@@ -167,29 +178,6 @@ var wineFileSystem = winePrefix.CreateOverlayFileSystem(FileSystem.Shared);
 var handler = new OriginHandler(wineFileSystem);
 ```
 
-**Usage (regardless of platform):**
-
-```csharp
-// method 1: iterate over the game-error result
-foreach (var (game, error) in handler.FindAllGames())
-{
-    if (game is not null)
-    {
-        Console.WriteLine($"Found {game}");
-    }
-    else
-    {
-        Console.WriteLine($"Error: {error}");
-    }
-}
-
-// method 2: use the dictionary if you need to find games by id
-Dictionary<OriginGame, OriginGameId> games = handler.FindAllGamesById(out string[] errors);
-
-// method 3: find a single game by id
-OriginGame? game = handler.FindOneGameById("Origin.OFR.50.0001456", out string[] errors);
-```
-
 ### EA Desktop
 
 EA Desktop is the replacement for [Origin](#origin): See [EA is deprecating Origin](https://www.ea.com/en-gb/news/ea-app). This is by far, the most complicated Store Handler. **You should read the [wiki entry](https://github.com/erri120/GameFinder/wiki/EA-Desktop).** My implementation decrypts the encrypted file, created by EA Desktop. You should be aware that the key used to encrypt the file is derived from hardware information. If the user changes their hardware, the decryption process might fail because they key has changed.
@@ -200,25 +188,6 @@ EA Desktop is only supported on Windows.
 
 ```csharp
 var handler = new EADesktopHandler(FileSystem.Shared, new HardwareInfoProvider());
-
-// method 1: iterate over the game-error result
-foreach (var (game, error) in handler.FindAllGames())
-{
-    if (game is not null)
-    {
-        Console.WriteLine($"Found {game}");
-    }
-    else
-    {
-        Console.WriteLine($"Error: {error}");
-    }
-}
-
-// method 2: use the dictionary if you need to find games by id
-Dictionary<EADesktopGame, EADesktopGameId> games = handler.FindAllGamesById(out string[] errors);
-
-// method 3: find a single game by id
-EADesktopGame? game = handler.FindOneGameById("Origin.SFT.50.0000532", out string[] errors);
 ```
 
 ### Xbox Game Pass
@@ -231,25 +200,6 @@ Xbox Game Pass is only supported on Windows.
 
 ```csharp
 var handler = new XboxHandler(FileSystem.Shared);
-
-// method 1: iterate over the game-error result
-foreach (var (game, error) in handler.FindAllGames())
-{
-    if (game is not null)
-    {
-        Console.WriteLine($"Found {game}");
-    }
-    else
-    {
-        Console.WriteLine($"Error: {error}");
-    }
-}
-
-// method 2: use the dictionary if you need to find games by id
-Dictionary<XboxGame, XboxGameId> games = handler.FindAllGamesById(out string[] errors);
-
-// method 3: find a single game by id
-XboxGame? game = handler.FindOneGameById("Distractionware.DiceyDungeons", out string[] errors);
 ```
 
 ### Bethesda.net

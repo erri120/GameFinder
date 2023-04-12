@@ -22,6 +22,7 @@ using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
+using OneOf;
 using FileSystem = NexusMods.Paths.FileSystem;
 using IFileSystem = NexusMods.Paths.IFileSystem;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -83,11 +84,10 @@ public static class Program
         var logFile = realFileSystem.GetKnownPath(KnownPath.CurrentDirectory).CombineUnchecked("log.log");
         if (realFileSystem.FileExists(logFile)) realFileSystem.DeleteFile(logFile);
 
-        logger.LogInformation($"Operating System: {RuntimeInformation.OSDescription}");
+        logger.LogInformation("Operating System: {OSDescription}", RuntimeInformation.OSDescription);
 
         if (OperatingSystem.IsWindows())
         {
-
             var windowsRegistry = new WindowsRegistry();
             if (options.Steam) RunSteamHandler(realFileSystem, windowsRegistry);
             if (options.GOG) RunGOGHandler(windowsRegistry, realFileSystem);
@@ -194,31 +194,30 @@ public static class Program
         {
             result.Switch(prefix =>
             {
-                logger.LogInformation($"Found wine prefix at {prefix.ConfigurationDirectory}");
+                logger.LogInformation("Found wine prefix at {PrefixConfigurationDirectory}", prefix.ConfigurationDirectory);
                 res.Add(prefix);
             }, error =>
             {
-                logger.LogError(error.Value);
+                logger.LogError("{Error}", error.Value);
             });
         }
 
         return res;
     }
 
-    private static void LogGamesAndErrors<TGame>(IEnumerable<Result<TGame>> results, ILogger logger, Action<TGame>? action = null)
+    private static void LogGamesAndErrors<TGame>(IEnumerable<OneOf<TGame, ErrorMessage>> results, ILogger logger, Action<TGame>? action = null)
         where TGame : class
     {
-        foreach (var (game, error) in results)
+        foreach (var result in results)
         {
-            if (game is not null)
+            result.Switch(game =>
             {
-                logger.LogInformation("Found {}", game);
+                logger.LogInformation("Found {Game}", game);
                 action?.Invoke(game);
-            }
-            else
+            }, error =>
             {
-                logger.LogError("{}", error);
-            }
+                logger.LogError("{Error}", error);
+            });
         }
     }
 }

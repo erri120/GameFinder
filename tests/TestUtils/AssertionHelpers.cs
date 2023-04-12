@@ -1,35 +1,36 @@
 using FluentAssertions;
 using GameFinder.Common;
+using OneOf;
 
 namespace TestUtils;
 
 public static class AssertionHelpers
 {
-    public static IEnumerable<TGame> ShouldOnlyBeGames<TGame>(this ICollection<Result<TGame>> results)
+    public static IEnumerable<TGame> ShouldOnlyBeGames<TGame>(this ICollection<OneOf<TGame, ErrorMessage>> results)
         where TGame : class
     {
         results.Should().AllSatisfy(result =>
         {
-            result.Error.Should().BeNull();
-            result.Game.Should().NotBeNull();
+            result.IsGame().Should().BeTrue();
+            result.IsError().Should().BeFalse();
         });
 
-        return results.Select(result => result.Game!);
+        return results.Select(result => result.AsGame());
     }
 
-    private static string ShouldOnlyBeOneError<TGame>(
-        this ICollection<Result<TGame>> results) where TGame : class
+    private static ErrorMessage ShouldOnlyBeOneError<TGame>(
+        this ICollection<OneOf<TGame, ErrorMessage>> results) where TGame : class
     {
         results.Should().ContainSingle();
 
         var result = results.First();
-        result.Game.Should().BeNull();
-        result.Error.Should().NotBeNull();
+        result.IsError().Should().BeTrue();
+        result.IsGame().Should().BeFalse();
 
-        return result.Error!;
+        return result.AsError();
     }
 
-    public static string ShouldOnlyBeOneError<TGame, TId>(
+    public static ErrorMessage ShouldOnlyBeOneError<TGame, TId>(
         this AHandler<TGame, TId> handler) where TGame : class where TId : notnull
     {
         var results = handler.FindAllGames().ToArray();

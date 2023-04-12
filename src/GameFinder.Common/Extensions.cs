@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
+using OneOf;
 
 namespace GameFinder.Common;
 
@@ -12,60 +14,27 @@ namespace GameFinder.Common;
 public static class Extensions
 {
     /// <summary>
-    /// Only returns non-null games from the <see cref="Result{TGame}"/> and discards
-    /// the error messages.
-    /// </summary>
-    /// <param name="results"></param>
-    /// <typeparam name="TGame"></typeparam>
-    /// <returns></returns>
-    public static IEnumerable<TGame> OnlyGames<TGame>(
-        this IEnumerable<Result<TGame>> results)
-        where TGame : class
-    {
-        foreach (var result in results)
-        {
-            if (result.Game is not null)
-            {
-                yield return result.Game;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Only returns non-null error messages from the <see cref="Result{TGame}"/> and
-    /// discards the games.
-    /// </summary>
-    /// <param name="results"></param>
-    /// <typeparam name="TGame"></typeparam>
-    /// <returns></returns>
-    public static IEnumerable<string> OnlyErrors<TGame>(
-        this IEnumerable<Result<TGame>> results)
-        where TGame : class
-    {
-        foreach (var result in results)
-        {
-            if (result.Error is not null)
-            {
-                yield return result.Error;
-            }
-        }
-    }
-
-    /// <summary>
     /// Fully enumerates <paramref name="results"/> and splits the results into
     /// two separate arrays.
     /// </summary>
     /// <param name="results"></param>
     /// <typeparam name="TGame"></typeparam>
     /// <returns></returns>
-    public static (TGame[] games, string[] errors) SplitResults<TGame>(
-        [InstantHandle] this IEnumerable<Result<TGame>> results)
+    public static (TGame[] games, ErrorMessage[] errors) SplitResults<TGame>(
+        [InstantHandle] this IEnumerable<OneOf<TGame, ErrorMessage>> results)
         where TGame : class
     {
         var allResults = results.ToArray();
 
-        var games = allResults.OnlyGames().ToArray();
-        var errors = allResults.OnlyErrors().ToArray();
+        var games = allResults
+            .Where(x => x.IsT0)
+            .Select(x => x.AsT0)
+            .ToArray();
+
+        var errors = allResults
+            .Where(x => x.IsT1)
+            .Select(x => x.AsT1)
+            .ToArray();
 
         return (games, errors);
     }
@@ -98,5 +67,97 @@ public static class Extensions
         }
 
         return dictionary;
+    }
+
+    /// <summary>
+    /// Returns <c>true</c> if the result is of type <typeparamref name="TGame"/>.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <typeparam name="TGame"></typeparam>
+    /// <returns></returns>
+    public static bool IsGame<TGame>(this OneOf<TGame, ErrorMessage> result)
+        where TGame : class
+    {
+        return result.IsT0;
+    }
+
+    /// <summary>
+    /// Returns <c>true</c> if the result is of type <see cref="ErrorMessage"/>.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static bool IsError<T>(this OneOf<T, ErrorMessage> result)
+    {
+        return result.IsT1;
+    }
+
+    /// <summary>
+    /// Returns the <typeparamref name="TGame"/> part of the result. This can throw if
+    /// the result is not of type <typeparamref name="TGame"/>. Use <see cref="TryGetGame{TGame}"/>
+    /// instead.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <typeparam name="TGame"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the result is not of type <typeparamref name="TGame"/>.
+    /// </exception>
+    public static TGame AsGame<TGame>(this OneOf<TGame, ErrorMessage> result)
+        where TGame : class
+    {
+        return result.AsT0;
+    }
+
+    /// <summary>
+    /// Returns the <see cref="ErrorMessage"/> part of the result. This can
+    /// throw if the result is not of type <see cref="ErrorMessage"/>. Use
+    /// <see cref="TryGetError{T}"/> instead.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the result is not of type <see cref="ErrorMessage"/>.
+    /// </exception>
+    public static ErrorMessage AsError<T>(this OneOf<T, ErrorMessage> result)
+    {
+        return result.AsT1;
+    }
+
+    /// <summary>
+    /// Returns the <typeparamref name="TGame"/> part of the result using the try-get
+    /// pattern.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="game"></param>
+    /// <typeparam name="TGame"></typeparam>
+    /// <returns></returns>
+    public static bool TryGetGame<TGame>(this OneOf<TGame, ErrorMessage> result,
+        [MaybeNullWhen(false)] out TGame game)
+        where TGame : class
+    {
+        game = null;
+        if (!result.IsT0) return false;
+
+        game = result.AsT0;
+        return true;
+    }
+
+    /// <summary>
+    /// Returns the <see cref="ErrorMessage"/> part of the result using the
+    /// try-get pattern.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="error"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static bool TryGetError<T>(this OneOf<T, ErrorMessage> result, out ErrorMessage error)
+    {
+        error = default;
+        if (!result.IsT1) return false;
+
+        error = result.AsT1;
+        return true;
     }
 }

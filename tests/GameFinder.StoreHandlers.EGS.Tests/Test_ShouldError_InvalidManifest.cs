@@ -20,7 +20,7 @@ public partial class EGSTests
         fs.AddFile(manifestItem, randomBytes);
 
         var error = handler.ShouldOnlyBeOneError();
-        error.Should().StartWith($"Unable to deserialize file {manifestItem}:\n");
+        error.ToString().Should().StartWith($"Unable to deserialize file {manifestItem}:\n");
     }
 
     [Theory, AutoFileSystem]
