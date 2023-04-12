@@ -63,8 +63,8 @@ public readonly struct ErrorMessage
         return obj switch
         {
             null => false,
-            string s => Message.Equals(s, StringComparison.InvariantCulture),
-            ErrorMessage errorMessage => Message.Equals(errorMessage.Message, StringComparison.InvariantCulture),
+            string s => string.Equals(Message, s, StringComparison.InvariantCulture),
+            ErrorMessage errorMessage => string.Equals(Message, errorMessage.Message, StringComparison.InvariantCulture),
             _ => false
         };
     }
