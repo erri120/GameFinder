@@ -17,7 +17,7 @@ public class HandlerTests
     [InlineData("C:\\", "C:\\", false)]
     public void Test_SanitizeInputPath(string input, string expected, bool linux)
     {
-        Skip.If(OperatingSystem.IsLinux() && !linux);
+        Skip.IfNot(OperatingSystem.IsLinux() && linux);
 
         var actual = Utils.SanitizeInputPath(input);
         actual.Should().Be(expected);
