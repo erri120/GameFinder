@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using JetBrains.Annotations;
 
 namespace GameFinder.Common;
@@ -62,4 +63,7 @@ public abstract class AHandler<TGame, TId>
         var allGames = FindAllGamesById(out errors);
         return allGames.TryGetValue(id, out var game) ? game : null;
     }
+
+    /// <inheritdoc cref="Utils.SanitizeInputPath"/>
+    protected static string SanitizeInputPath(string input) => Utils.SanitizeInputPath(input);
 }

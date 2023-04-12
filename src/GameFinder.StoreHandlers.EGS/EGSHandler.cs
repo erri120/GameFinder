@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using GameFinder.Common;
@@ -9,12 +10,14 @@ using NexusMods.Paths;
 
 namespace GameFinder.StoreHandlers.EGS;
 
-record ManifestFile(string CatalogItemId, string DisplayName, string InstallLocation);
+[UsedImplicitly]
+internal record ManifestFile(string CatalogItemId, string DisplayName, string InstallLocation);
 
 /// <summary>
 /// Handler for finding games installed with the Epic Games Store.
 /// </summary>
 [PublicAPI]
+[RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(Stream, JsonSerializerOptions)")]
 public class EGSHandler : AHandler<EGSGame, EGSGameId>
 {
     internal const string RegKey = @"Software\Epic Games\EOS";
@@ -102,7 +105,12 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
                 return Result.FromError<EGSGame>($"Manifest {itemFile.GetFullPath()} does not have a value \"InstallLocation\"");
             }
 
-            var res = new EGSGame(EGSGameId.From(game.CatalogItemId), game.DisplayName, _fileSystem.FromFullPath(game.InstallLocation));
+            var res = new EGSGame(
+                EGSGameId.From(game.CatalogItemId),
+                game.DisplayName,
+                _fileSystem.FromFullPath(SanitizeInputPath(game.InstallLocation))
+            );
+
             return Result.FromGame(res);
         }
         catch (Exception e)
@@ -137,7 +145,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
             if (regKey is null || !regKey.TryGetString("ModSdkMetadataDir",
                     out var registryMetadataDir)) return false;
 
-            manifestDir = _fileSystem.FromFullPath(registryMetadataDir);
+            manifestDir = _fileSystem.FromFullPath(SanitizeInputPath(registryMetadataDir));
             return true;
 
         }

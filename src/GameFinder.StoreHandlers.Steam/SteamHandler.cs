@@ -185,7 +185,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
         if (!regKey.TryGetString("SteamPath", out var steamPath)) return default;
 
-        var directoryInfo = _fileSystem.FromFullPath(steamPath);
+        var directoryInfo = _fileSystem.FromFullPath(SanitizeInputPath(steamPath));
         return directoryInfo;
     }
 
@@ -266,7 +266,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
                 .Select(child => child["path"])
                 .Where(pathValue => pathValue is not null && pathValue.ValueType == KVValueType.String)
                 .Select(pathValue => pathValue.ToString(CultureInfo.InvariantCulture))
-                .Select(pathValue => _fileSystem.FromFullPath(pathValue))
+                .Select(pathValue => _fileSystem.FromFullPath(SanitizeInputPath(pathValue)))
                 .Select(pathValue => pathValue.CombineUnchecked("steamapps"))
                 .ToList();
 

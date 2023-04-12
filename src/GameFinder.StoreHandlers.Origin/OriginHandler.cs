@@ -38,7 +38,7 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
     public override Func<OriginGame, OriginGameId> IdSelector => game => game.Id;
 
     /// <inheritdoc/>
-    protected override IEqualityComparer<OriginGameId>? IdEqualityComparer => OriginGameIdComparer.Default;
+    protected override IEqualityComparer<OriginGameId> IdEqualityComparer => OriginGameIdComparer.Default;
 
     /// <inheritdoc/>
     public override IEnumerable<Result<OriginGame>> FindAllGames()
@@ -104,7 +104,11 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
                 .OrderByDescending(x => x.Length)
                 .First();
 
-            var game = new OriginGame(OriginGameId.From(id), _fileSystem.FromFullPath(path));
+            var game = new OriginGame(
+                OriginGameId.From(id),
+                _fileSystem.FromFullPath(SanitizeInputPath(path))
+            );
+
             return Result.FromGame(game);
         }
         catch (Exception e)

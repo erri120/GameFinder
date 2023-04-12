@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -14,6 +15,7 @@ namespace GameFinder.StoreHandlers.EADesktop;
 /// Handler for finding games installed with EA Desktop.
 /// </summary>
 [PublicAPI]
+[RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
 public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
 {
     internal const string AllUsersFolderName = "530c11479fe252fc5aabc24935b9776d4900eb3ba58fdc271e0d6229413ad40e";
@@ -225,13 +227,10 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         }
 
         var baseInstallPath = installInfo.BaseInstallPath;
-        if (baseInstallPath.EndsWith('\\'))
-            baseInstallPath = baseInstallPath[..^1];
-
         var game = new EADesktopGame(
             EADesktopGameId.From(softwareId),
             baseSlug,
-            fileSystem.FromFullPath(baseInstallPath));
+            fileSystem.FromFullPath(SanitizeInputPath(baseInstallPath)));
 
         return Result.FromGame(game);
     }

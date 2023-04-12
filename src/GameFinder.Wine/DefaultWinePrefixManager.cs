@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
 using OneOf;
@@ -82,13 +83,13 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
         var winePrefixEnvVariable = Environment.GetEnvironmentVariable("WINEPREFIX");
         if (winePrefixEnvVariable is not null)
         {
-            yield return fileSystem.FromFullPath(winePrefixEnvVariable);
+            yield return fileSystem.FromFullPath(Utils.SanitizeInputPath(winePrefixEnvVariable));
         }
 
         // WINEPREFIX0, WINEPREFIX1, ...
         foreach (var numberedEnvVariable in GetNumberedEnvironmentVariables())
         {
-            yield return fileSystem.FromFullPath(numberedEnvVariable);
+            yield return fileSystem.FromFullPath(Utils.SanitizeInputPath(numberedEnvVariable));
         }
 
         // Bottling standards: https://wiki.winehq.org/Bottling_Standards

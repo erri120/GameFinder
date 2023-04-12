@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace GameFinder.StoreHandlers.Xbox;
 /// Handler for finding games installed with Xbox Game Pass.
 /// </summary>
 [PublicAPI]
+[RequiresUnreferencedCode("Calls System.Xml.Serialization.XmlSerializer.Deserialize(XmlReader)")]
 public class XboxHandler : AHandler<XboxGame, XboxGameId>
 {
     private readonly IFileSystem _fileSystem;
