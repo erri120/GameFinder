@@ -14,6 +14,7 @@ This is a major release, featuring Wine, Bottles and Proton support for GOG, EGS
 
 - re-added Xbox Game Pass
 - replaced `System.IO.Abstraction` with `NexusMods.Path.IFileSystem`
+  - paths are now of type `AbsolutePath` instead of `string`
 - changed `AHandler<TGame, TId>` to require `TId : notnull`
 - changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen)
 
