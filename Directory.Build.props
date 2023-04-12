@@ -13,7 +13,8 @@
     <PropertyGroup>
         <!-- https://github.com/meziantou/Meziantou.Analyzer/tree/main/docs/Rules -->
         <!-- MA0048: File name must match type name -->
+        <!-- MA0051: Method is too long -->
         <!-- MA0097: A class that implements IComparable<T> or IComparable should override comparison operators -->
-        <NoWarn>MA0048,MA0097</NoWarn>
+        <NoWarn>MA0048,MA0051,MA0097</NoWarn>
     </PropertyGroup>
 </Project>
