@@ -8,17 +8,31 @@ The format is based on [Keep a Changelog][Keep a Changelog] and this project adh
 
 ## 3.0.0 - TBD
 
-This is a major release, featuring Wine, Bottles and Proton support for GOG, EGS and Origin. This release also replaces [`System.IO.Abstraction`](https://github.com/TestableIO/System.IO.Abstractions) with `NexusMods.Paths` from the new [Nexus Mods App](https://github.com/Nexus-Mods/NexusMods.App) and re-adds [Xbox Game Pass](./README.md#xbox-game-pass) support.
+This is a major release with big changes featuring Wine, Bottles and Proton support for GOG, EGS and Origin. This release also replaces [`System.IO.Abstraction`](https://github.com/TestableIO/System.IO.Abstractions) with `NexusMods.Paths` from the new [Nexus Mods App](https://github.com/Nexus-Mods/NexusMods.App), changes how results are handled and re-adds [Xbox Game Pass](./README.md#xbox-game-pass) support.
 
-**Changes**:
+**Breaking Changes**:
 
-- re-added Xbox Game Pass
+- updated `FindAllGames` to return `OneOf<TGame, ErrorMessage>` instead of `Result<TGame>` (using the [OneOf](https://github.com/mcintyre321/OneOf) library)
 - replaced `System.IO.Abstraction` with `NexusMods.Path.IFileSystem`
   - paths are now of type `AbsolutePath` instead of `string`
 - changed `AHandler<TGame, TId>` to require `TId : notnull`
+- removed the extension functions `OnlyGame` and `OnlyError`
 - changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen)
 
+**Other Changes**:
+
+- re-added Xbox Game Pass
+
 **How to upgrade**:
+
+The transition from `Result<TGame>` to `OneOf<TGame, ErrorMessage>` should be straight forward. You can use the provided helper methods for [matching](https://github.com/mcintyre321/OneOf#matching) like `result.Match(game => { }, error => { })` or `result.Switch(game => { }, error => { })` depending on your needs. I've also added some extension methods to make the transition easier:
+
+- `bool IsGame()`
+- `bool IsError()`
+- `TGame AsGame()`
+- `ErrorMessage AsError`
+- `bool TryGetGame(out TGame)`
+- `bool TryGetError(out ErrorMessage)`
 
 Store handlers, like `GOGHandler`, now require an implementation of `NexusMods.Paths.IFileSystem`, instead of `System.IO.Abstraction.IFileSystem`. You can use the shared instance at `NexusMods.Path.FileSystem.Shared`, if you want to use the real file system.
 

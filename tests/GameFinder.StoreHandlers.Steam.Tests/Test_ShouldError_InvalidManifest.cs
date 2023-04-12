@@ -24,7 +24,7 @@ public partial class SteamTests
 ");
 
         var error = handler.ShouldOnlyBeOneError();
-        error.Should().StartWith($"Exception while parsing file {manifest}:\nSystem.FormatException:");
+        error.ToString().Should().StartWith($"Exception while parsing file {manifest}:\nSystem.FormatException:");
     }
 
     [Theory, AutoFileSystem]
@@ -54,6 +54,6 @@ public partial class SteamTests
         fs.AddFile(manifest, randomBytes);
 
         var error = handler.ShouldOnlyBeOneError();
-        error.Should().StartWith($"Exception while parsing file {manifest}:\nValveKeyValue.KeyValueException:");
+        error.ToString().Should().StartWith($"Exception while parsing file {manifest}:\nValveKeyValue.KeyValueException:");
     }
 }

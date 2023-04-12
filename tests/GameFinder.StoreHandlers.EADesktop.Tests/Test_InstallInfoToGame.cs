@@ -20,8 +20,8 @@ public partial class EADesktopTests
         };
 
         var fs = new InMemoryFileSystem();
-        var (game, error) = EADesktopHandler.InstallInfoToGame(fs, installInfo, 0, fs.GetKnownPath(KnownPath.TempDirectory));
-        error.Should().BeNull();
-        game.Should().NotBeNull();
+        var result = EADesktopHandler.InstallInfoToGame(fs, installInfo, 0, fs.GetKnownPath(KnownPath.TempDirectory));
+        result.IsT0.Should().BeTrue();
+        result.IsT1.Should().BeFalse();
     }
 }

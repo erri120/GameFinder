@@ -15,10 +15,11 @@ public partial class XboxTests
         var bytes = CreateGamingRootFile(expectedFolders);
         fs.AddFile(gamingRootFile, bytes);
 
-        var (actualFolders, error) = XboxHandler.ParseGamingRootFile(fs, gamingRootFile);
-        error.Should().BeNull();
-        actualFolders.Should().NotBeNull();
+        var results = XboxHandler.ParseGamingRootFile(fs, gamingRootFile);
+        results.IsT0.Should().BeTrue();
+        results.IsT1.Should().BeFalse();
 
+        var actualFolders = results.AsT0;
         actualFolders!.Should().BeEquivalentTo(expectedFolders);
     }
 
@@ -34,9 +35,11 @@ public partial class XboxTests
 
         fs.AddFile(gamingRootFilePath, bytes);
 
-        var (actualFolders, error) = XboxHandler.ParseGamingRootFile(fs, gamingRootFilePath);
-        error.Should().BeNull();
-        actualFolders.Should().NotBeNull();
-        actualFolders!.Should().ContainSingle(x => x.FileName.Equals("XboxGames", StringComparison.Ordinal));
+        var results = XboxHandler.ParseGamingRootFile(fs, gamingRootFilePath);
+        results.IsT0.Should().BeTrue();
+        results.IsT1.Should().BeFalse();
+
+        var actualFolders = results.AsT0;
+        actualFolders.Should().ContainSingle(x => x.FileName.Equals("XboxGames", StringComparison.Ordinal));
     }
 }

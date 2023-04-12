@@ -12,10 +12,6 @@
         <DocumentationFile>bin\Release\GameFinder.Wine.xml</DocumentationFile>
     </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="OneOf" Version="3.0.243" />
-    </ItemGroup>
-
     <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <ItemGroup>

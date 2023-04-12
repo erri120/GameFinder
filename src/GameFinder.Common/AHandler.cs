@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using JetBrains.Annotations;
+using OneOf;
 
 namespace GameFinder.Common;
 
@@ -29,12 +29,11 @@ public abstract class AHandler<TGame, TId>
     protected abstract IEqualityComparer<TId>? IdEqualityComparer { get; }
 
     /// <summary>
-    /// Finds all games installed with this store. The return type <see cref="Result{TGame}"/>
-    /// will always be a non-null game or a non-null error message.
+    /// Finds all games installed with this store.
     /// </summary>
     /// <returns></returns>
     [MustUseReturnValue]
-    public abstract IEnumerable<Result<TGame>> FindAllGames();
+    public abstract IEnumerable<OneOf<TGame, ErrorMessage>> FindAllGames();
 
     /// <summary>
     /// Calls <see cref="FindAllGames"/> and converts the result into a dictionary where
@@ -43,7 +42,7 @@ public abstract class AHandler<TGame, TId>
     /// <param name="errors"></param>
     /// <returns></returns>
     [MustUseReturnValue]
-    public IDictionary<TId, TGame> FindAllGamesById(out string[] errors)
+    public IDictionary<TId, TGame> FindAllGamesById(out ErrorMessage[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
         errors = allErrors;
@@ -58,7 +57,7 @@ public abstract class AHandler<TGame, TId>
     /// <param name="errors"></param>
     /// <returns></returns>
     [MustUseReturnValue]
-    public TGame? FindOneGameById(TId id, out string[] errors)
+    public TGame? FindOneGameById(TId id, out ErrorMessage[] errors)
     {
         var allGames = FindAllGamesById(out errors);
         return allGames.TryGetValue(id, out var game) ? game : null;

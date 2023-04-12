@@ -11,11 +11,12 @@ public partial class XboxTests
         var xmlContents = CreateAppManifestFile(id, displayName);
         fs.AddFile(appManifestPath, xmlContents);
 
-        var (game, error) = XboxHandler.ParseAppManifest(fs, appManifestPath);
-        error.Should().BeNull();
-        game.Should().NotBeNull();
+        var result = XboxHandler.ParseAppManifest(fs, appManifestPath);
+        result.IsT0.Should().BeTrue();
+        result.IsT1.Should().BeFalse();
 
-        game!.Id.Should().Be(XboxGameId.From(id));
+        var game = result.AsT0;
+        game.Id.Should().Be(XboxGameId.From(id));
         game.DisplayName.Should().Be(displayName);
         game.Path.Should().Be(appManifestPath.Parent);
     }

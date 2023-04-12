@@ -12,6 +12,7 @@ using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
 using NexusMods.Paths.Extensions;
+using OneOf;
 
 namespace GameFinder.StoreHandlers.Xbox;
 
@@ -40,17 +41,17 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
     protected override IEqualityComparer<XboxGameId> IdEqualityComparer => XboxGameIdComparer.Default;
 
     /// <inheritdoc/>
-    public override IEnumerable<Result<XboxGame>> FindAllGames()
+    public override IEnumerable<OneOf<XboxGame, ErrorMessage>> FindAllGames()
     {
         var (paths, errors) = GetAppFolders(_fileSystem);
         foreach (var error in errors)
         {
-            yield return Result.FromError<XboxGame>(error);
+            yield return error;
         }
 
         if (paths.Count == 0)
         {
-            yield return Result.FromError<XboxGame>("Unable to find any app folders!");
+            yield return new ErrorMessage("Unable to find any app folders!");
         }
 
         foreach (var path in paths)
@@ -62,7 +63,7 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
 
             if (directories.Length == 0)
             {
-                yield return Result.FromError<XboxGame>($"App folder {path} does not contain any sub directories!");
+                yield return new ErrorMessage($"App folder {path} does not contain any sub directories!");
                 continue;
             }
 
@@ -71,27 +72,27 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
                 var appManifestFilePath = directory.CombineUnchecked("appxmanifest.xml");
                 if (!_fileSystem.FileExists(appManifestFilePath))
                 {
-                    yield return Result.FromError<XboxGame>($"Manifest file {appManifestFilePath} does not exist!");
+                    yield return new ErrorMessage($"Manifest file {appManifestFilePath} does not exist!");
                     continue;
                 }
 
-                var (game, error) = ParseAppManifest(_fileSystem, appManifestFilePath);
-                if (game is not null)
+                var result = ParseAppManifest(_fileSystem, appManifestFilePath);
+                if (result.TryGetGame(out var game))
                 {
-                    yield return Result.FromGame(game);
+                    yield return game;
                 }
-                else if (error is not null)
+                else
                 {
-                    yield return Result.FromError<XboxGame>(error);
+                    yield return result.AsError();
                 }
             }
         }
     }
 
-    internal static (List<AbsolutePath> paths, List<string> errors) GetAppFolders(IFileSystem fileSystem)
+    internal static (List<AbsolutePath> paths, List<ErrorMessage> errors) GetAppFolders(IFileSystem fileSystem)
     {
         var paths = new List<AbsolutePath>();
-        var errors = new List<string>();
+        var errors = new List<ErrorMessage>();
 
         foreach (var rootDirectory in fileSystem.EnumerateRootDirectories())
         {
@@ -116,21 +117,17 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
 
             if (!gamingRootFileExists) continue;
 
-            var (additionalPaths, error) = ParseGamingRootFile(fileSystem, gamingRootFilePath);
-            if (additionalPaths is not null)
-            {
-                paths.AddRange(additionalPaths);
-            }
-            else if (error is not null)
-            {
-                errors.Add(error);
-            }
+            var parseGamingRootFileResult = ParseGamingRootFile(fileSystem, gamingRootFilePath);
+            parseGamingRootFileResult.Switch(
+                additionalPaths => paths.AddRange(additionalPaths),
+                error => errors.Add(error)
+            );
         }
 
         return (paths, errors);
     }
 
-    internal static Result<XboxGame> ParseAppManifest(IFileSystem fileSystem,
+    internal static OneOf<XboxGame, ErrorMessage> ParseAppManifest(IFileSystem fileSystem,
         AbsolutePath manifestFilePath)
     {
         try
@@ -146,26 +143,26 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
             var obj = new XmlSerializer(typeof(Package)).Deserialize(reader);
             if (obj is null)
             {
-                return Result.FromError<XboxGame>($"Unable to deserialize file {manifestFilePath}");
+                return new ErrorMessage($"Unable to deserialize file {manifestFilePath}");
             }
 
             if (obj is not Package appManifest)
             {
-                return Result.FromError<XboxGame>($"Deserialization of {manifestFilePath} failed: resulting object is not of type {typeof(Package)} but {obj.GetType()}");
+                return new ErrorMessage($"Deserialization of {manifestFilePath} failed: resulting object is not of type {typeof(Package)} but {obj.GetType()}");
             }
 
             var displayName = appManifest.Properties.DisplayName;
             var id = appManifest.Identity.Name;
             var game = new XboxGame(XboxGameId.From(id), displayName, manifestFilePath.Parent);
-            return Result.FromGame(game);
+            return game;
         }
         catch (Exception e)
         {
-            return Result.FromException<XboxGame>($"Unable to parse manifest file {manifestFilePath}", e);
+            return new ErrorMessage(e, $"Unable to parse manifest file {manifestFilePath}");
         }
     }
 
-    internal static Result<List<AbsolutePath>> ParseGamingRootFile(
+    internal static OneOf<List<AbsolutePath>, ErrorMessage> ParseGamingRootFile(
         IFileSystem fileSystem, AbsolutePath gamingRootFilePath)
     {
         try
@@ -177,13 +174,13 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
             var magic = reader.ReadUInt32();
             if (magic != expectedMagic)
             {
-                return Result.FromError<List<AbsolutePath>>($"Unable to parse {gamingRootFilePath}, file magic does not match: expected {expectedMagic.ToString("x8", NumberFormatInfo.InvariantInfo)} got {magic.ToString("x8", NumberFormatInfo.InvariantInfo)}");
+                return new ErrorMessage($"Unable to parse {gamingRootFilePath}, file magic does not match: expected {expectedMagic.ToString("x8", NumberFormatInfo.InvariantInfo)} got {magic.ToString("x8", NumberFormatInfo.InvariantInfo)}");
             }
 
             var folderCount = reader.ReadUInt32();
             if (folderCount >= byte.MaxValue)
             {
-                return Result.FromError<List<AbsolutePath>>($"Folder count exceeds the limit: {folderCount}");
+                return new ErrorMessage($"Folder count exceeds the limit: {folderCount}");
             }
 
             var parentFolder = gamingRootFilePath.Parent;
@@ -202,11 +199,11 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
                 folders.Add(parentFolder.CombineUnchecked(part));
             }
 
-            return Result.FromGame(folders);
+            return folders;
         }
         catch (Exception e)
         {
-            return Result.FromException<List<AbsolutePath>>($"Unable to parse gaming root file {gamingRootFilePath}", e);
+            return new ErrorMessage(e, $"Unable to parse gaming root file {gamingRootFilePath}");
         }
 
     }

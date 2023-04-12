@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Web;
 using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
+using OneOf;
 
 namespace GameFinder.StoreHandlers.Origin;
 
@@ -41,39 +43,42 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
     protected override IEqualityComparer<OriginGameId> IdEqualityComparer => OriginGameIdComparer.Default;
 
     /// <inheritdoc/>
-    public override IEnumerable<Result<OriginGame>> FindAllGames()
+    public override IEnumerable<OneOf<OriginGame, ErrorMessage>> FindAllGames()
     {
         var manifestDir = GetManifestDir(_fileSystem);
 
         if (!_fileSystem.DirectoryExists(manifestDir))
         {
-            yield return Result.FromError<OriginGame>($"Manifest folder {manifestDir} does not exist!");
+            yield return new ErrorMessage($"Manifest folder {manifestDir} does not exist!");
             yield break;
         }
 
         var mfstFiles = _fileSystem.EnumerateFiles(manifestDir, "*.mfst").ToList();
         if (mfstFiles.Count == 0)
         {
-            yield return Result.FromError<OriginGame>($"Manifest folder {manifestDir} does not contain any .mfst files");
+            yield return new ErrorMessage($"Manifest folder {manifestDir} does not contain any .mfst files");
             yield break;
         }
 
         foreach (var mfstFile in mfstFiles)
         {
-            var (game, error) = ParseMfstFile(mfstFile);
-            if (error is not null)
+            var result = ParseMfstFile(mfstFile);
+
+            // ignore steam games
+            if (result.IsT2) continue;
+
+            if (result.IsT1)
             {
-                yield return Result.FromError<OriginGame>(error);
+                yield return result.AsT1;
                 continue;
             }
 
-            // ignored game
-            if (game is null) continue;
-            yield return Result.FromGame(game);
+            yield return result.AsT0;
         }
     }
 
-    private Result<OriginGame> ParseMfstFile(AbsolutePath filePath)
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
+    private OneOf<OriginGame, ErrorMessage, bool> ParseMfstFile(AbsolutePath filePath)
     {
         try
         {
@@ -87,17 +92,17 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
             var ids = query.GetValues("id");
             if (ids is null || ids.Length == 0)
             {
-                return Result.FromError<OriginGame>($"Manifest {filePath} does not have a value \"id\"");
+                return new ErrorMessage($"Manifest {filePath} does not have a value \"id\"");
             }
 
             var id = ids[0];
             if (id.EndsWith("@steam", StringComparison.OrdinalIgnoreCase))
-                return new Result<OriginGame>();
+                return true;
 
             var installPaths = query.GetValues("dipInstallPath");
             if (installPaths is null || installPaths.Length == 0)
             {
-                return Result.FromError<OriginGame>($"Manifest {filePath} does not have a value \"dipInstallPath\"");
+                return new ErrorMessage($"Manifest {filePath} does not have a value \"dipInstallPath\"");
             }
 
             var path = installPaths
@@ -109,11 +114,11 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
                 _fileSystem.FromFullPath(SanitizeInputPath(path))
             );
 
-            return Result.FromGame(game);
+            return game;
         }
         catch (Exception e)
         {
-            return Result.FromException<OriginGame>($"Exception while parsing {filePath}", e);
+            return new ErrorMessage(e, $"Exception while parsing {filePath}");
         }
     }
 }
