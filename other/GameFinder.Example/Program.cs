@@ -198,7 +198,7 @@ public static class Program
                 res.Add(prefix);
             }, error =>
             {
-                logger.LogError("{Error}", error.Value);
+                logger.LogError("{Error}", error);
             });
         }
 

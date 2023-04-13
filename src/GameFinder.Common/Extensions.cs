@@ -138,9 +138,9 @@ public static class Extensions
         where TGame : class
     {
         game = null;
-        if (!result.IsT0) return false;
+        if (!result.IsGame()) return false;
 
-        game = result.AsT0;
+        game = result.AsGame();
         return true;
     }
 
@@ -155,9 +155,9 @@ public static class Extensions
     public static bool TryGetError<T>(this OneOf<T, ErrorMessage> result, out ErrorMessage error)
     {
         error = default;
-        if (!result.IsT1) return false;
+        if (!result.IsError()) return false;
 
-        error = result.AsT1;
+        error = result.AsError();
         return true;
     }
 }

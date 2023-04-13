@@ -1,3 +1,4 @@
+using GameFinder.Common;
 using NexusMods.Paths;
 using NexusMods.Paths.TestingHelpers;
 
@@ -17,10 +18,10 @@ public partial class BottlesTests
         var bottlesConfigFile = prefixDirectory.CombineUnchecked("bottle.yml");
 
         prefixManager.FindPrefixes().Should()
-            .ContainSingle(result => result.IsT1)
+            .ContainSingle(result => result.IsError())
             .Which
-            .AsT1
+            .AsError()
             .Should()
-            .Be(PrefixDiscoveryError.From($"Bottles configuration file is missing at {bottlesConfigFile}"));
+            .Be($"Bottles configuration file is missing at {bottlesConfigFile}");
     }
 }

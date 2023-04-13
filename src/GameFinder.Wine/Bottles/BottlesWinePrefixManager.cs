@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using GameFinder.Common;
 using NexusMods.Paths;
 using OneOf;
 
@@ -23,45 +24,41 @@ public class BottlesWinePrefixManager : IWinePrefixManager<BottlesWinePrefix>
     }
 
     /// <inheritdoc/>
-    public IEnumerable<OneOf<BottlesWinePrefix, PrefixDiscoveryError>> FindPrefixes()
+    public IEnumerable<OneOf<BottlesWinePrefix, ErrorMessage>> FindPrefixes()
     {
         var defaultLocation = GetDefaultLocations(_fileSystem)
             .FirstOrDefault(x => _fileSystem.DirectoryExists(x));
 
         if (string.IsNullOrEmpty(defaultLocation.Directory))
         {
-            yield return PrefixDiscoveryError.From("Unable to find any bottles installation.");
+            yield return new ErrorMessage("Unable to find any bottles installation.");
             yield break;
         }
 
         var bottles = defaultLocation.CombineUnchecked("bottles");
         foreach (var bottle in _fileSystem.EnumerateDirectories(bottles, recursive: false))
         {
-            if (IsValidBottlesPrefix(_fileSystem, bottle, out var error))
-            {
-                yield return new BottlesWinePrefix(bottle);
-            }
-            else
-            {
-                yield return error;
-            }
+            var res = IsValidBottlesPrefix(_fileSystem, bottle);
+            yield return res.Match<OneOf<BottlesWinePrefix, ErrorMessage>>(
+                _ => new BottlesWinePrefix(bottle),
+                error => error);
         }
     }
 
-    internal static bool IsValidBottlesPrefix(IFileSystem fs, AbsolutePath directory,
-        [MaybeNullWhen(true)] out PrefixDiscoveryError error)
+    internal static OneOf<bool, ErrorMessage> IsValidBottlesPrefix(IFileSystem fs, AbsolutePath directory)
     {
-        if (!DefaultWinePrefixManager.IsValidPrefix(fs, directory, out error))
-            return false;
+        var defaultWinePrefixRes = DefaultWinePrefixManager.IsValidPrefix(fs, directory);
+        if (defaultWinePrefixRes.IsError())
+        {
+            return defaultWinePrefixRes.AsError();
+        }
 
         var bottlesConfigFile = directory.CombineUnchecked("bottle.yml");
         if (!fs.FileExists(bottlesConfigFile))
         {
-            error = PrefixDiscoveryError.From($"Bottles configuration file is missing at {bottlesConfigFile}");
-            return false;
+            return new ErrorMessage($"Bottles configuration file is missing at {bottlesConfigFile}");
         }
 
-        error = null;
         return true;
     }
 

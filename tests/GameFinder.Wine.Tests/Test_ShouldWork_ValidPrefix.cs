@@ -15,9 +15,9 @@ public partial class WineTests
         prefixManager
             .FindPrefixes()
             .Should()
-            .ContainSingle(result => result.IsT0)
+            .ContainSingle(result => result.IsPrefix())
             .Which
-            .AsT0
+            .AsPrefix()
             .ConfigurationDirectory
             .Should()
             .Be(prefixDirectory);

@@ -28,48 +28,39 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
     }
 
     /// <inheritdoc/>
-    public IEnumerable<OneOf<WinePrefix, PrefixDiscoveryError>> FindPrefixes()
+    public IEnumerable<OneOf<WinePrefix, ErrorMessage>> FindPrefixes()
     {
         foreach (var defaultWinePrefixLocation in GetDefaultWinePrefixLocations(_fileSystem))
         {
             if (!_fileSystem.DirectoryExists(defaultWinePrefixLocation)) continue;
 
-            if (IsValidPrefix(_fileSystem, defaultWinePrefixLocation, out var error))
-            {
-                yield return new WinePrefix(defaultWinePrefixLocation);
-            }
-            else
-            {
-                yield return error;
-            }
+            var res = IsValidPrefix(_fileSystem, defaultWinePrefixLocation);
+            yield return res.Match<OneOf<WinePrefix, ErrorMessage>>(
+                _ => new WinePrefix(defaultWinePrefixLocation),
+                error => error);
         }
     }
 
-    internal static bool IsValidPrefix(IFileSystem fileSystem, AbsolutePath directory,
-        [MaybeNullWhen(true)] out PrefixDiscoveryError error)
+    internal static OneOf<bool, ErrorMessage> IsValidPrefix(IFileSystem fileSystem, AbsolutePath directory)
     {
         var virtualDrive = directory.CombineUnchecked("drive_c");
         if (!fileSystem.DirectoryExists(virtualDrive))
         {
-            error = PrefixDiscoveryError.From($"Virtual C: drive does not exist at {virtualDrive}");
-            return false;
+            return new ErrorMessage($"Virtual C: drive does not exist at {virtualDrive}");
         }
 
         var systemRegistryFile = directory.CombineUnchecked("system.reg");
         if (!fileSystem.FileExists(systemRegistryFile))
         {
-            error = PrefixDiscoveryError.From($"System registry file does not exist at {systemRegistryFile}");
-            return false;
+            return new ErrorMessage($"System registry file does not exist at {systemRegistryFile}");
         }
 
         var userRegistryFile = directory.CombineUnchecked("user.reg");
         if (!fileSystem.FileExists(userRegistryFile))
         {
-            error = PrefixDiscoveryError.From($"User registry file does not exist at {userRegistryFile}");
-            return false;
+            return new ErrorMessage($"User registry file does not exist at {userRegistryFile}");
         }
 
-        error = null;
         return true;
     }
 

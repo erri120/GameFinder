@@ -1,3 +1,4 @@
+using GameFinder.Common;
 using NexusMods.Paths;
 using NexusMods.Paths.TestingHelpers;
 
@@ -12,12 +13,11 @@ public partial class WineTests
         var virtualDriveDirectory = prefixDirectory.CombineUnchecked("drive_c");
 
         prefixManager.FindPrefixes().Should()
-            .ContainSingle(result => result.IsT1)
+            .ContainSingle(result => result.IsError())
             .Which
-            .AsT1
+            .AsError()
             .Should()
-            .Be(PrefixDiscoveryError
-                .From($"Virtual C: drive does not exist at {virtualDriveDirectory}"));
+            .Be($"Virtual C: drive does not exist at {virtualDriveDirectory}");
     }
 
     [Theory, AutoFileSystem]
@@ -30,12 +30,11 @@ public partial class WineTests
         var systemRegistryFile = prefixDirectory.CombineUnchecked("system.reg");
 
         prefixManager.FindPrefixes().Should()
-            .ContainSingle(result => result.IsT1)
+            .ContainSingle(result => result.IsError())
             .Which
-            .AsT1
+            .AsError()
             .Should()
-            .Be(PrefixDiscoveryError
-                .From($"System registry file does not exist at {systemRegistryFile}"));
+            .Be($"System registry file does not exist at {systemRegistryFile}");
     }
 
     [Theory, AutoFileSystem]
@@ -51,11 +50,10 @@ public partial class WineTests
         var userRegistryFile = prefixDirectory.CombineUnchecked("user.reg");
 
         prefixManager.FindPrefixes().Should()
-            .ContainSingle(result => result.IsT1)
+            .ContainSingle(result => result.IsError())
             .Which
-            .AsT1
+            .AsError()
             .Should()
-            .Be(PrefixDiscoveryError
-                .From($"User registry file does not exist at {userRegistryFile}"));
+            .Be($"User registry file does not exist at {userRegistryFile}");
     }
 }
