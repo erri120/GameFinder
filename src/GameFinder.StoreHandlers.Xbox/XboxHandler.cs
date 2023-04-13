@@ -72,8 +72,21 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
                 var appManifestFilePath = directory.CombineUnchecked("appxmanifest.xml");
                 if (!_fileSystem.FileExists(appManifestFilePath))
                 {
-                    yield return new ErrorMessage($"Manifest file {appManifestFilePath} does not exist!");
-                    continue;
+                    var contentDirectory = directory.CombineUnchecked("Content");
+                    if (_fileSystem.DirectoryExists(contentDirectory))
+                    {
+                        appManifestFilePath = contentDirectory.CombineUnchecked("appxmanifest.xml");
+                        if (!_fileSystem.FileExists(appManifestFilePath))
+                        {
+                            yield return new ErrorMessage($"Manifest file does not exist at {appManifestFilePath}");
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        yield return new ErrorMessage($"Manifest file does not exist at {appManifestFilePath} and there is no Content folder at {contentDirectory}");
+                        continue;
+                    }
                 }
 
                 var result = ParseAppManifest(_fileSystem, appManifestFilePath);
