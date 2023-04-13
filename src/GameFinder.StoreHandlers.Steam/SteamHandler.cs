@@ -166,7 +166,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
             }
 
             libraryFoldersFile = GetLibraryFoldersFile(steamDir);
-            if (!_fileSystem.DirectoryExists(libraryFoldersFile))
+            if (!_fileSystem.FileExists(libraryFoldersFile))
             {
                 return new ErrorMessage($"Unable to find Steam in one of the default paths and the path from the registry is not a valid Steam installation because {libraryFoldersFile} does not exist");
             }
