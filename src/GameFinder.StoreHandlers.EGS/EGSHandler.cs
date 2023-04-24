@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using GameFinder.Common;
@@ -18,7 +17,6 @@ internal record ManifestFile(string CatalogItemId, string DisplayName, string In
 /// Handler for finding games installed with the Epic Games Store.
 /// </summary>
 [PublicAPI]
-[RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(Stream, JsonSerializerOptions)")]
 public class EGSHandler : AHandler<EGSGame, EGSGameId>
 {
     internal const string RegKey = @"Software\Epic Games\EOS";
@@ -26,12 +24,6 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
 
     private readonly IRegistry _registry;
     private readonly IFileSystem _fileSystem;
-
-    private readonly JsonSerializerOptions _jsonSerializerOptions =
-        new()
-        {
-            AllowTrailingCommas = true,
-        };
 
     /// <summary>
     /// Constructor.
@@ -82,7 +74,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
 
         try
         {
-            var game = JsonSerializer.Deserialize<ManifestFile>(stream, _jsonSerializerOptions);
+            var game = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.ManifestFile);
 
             if (game is null)
             {

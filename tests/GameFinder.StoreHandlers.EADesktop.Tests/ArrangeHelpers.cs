@@ -60,21 +60,16 @@ public partial class EADesktopTests
 
         var games = fixture.CreateMany<EADesktopGame>().ToArray();
 
-        var installInfos = games.Select(game => new InstallInfo
-        {
-            BaseSlug = game.BaseSlug,
-            BaseInstallPath = game.BaseInstallPath + "\\",
-            SoftwareId = game.EADesktopGameId.Value,
-        }).ToList();
+        var installInfos = games.Select(game => new InstallInfo(
+            game.BaseInstallPath + "\\",
+            game.BaseSlug,
+            InstallCheck: null,
+            game.EADesktopGameId.Value))
+            .ToList();
 
-        var installInfo = new InstallInfoFile
-        {
-            InstallInfos = installInfos,
-            Schema = new Schema
-            {
-                Version = EADesktopHandler.SupportedSchemaVersion,
-            },
-        };
+        var installInfo = new InstallInfoFile(
+            installInfos,
+            new Schema(EADesktopHandler.SupportedSchemaVersion));
 
         var encryptionKey = Decryption.CreateDecryptionKey(hardwareInfoProvider);
 

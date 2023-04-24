@@ -16,7 +16,6 @@ namespace GameFinder.StoreHandlers.EADesktop;
 /// Handler for finding games installed with EA Desktop.
 /// </summary>
 [PublicAPI]
-[RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
 public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
 {
     internal const string AllUsersFolderName = "530c11479fe252fc5aabc24935b9776d4900eb3ba58fdc271e0d6229413ad40e";
@@ -28,6 +27,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         PropertyNameCaseInsensitive = true,
         AllowTrailingCommas = true,
         NumberHandling = JsonNumberHandling.Strict,
+        TypeInfoResolver = SourceGenerationContext.Default,
     };
 
     private readonly IFileSystem _fileSystem;
@@ -142,6 +142,10 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         }
     }
 
+    [SuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = $"{nameof(JsonSerializerOptions)} uses {nameof(SourceGenerationContext)} for type information.")]
     private IEnumerable<OneOf<EADesktopGame, ErrorMessage>> ParseInstallInfoFileInner(string plaintext, AbsolutePath installInfoFile, SchemaPolicy schemaPolicy)
     {
         var installInfoFileContents = JsonSerializer.Deserialize<InstallInfoFile>(plaintext, JsonSerializerOptions);

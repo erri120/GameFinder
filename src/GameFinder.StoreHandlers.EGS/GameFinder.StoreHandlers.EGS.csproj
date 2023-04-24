@@ -4,6 +4,10 @@
         <PackageTags>epic egs epic-games-store games</PackageTags>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IsTrimmable>true</IsTrimmable>
+    </PropertyGroup>
+
     <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <ItemGroup>

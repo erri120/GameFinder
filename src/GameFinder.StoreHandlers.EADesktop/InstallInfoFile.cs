@@ -5,24 +5,17 @@ using JetBrains.Annotations;
 namespace GameFinder.StoreHandlers.EADesktop;
 
 [UsedImplicitly]
-internal class InstallInfoFile
-{
-    public List<InstallInfo>? InstallInfos { get; init; }
-    public Schema? Schema { get; init; }
-}
+internal record InstallInfoFile(
+    List<InstallInfo>? InstallInfos,
+    Schema? Schema);
 
 [UsedImplicitly]
-internal class InstallInfo
-{
-    public string? BaseInstallPath { get; init; }
-    public string? BaseSlug { get; init; }
-    public string? InstallCheck { get; init; }
-    [JsonPropertyName("softwareId")]
-    public string? SoftwareId { get; init; }
-}
+internal record InstallInfo(
+    string? BaseInstallPath,
+    string? BaseSlug,
+    string? InstallCheck,
+    [property: JsonPropertyName("softwareId")]
+    string? SoftwareId);
 
 [UsedImplicitly]
-internal class Schema
-{
-    public int Version { get; init; }
-}
+internal record Schema(int Version);

@@ -11,13 +11,11 @@ public partial class EADesktopTests
         var baseInstallPath = fileSystem.GetKnownPath(KnownPath.TempDirectory)
             .CombineUnchecked(baseInstallPathName);
 
-        var installInfo = new InstallInfo
-        {
-            BaseSlug = baseSlug,
-            InstallCheck = installCheck,
-            BaseInstallPath = baseInstallPath.GetFullPath(),
-            SoftwareId = softwareId,
-        };
+        var installInfo = new InstallInfo(
+            baseInstallPath.GetFullPath(),
+            baseSlug,
+            installCheck,
+            softwareId);
 
         var fs = new InMemoryFileSystem();
         var result = EADesktopHandler.InstallInfoToGame(fs, installInfo, 0, fs.GetKnownPath(KnownPath.TempDirectory));
