@@ -14,11 +14,10 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-        <!-- https://github.com/dotnet/sourcelink -->
-        <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+        <!-- https://github.com/dotnet/sourcelink/tree/main/docs#publishrepositoryurl -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
 
-        <!-- Embed source files that are not tracked by the source control manager in the PDB -->
+        <!-- https://github.com/dotnet/sourcelink/tree/main/docs#embeduntrackedsources -->
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
     </PropertyGroup>
 

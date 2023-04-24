@@ -4,8 +4,14 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-        <!-- https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#continuousintegrationbuild -->
+        <!-- https://github.com/dotnet/sourcelink/tree/main/docs#continuousintegrationbuild -->
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+
+        <!-- https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-options/code-generation#deterministic -->
+        <Deterministic>true</Deterministic>
+
+        <!-- https://github.com/dotnet/sourcelink/tree/main/docs#deterministicsourcepaths -->
+        <DeterministicSourcePaths>true</DeterministicSourcePaths>
     </PropertyGroup>
 
     <ItemGroup>
