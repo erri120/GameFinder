@@ -142,7 +142,8 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         }
     }
 
-    [SuppressMessage(
+
+    [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic access otherwise can break functionality when trimming application code",
         Justification = $"{nameof(JsonSerializerOptions)} uses {nameof(SourceGenerationContext)} for type information.")]
