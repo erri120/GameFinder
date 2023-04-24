@@ -16,6 +16,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     </PropertyGroup>
 

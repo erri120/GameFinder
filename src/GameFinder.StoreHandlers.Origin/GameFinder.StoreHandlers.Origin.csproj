@@ -8,14 +8,6 @@
         <IsTrimmable>true</IsTrimmable>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.Origin.xml</DocumentationFile>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DocumentationFile>bin\Release\GameFinder.StoreHandlers.Origin.xml</DocumentationFile>
-    </PropertyGroup>
-
     <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <ItemGroup>

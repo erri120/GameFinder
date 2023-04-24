@@ -8,14 +8,6 @@
         <IsTrimmable>true</IsTrimmable>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <DocumentationFile>bin\Debug\GameFinder.StoreHandlers.Steam.xml</DocumentationFile>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DocumentationFile>bin\Release\GameFinder.StoreHandlers.Steam.xml</DocumentationFile>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="ValveKeyValue" Version="0.8.2.162" />
     </ItemGroup>
