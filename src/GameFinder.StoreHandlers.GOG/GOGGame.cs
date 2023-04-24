@@ -1,3 +1,4 @@
+using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
 
@@ -10,4 +11,4 @@ namespace GameFinder.StoreHandlers.GOG;
 /// <param name="Name"></param>
 /// <param name="Path"></param>
 [PublicAPI]
-public record GOGGame(GOGGameId Id, string Name, AbsolutePath Path);
+public record GOGGame(GOGGameId Id, string Name, AbsolutePath Path) : IGame;

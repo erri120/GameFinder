@@ -86,7 +86,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
             yield break;
         }
 
-        var plaintext = decryptionResult.AsGame();
+        var plaintext = decryptionResult.AsT0;
         foreach (var result in ParseInstallInfoFile(plaintext, installInfoFile, SchemaPolicy))
         {
             yield return result;

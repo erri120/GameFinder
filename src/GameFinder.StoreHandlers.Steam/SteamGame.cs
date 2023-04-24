@@ -1,4 +1,5 @@
 using System.Globalization;
+using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
 
@@ -11,7 +12,7 @@ namespace GameFinder.StoreHandlers.Steam;
 /// <param name="Name">Name of the game</param>
 /// <param name="Path">Absolute path to the game installation folder</param>
 [PublicAPI]
-public record SteamGame(SteamGameId AppId, string Name, AbsolutePath Path)
+public record SteamGame(SteamGameId AppId, string Name, AbsolutePath Path) : IGame
 {
     /// <summary>
     /// Returns the absolute path of the manifest for this game.

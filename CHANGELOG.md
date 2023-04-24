@@ -16,6 +16,8 @@ This is a major release with big changes featuring Wine, Bottles and Proton supp
 - replaced `System.IO.Abstraction` with `NexusMods.Path.IFileSystem`
   - paths are now of type `AbsolutePath` instead of `string`
 - changed `AHandler<TGame, TId>` to require `TId : notnull`
+- added `IGame` interface
+- changed `AHandler<TGame, TId>` to require `TGame : IGame`
 - removed the extension functions `OnlyGame` and `OnlyError`
 - changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen)
 

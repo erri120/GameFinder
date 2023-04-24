@@ -1,3 +1,4 @@
+using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
 
@@ -9,4 +10,4 @@ namespace GameFinder.StoreHandlers.Origin;
 /// <param name="Id"></param>
 /// <param name="InstallPath"></param>
 [PublicAPI]
-public record OriginGame(OriginGameId Id, AbsolutePath InstallPath);
+public record OriginGame(OriginGameId Id, AbsolutePath InstallPath) : IGame;

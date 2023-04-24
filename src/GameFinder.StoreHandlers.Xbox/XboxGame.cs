@@ -1,3 +1,4 @@
+using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
 
@@ -10,4 +11,4 @@ namespace GameFinder.StoreHandlers.Xbox;
 /// <param name="DisplayName"></param>
 /// <param name="Path"></param>
 [PublicAPI]
-public record XboxGame(XboxGameId Id, string DisplayName, AbsolutePath Path);
+public record XboxGame(XboxGameId Id, string DisplayName, AbsolutePath Path) : IGame;

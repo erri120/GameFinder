@@ -22,7 +22,7 @@ public static class Extensions
     /// <returns></returns>
     public static (TGame[] games, ErrorMessage[] errors) SplitResults<TGame>(
         [InstantHandle] this IEnumerable<OneOf<TGame, ErrorMessage>> results)
-        where TGame : class
+        where TGame : class, IGame
     {
         var allResults = results.ToArray();
 
@@ -76,7 +76,7 @@ public static class Extensions
     /// <typeparam name="TGame"></typeparam>
     /// <returns></returns>
     public static bool IsGame<TGame>(this OneOf<TGame, ErrorMessage> result)
-        where TGame : class
+        where TGame : class, IGame
     {
         return result.IsT0;
     }
@@ -104,7 +104,7 @@ public static class Extensions
     /// Thrown when the result is not of type <typeparamref name="TGame"/>.
     /// </exception>
     public static TGame AsGame<TGame>(this OneOf<TGame, ErrorMessage> result)
-        where TGame : class
+        where TGame : class, IGame
     {
         return result.AsT0;
     }
@@ -135,7 +135,7 @@ public static class Extensions
     /// <returns></returns>
     public static bool TryGetGame<TGame>(this OneOf<TGame, ErrorMessage> result,
         [MaybeNullWhen(false)] out TGame game)
-        where TGame : class
+        where TGame : class, IGame
     {
         game = null;
         if (!result.IsGame()) return false;

@@ -12,7 +12,7 @@ namespace GameFinder.Common;
 /// <typeparam name="TId"></typeparam>
 [PublicAPI]
 public abstract class AHandler<TGame, TId>
-    where TGame : class
+    where TGame : class, IGame
     where TId : notnull
 {
     /// <summary>

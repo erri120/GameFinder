@@ -7,7 +7,7 @@ namespace TestUtils;
 public static class AssertionHelpers
 {
     public static IEnumerable<TGame> ShouldOnlyBeGames<TGame>(this ICollection<OneOf<TGame, ErrorMessage>> results)
-        where TGame : class
+        where TGame : class, IGame
     {
         results.Should().AllSatisfy(result =>
         {
@@ -19,7 +19,8 @@ public static class AssertionHelpers
     }
 
     private static ErrorMessage ShouldOnlyBeOneError<TGame>(
-        this ICollection<OneOf<TGame, ErrorMessage>> results) where TGame : class
+        this ICollection<OneOf<TGame, ErrorMessage>> results)
+        where TGame : class, IGame
     {
         results.Should().ContainSingle();
 
@@ -31,14 +32,18 @@ public static class AssertionHelpers
     }
 
     public static ErrorMessage ShouldOnlyBeOneError<TGame, TId>(
-        this AHandler<TGame, TId> handler) where TGame : class where TId : notnull
+        this AHandler<TGame, TId> handler)
+        where TGame : class, IGame
+        where TId : notnull
     {
         var results = handler.FindAllGames().ToArray();
         return results.ShouldOnlyBeOneError();
     }
 
     public static void ShouldFindAllGames<TGame, TId>(this AHandler<TGame, TId> handler,
-        IEnumerable<TGame> expectedGames) where TGame : class where TId : notnull
+        IEnumerable<TGame> expectedGames)
+        where TGame : class, IGame
+        where TId : notnull
     {
         var results = handler.FindAllGames().ToArray();
         var games = results.ShouldOnlyBeGames();
@@ -49,7 +54,9 @@ public static class AssertionHelpers
     public static void ShouldFindAllGamesById<TGame, TId>(
         this AHandler<TGame, TId> handler,
         ICollection<TGame> expectedGames,
-        Func<TGame, TId> keySelector) where TGame : class where TId : notnull
+        Func<TGame, TId> keySelector)
+        where TGame : class, IGame
+        where TId : notnull
     {
         var results = handler.FindAllGamesById(out var errors);
         errors.Should().BeEmpty();
