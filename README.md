@@ -59,7 +59,7 @@ foreach (var result in results)
 
 ### Finding a single game
 
-If you're working on an application that only needs to find **1** game, then you can use the `FindOneGameById` method instead. **IMPORTANT NOTE:** the store handlers **do not cache the result**. If you call this method multiple, the store handler will do the same thing multiple times, which is search for every game installed. Do not call this method if you need to [find multiple games](#finding-multiple-games).
+If you're working on an application that only needs to find **1** game, then you can use the `FindOneGameById` method instead. **IMPORTANT NOTE: the results are not cached**. If you call this method multiple, the store handler will do the same thing multiple times, which is search for every game installed. Do not call this method if you need to [find multiple games](#finding-multiple-games).
 
 ```csharp
 var game = handler.FindOneGameById(someId, out var errors);
@@ -81,7 +81,7 @@ if (game is null)
 
 ### Finding multiple games
 
-If you need to find multiple games at once, you can use the `FindAllGamesById` method instead. This returns an `IDictionary<TId, TGame>` which you can use to lookup games by id. **IMPORTANT NOTE:** the store handlers **do not cache the result**. You have to do that yourself.
+If you need to find multiple games at once, you can use the `FindAllGamesById` method instead. This returns an `IDictionary<TId, TGame>` which you can use to lookup games by id. **IMPORTANT NOTE: the results are not cached**. You have to do that yourself.
 
 ```csharp
 var games = handler.FindAllGamesById(out var errors);
