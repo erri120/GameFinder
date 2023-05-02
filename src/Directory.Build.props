@@ -24,6 +24,7 @@
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <IsTrimmable>true</IsTrimmable>
     </PropertyGroup>
 
     <ItemGroup>

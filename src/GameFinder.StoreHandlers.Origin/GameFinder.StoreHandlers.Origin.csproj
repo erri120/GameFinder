@@ -4,10 +4,6 @@
         <PackageTags>ea origin games</PackageTags>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <IsTrimmable>true</IsTrimmable>
-    </PropertyGroup>
-
     <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <ItemGroup>

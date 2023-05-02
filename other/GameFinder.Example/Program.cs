@@ -165,6 +165,10 @@ public static class Program
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:RequiresUnreferencedCodeAttribute",
+        Justification = "Required types are preserved using TrimmerRootDescriptor file.")]
     private static void RunXboxHandler(IFileSystem fileSystem)
     {
         var logger = _provider.CreateLogger(nameof(XboxHandler));

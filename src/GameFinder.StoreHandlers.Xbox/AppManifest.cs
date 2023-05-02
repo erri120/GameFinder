@@ -1,5 +1,6 @@
 using System.Xml.Serialization;
 using JetBrains.Annotations;
+#pragma warning disable CS1591
 
 namespace GameFinder.StoreHandlers.Xbox;
 

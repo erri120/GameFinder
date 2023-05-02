@@ -11,7 +11,16 @@
 
     <ItemGroup>
         <PackageReference Include="CommandLineParser" Version="2.9.1" />
+        <TrimmerRootAssembly Include="CommandLine" />
+
         <PackageReference Include="NLog" Version="5.1.4" />
+        <TrimmerRootAssembly Include="NLog" />
+
         <PackageReference Include="NLog.Extensions.Logging" Version="5.2.3" />
+        <TrimmerRootAssembly Include="NLog.Extensions.Logging" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <TrimmerRootDescriptor Include="GameFinderRoots.xml" />
     </ItemGroup>
 </Project>

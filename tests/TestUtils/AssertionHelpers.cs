@@ -11,7 +11,7 @@ public static class AssertionHelpers
     {
         results.Should().AllSatisfy(result =>
         {
-            result.IsGame().Should().BeTrue();
+            result.IsGame().Should().BeTrue(result.IsError() ? result.AsError().Message : string.Empty);
             result.IsError().Should().BeFalse();
         });
 

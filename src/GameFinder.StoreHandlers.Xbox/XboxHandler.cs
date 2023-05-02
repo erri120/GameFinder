@@ -20,7 +20,7 @@ namespace GameFinder.StoreHandlers.Xbox;
 /// Handler for finding games installed with Xbox Game Pass.
 /// </summary>
 [PublicAPI]
-[RequiresUnreferencedCode("Calls System.Xml.Serialization.XmlSerializer.Deserialize(XmlReader)")]
+[RequiresUnreferencedCode($"Calls System.Xml.Serialization.XmlSerializer.Deserialize(XmlReader) with {nameof(Package)}. Make sure {nameof(Package)} is preserved by using TrimmerRootDescriptor or TrimmerRootAssembly!")]
 public class XboxHandler : AHandler<XboxGame, XboxGameId>
 {
     private readonly IFileSystem _fileSystem;

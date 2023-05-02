@@ -1,0 +1,8 @@
+<linker>
+    <assembly fullname="GameFinder.StoreHandlers.Xbox">
+        <!-- XML Deserialization doesn't support source generators yet -->
+        <type fullname="GameFinder.StoreHandlers.Xbox.Package" />
+        <type fullname="GameFinder.StoreHandlers.Xbox.Properties" />
+        <type fullname="GameFinder.StoreHandlers.Xbox.Identity" />
+    </assembly>
+</linker>
