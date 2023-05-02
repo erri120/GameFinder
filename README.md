@@ -141,7 +141,7 @@ var handler = new GOGHandler(wineRegistry, wineFileSystem);
 
 ### Epic Games Store
 
-The Epic Games Store is supported natively on Windows, and with [Wine](#wine) on Linux.
+The Epic Games Store is supported natively on Windows, and with [Wine](#wine) on Linux. Use the [Epic Games Store Database](https://github.com/erri120/egs-db) to find the ID of a game (**WIP**).
 
 **Usage (native on Windows):**
 
