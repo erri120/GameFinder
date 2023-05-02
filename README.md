@@ -21,6 +21,10 @@ Additionally, the following Linux tools are supported:
 
 - [Wine](#wine) [![Nuget](https://img.shields.io/nuget/v/GameFinder.Wine)](https://www.nuget.org/packages/GameFinder.Wine)
 
+## Example
+
+The [example project](./other/GameFinder.Example) uses every available store handler and can be used as a reference. You can go to the [GitHub Actions Page](https://github.com/erri120/GameFinder/actions/workflows/ci.yml) and click on one of the latest CI workflow runs to download a build of this project.
+
 ## Usage
 
 All store handlers inherit from `AHandler<TGame, TId>` and implement `FindAllGames()` which returns `IEnumerable<OneOf<TGame, ErrorMessage>>`. The [`OneOf`](https://github.com/mcintyre321/OneOf) struct is a F# style union and is guaranteed to only contain _one of_ the following: a `TGame` or an `ErrorMessage`. I recommended checking out the [OneOf library](https://github.com/mcintyre321/OneOf), if you want to learn more.
@@ -287,6 +291,18 @@ if (protonDirectory != default && fileSystem.DirectoryExists(protonDirectory))
     Console.WriteLine($"Proton prefix is at {protonDirectory}");
 }
 ```
+
+## Trimming
+
+Self-contained deployments and executables can be [trimmed](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trim-self-contained) starting with .NET 6. This feature is _only_ available to applications that are published self-contained. All published GameFinder libraries support trimming.
+
+The [example](./other/GameFinder.Example) project is being published trimmed in the [CI](./.github/workflows/ci.yml) using this command:
+
+```bash
+dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -r linux-x64 -o bin/linux --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true
+```
+
+I recommend looking at the [project file](./other/GameFinder.Example/GameFinder.Example.csproj) of the example project, if you run into warnings or errors with trimming.
 
 ## Contributing
 

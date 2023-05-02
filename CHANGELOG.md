@@ -24,6 +24,7 @@ This is a major release with big changes featuring Wine, Bottles and Proton supp
 **Other Changes**:
 
 - re-added Xbox Game Pass
+- enabled [Trimming](./README.md#trimming)
 
 **How to upgrade**:
 
