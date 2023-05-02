@@ -1,4 +1,9 @@
 <linker>
+    <assembly fullname="GameFinder.Example">
+        <!-- Required for CommandLineParser -->
+        <type fullname="GameFinder.Example.Options" />
+    </assembly>
+
     <assembly fullname="GameFinder.StoreHandlers.Xbox">
         <!-- XML Deserialization doesn't support source generators yet -->
         <type fullname="GameFinder.StoreHandlers.Xbox.Package" />
