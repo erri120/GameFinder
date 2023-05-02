@@ -40,7 +40,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
     protected override IEqualityComparer<EGSGameId> IdEqualityComparer => EGSGameIdComparer.Default;
 
     /// <inheritdoc/>
-    public override Func<EGSGame, EGSGameId> IdSelector => game => game.EGSGameId;
+    public override Func<EGSGame, EGSGameId> IdSelector => game => game.CatalogItemId;
 
     /// <inheritdoc/>
     public override IEnumerable<OneOf<EGSGame, ErrorMessage>> FindAllGames()
@@ -74,37 +74,37 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
 
         try
         {
-            var game = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.ManifestFile);
+            var manifest = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.ManifestFile);
 
-            if (game is null)
+            if (manifest is null)
             {
                 return new ErrorMessage($"Unable to deserialize file {itemFile.GetFullPath()}");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (game.CatalogItemId is null)
+            if (manifest.CatalogItemId is null)
             {
                 return new ErrorMessage($"Manifest {itemFile.GetFullPath()} does not have a value \"CatalogItemId\"");
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (game.DisplayName is null)
+            if (manifest.DisplayName is null)
             {
                 return new ErrorMessage($"Manifest {itemFile.GetFullPath()} does not have a value \"DisplayName\"");
             }
 
-            if (string.IsNullOrEmpty(game.InstallLocation))
+            if (string.IsNullOrEmpty(manifest.InstallLocation))
             {
                 return new ErrorMessage($"Manifest {itemFile.GetFullPath()} does not have a value \"InstallLocation\"");
             }
 
-            var res = new EGSGame(
-                EGSGameId.From(game.CatalogItemId),
-                game.DisplayName,
-                _fileSystem.FromFullPath(SanitizeInputPath(game.InstallLocation))
+            var game = new EGSGame(
+                EGSGameId.From(manifest.CatalogItemId),
+                manifest.DisplayName,
+                _fileSystem.FromFullPath(SanitizeInputPath(manifest.InstallLocation))
             );
 
-            return res;
+            return game;
         }
         catch (Exception e)
         {
