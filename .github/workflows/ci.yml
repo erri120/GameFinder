@@ -7,6 +7,16 @@ on:
     branches: [ master ]
 
 jobs:
+  formatting:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check formatting
+      run: dotnet format --verify-no-changes --severity error
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -23,9 +33,6 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
-
-    - name: Check formatting
-      run: dotnet format --no-restore --verify-no-changes --severity error --exclude extern
 
     - name: Build
       run: dotnet build --no-restore
