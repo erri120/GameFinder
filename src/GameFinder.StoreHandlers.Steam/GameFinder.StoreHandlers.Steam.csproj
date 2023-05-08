@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ValveKeyValue" Version="0.8.2.162" />
+        <PackageReference Include="ValveKeyValue" Version="0.8.2.*" />
     </ItemGroup>
 
     <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
