@@ -18,7 +18,7 @@ jobs:
       env:
         INPUT_VERSION: ${{ github.event.inputs.version }}
       run: |
-        echo ::set-output name=current_version::${INPUT_VERSION}
+        echo "current_version=${INPUT_VERSION}" >> $env:GITHUB_OUTPUT
 
     - uses: actions/checkout@v3
 
