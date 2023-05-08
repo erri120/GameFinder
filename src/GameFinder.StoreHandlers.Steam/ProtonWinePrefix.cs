@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using GameFinder.Wine;
 using JetBrains.Annotations;
 using NexusMods.Paths;
@@ -26,6 +27,13 @@ public class ProtonWinePrefix : AWinePrefix
     public ProtonWinePrefix(AbsolutePath protonDirectory, AbsolutePath configurationDirectory) : base(configurationDirectory)
     {
         ProtonDirectory = protonDirectory;
+    }
+
+    /// <inheritdoc/>
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    protected override string GetUserName()
+    {
+        return "steamuser";
     }
 
     /// <summary>

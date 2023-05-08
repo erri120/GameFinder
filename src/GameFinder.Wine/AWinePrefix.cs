@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using GameFinder.RegistryUtils;
@@ -58,6 +56,17 @@ public abstract class AWinePrefix
     }
 
     /// <summary>
+    /// Returns the username for this wine prefix.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual string GetUserName()
+    {
+        var user = Environment.GetEnvironmentVariable("USER", EnvironmentVariableTarget.Process);
+        if (user is null) throw new PlatformNotSupportedException();
+        return user;
+    }
+
+    /// <summary>
     /// Creates an overlay <see cref="IFileSystem"/> with path
     /// mappings into the wine prefix.
     /// </summary>
@@ -67,10 +76,9 @@ public abstract class AWinePrefix
     {
         var rootDirectory = GetVirtualDrivePath();
 
-        // TODO: the Wine user can be different, Proton uses "steamuser"
         var newHomeDirectory = rootDirectory
             .CombineUnchecked("Users")
-            .CombineUnchecked(Environment.GetEnvironmentVariable("USER")!);
+            .CombineUnchecked(GetUserName());
 
         var (pathMappings, knownPathMappings) = BaseFileSystem.CreateWinePathMappings(
             fileSystem,
