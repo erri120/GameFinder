@@ -57,6 +57,11 @@ internal static class InteropHelpers
 [SupportedOSPlatform("windows")]
 public sealed class WindowsRegistry : IRegistry
 {
+    /// <summary>
+    /// Shared instance of <see cref="IRegistry"/> for Windows.
+    /// </summary>
+    public static readonly IRegistry Shared = new WindowsRegistry();
+
     /// <inheritdoc/>
     public IRegistryKey OpenBaseKey(RegistryHive hive, RegistryView view = RegistryView.Default)
     {

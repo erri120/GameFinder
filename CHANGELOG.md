@@ -24,6 +24,7 @@ This is a major release with big changes featuring Wine, Bottles and Proton supp
 - Changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen).
 - Added `Func<TGame, TId> IdSelector` and `IEqualityComparer<TId>? IdEqualityComparer` to `AHandler<TGame, TId>`. These can be used to construct key-value types like a dictionary.
 - Changed `FindAllGamesById` to return `IReadOnlyDictionary<TGame, TId>` instead of `IDictionary<TGame, TId>`.
+- Added `WindowsRegistry.Shared` for a shared instance of `IRegistry`.
 
 **Other Changes**:
 
