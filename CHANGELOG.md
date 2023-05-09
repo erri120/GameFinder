@@ -12,21 +12,22 @@ This is a major release with big changes featuring Wine, Bottles and Proton supp
 
 **Breaking Changes**:
 
-- updated `FindAllGames` to return `OneOf<TGame, ErrorMessage>` instead of `Result<TGame>` (using the [OneOf](https://github.com/mcintyre321/OneOf) library)
-- replaced `System.IO.Abstraction` with `NexusMods.Path.IFileSystem`
-  - paths are now of type `AbsolutePath` instead of `string`
-- changed `AHandler<TGame, TId>` to require `TId : notnull`
-- added `IGame` interface
-- changed `AHandler<TGame, TId>` to require `TGame : IGame`
-- removed the extension functions `OnlyGame` and `OnlyError`
-- changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen)
-- added `Func<TGame, TId> IdSelector` and `IEqualityComparer<TId>? IdEqualityComparer` to `AHandler<TGame, TId>`. These can be used to construct key-value types like a dictionary.
+- Updated `FindAllGames` to return `OneOf<TGame, ErrorMessage>` instead of `Result<TGame>` (using the [OneOf](https://github.com/mcintyre321/OneOf) library).
+- Replaced `System.IO.Abstraction` with `NexusMods.Path.IFileSystem`.
+  - Paths are now of type `AbsolutePath` instead of `string`.
+- Changed `AHandler<TGame, TId>` to require `TId : notnull`.
+- Added `IGame` interface.
+- Changed `AHandler<TGame, TId>` to require `TGame : IGame`.
+- Removed the extension functions `OnlyGame` and `OnlyError`.
+- Changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen).
+- Added `Func<TGame, TId> IdSelector` and `IEqualityComparer<TId>? IdEqualityComparer` to `AHandler<TGame, TId>`. These can be used to construct key-value types like a dictionary.
+- Changed `FindAllGamesById` to return `IReadOnlyDictionary<TGame, TId>` instead of `IDictionary<TGame, TId>`.
 
 **Other Changes**:
 
-- re-added Xbox Game Pass
-- Wine: added `GetUserName`, `ProtonWinePrefix` will now use `steamuser`
-- enabled [Trimming](./README.md#trimming)
+- Re-added Xbox Game Pass.
+- Wine: added `GetUserName`, `ProtonWinePrefix` will now use `steamuser`.
+- Enabled [Trimming](./README.md#trimming).
 
 **How to upgrade**:
 

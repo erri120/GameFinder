@@ -85,7 +85,7 @@ if (game is null)
 
 ### Finding multiple games
 
-If you need to find multiple games at once, you can use the `FindAllGamesById` method instead. This returns an `IDictionary<TId, TGame>` which you can use to lookup games by id. **IMPORTANT NOTE: the results are not cached**. You have to do that yourself.
+If you need to find multiple games at once, you can use the `FindAllGamesById` method instead. This returns an `IReadOnlyDictionary<TId, TGame>` which you can use to lookup games by id. **IMPORTANT NOTE: the results are not cached**. You have to do that yourself.
 
 ```csharp
 var games = handler.FindAllGamesById(out var errors);

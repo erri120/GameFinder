@@ -51,7 +51,7 @@ public static class Extensions
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TElement"></typeparam>
     /// <returns></returns>
-    public static IDictionary<TKey, TElement> CustomToDictionary<TSource, TKey, TElement>(
+    public static IReadOnlyDictionary<TKey, TElement> CustomToDictionary<TSource, TKey, TElement>(
         [InstantHandle] this IEnumerable<TSource> source, Func<TSource, TKey> keySelector,
         Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer = null)
         where TKey : notnull
