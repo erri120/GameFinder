@@ -1,7 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <!-- NuGet will doesn't allow the upload of snupkg files that don't contain any symbols -->
+        <IncludeSymbols>false</IncludeSymbols>
+
+        <!-- No build output for this project-->
         <IncludeBuildOutput>false</IncludeBuildOutput>
+
+        <!-- NU5128: Add lib or ref assemblies for the net** target framework -->
+        <NoWarn>$(NoWarn);NU5128</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
