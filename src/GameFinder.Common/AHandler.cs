@@ -1,17 +1,36 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using OneOf;
 
 namespace GameFinder.Common;
 
 /// <summary>
-/// Interface of store handlers.
+/// Base class for store handlers.
+/// </summary>
+/// <seealso cref="AHandler{TGame,TId}"/>
+[PublicAPI]
+public abstract class AHandler
+{
+    /// <summary>
+    /// Finds all <see cref="IGame"/> instances installed with this store.
+    /// </summary>
+    /// <returns></returns>
+    /// <seealso cref="AHandler{TGame,TId}.FindAllGames"/>
+    [MustUseReturnValue]
+    [System.Diagnostics.Contracts.Pure]
+    public abstract IEnumerable<OneOf<IGame, ErrorMessage>> FindAllInterfaceGames();
+}
+
+/// <summary>
+/// Generic base class for store handlers.
 /// </summary>
 /// <typeparam name="TGame"></typeparam>
 /// <typeparam name="TId"></typeparam>
+/// <seealso cref="AHandler"/>
 [PublicAPI]
-public abstract class AHandler<TGame, TId>
+public abstract class AHandler<TGame, TId> : AHandler
     where TGame : class, IGame
     where TId : notnull
 {
@@ -28,11 +47,22 @@ public abstract class AHandler<TGame, TId>
     /// </summary>
     public abstract IEqualityComparer<TId>? IdEqualityComparer { get; }
 
+    /// <inheritdoc/>
+    [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
+    public override IEnumerable<OneOf<IGame, ErrorMessage>> FindAllInterfaceGames()
+    {
+        foreach (var res in FindAllGames())
+        {
+            yield return res.MapT0(x => (IGame)x);
+        }
+    }
+
     /// <summary>
     /// Finds all games installed with this store.
     /// </summary>
     /// <returns></returns>
     [MustUseReturnValue]
+    [System.Diagnostics.Contracts.Pure]
     public abstract IEnumerable<OneOf<TGame, ErrorMessage>> FindAllGames();
 
     /// <summary>
@@ -42,6 +72,7 @@ public abstract class AHandler<TGame, TId>
     /// <param name="errors"></param>
     /// <returns></returns>
     [MustUseReturnValue]
+    [System.Diagnostics.Contracts.Pure]
     public IReadOnlyDictionary<TId, TGame> FindAllGamesById(out ErrorMessage[] errors)
     {
         var (games, allErrors) = FindAllGames().SplitResults();
@@ -57,6 +88,7 @@ public abstract class AHandler<TGame, TId>
     /// <param name="errors"></param>
     /// <returns></returns>
     [MustUseReturnValue]
+    [System.Diagnostics.Contracts.Pure]
     public TGame? FindOneGameById(TId id, out ErrorMessage[] errors)
     {
         var allGames = FindAllGamesById(out errors);

@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.org) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
+## [3.0.1](https://github.com/erri120/GameFinder/compare/v3.0.0...v3.0.1) - 2023-05-09
+
+First small release after the major [3.0.0](#300---2023-05-09) release.
+
+**Changes**:
+
+- Added `AHandler`. This is a non-generic abstract base class, inherited by `AHandler<TGame, TId>` and should alleviate some of the issues with generics hell. This class only has one method `IEnumerable<OneOf<IGame, ErrorMessage>> FindAllInterfaceGames()` which makes use of the new `IGame` interface added in [3.0.0](#300---2023-05-09).
+
 ## [3.0.0](https://github.com/erri120/GameFinder/compare/v2.6.0...v3.0.0) - 2023-05-09
 
 This is a major release with big changes featuring Wine, Bottles and Proton support for GOG, EGS and Origin. This release also replaces [`System.IO.Abstraction`](https://github.com/TestableIO/System.IO.Abstractions) with `NexusMods.Paths` from the new [Nexus Mods App](https://github.com/Nexus-Mods/NexusMods.App), changes how results are handled and re-adds [Xbox Game Pass](./README.md#xbox-game-pass) support.
