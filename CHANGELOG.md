@@ -20,6 +20,7 @@ This is a major release with big changes featuring Wine, Bottles and Proton supp
 - changed `AHandler<TGame, TId>` to require `TGame : IGame`
 - removed the extension functions `OnlyGame` and `OnlyError`
 - changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen)
+- added `Func<TGame, TId> IdSelector` and `IEqualityComparer<TId>? IdEqualityComparer` to `AHandler<TGame, TId>`. These can be used to construct key-value types like a dictionary.
 
 **Other Changes**:
 
