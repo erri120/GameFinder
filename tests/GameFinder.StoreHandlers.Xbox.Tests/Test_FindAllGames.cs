@@ -21,4 +21,12 @@ public partial class XboxTests
         var expectedGames = SetupGames(fs, appFolder).ToArray();
         handler.ShouldFindAllGamesById(expectedGames, game => game.Id);
     }
+
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_FindAllInterfaceGames(InMemoryFileSystem fs, AbsolutePath appFolder)
+    {
+        var handler = SetupHandler(fs, appFolder);
+        var expectedGames = SetupGames(fs, appFolder);
+        handler.ShouldFindAllInterfacesGames(expectedGames);
+    }
 }

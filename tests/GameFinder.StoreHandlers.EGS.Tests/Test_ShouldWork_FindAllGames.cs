@@ -24,4 +24,13 @@ public partial class EGSTests
 
         handler.ShouldFindAllGamesById(expectedGames, game => game.CatalogItemId);
     }
+
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_FindAllInterfaceGames(InMemoryFileSystem fs, InMemoryRegistry registry)
+    {
+        var (handler, manifestDir) = SetupHandler(fs, registry);
+        var expectedGames = SetupGames(fs, manifestDir);
+
+        handler.ShouldFindAllInterfacesGames(expectedGames);
+    }
 }

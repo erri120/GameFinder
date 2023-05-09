@@ -40,7 +40,8 @@ public static class AssertionHelpers
         return results.ShouldOnlyBeOneError();
     }
 
-    public static void ShouldFindAllGames<TGame, TId>(this AHandler<TGame, TId> handler,
+    public static void ShouldFindAllGames<TGame, TId>(
+        this AHandler<TGame, TId> handler,
         IEnumerable<TGame> expectedGames)
         where TGame : class, IGame
         where TId : notnull
@@ -63,5 +64,17 @@ public static class AssertionHelpers
 
         results.Should().ContainKeys(expectedGames.Select(keySelector));
         results.Should().ContainValues(expectedGames);
+    }
+
+    public static void ShouldFindAllInterfacesGames<TGame, TId>(
+        this AHandler<TGame, TId> handler,
+        IEnumerable<TGame> expectedGames)
+        where TGame : class, IGame
+        where TId : notnull
+    {
+        var results = handler.FindAllInterfaceGames().ToArray();
+        var games = results.ShouldOnlyBeGames();
+
+        games.Should().AllBeOfType<TGame>().Which.Should().Equal(expectedGames);
     }
 }

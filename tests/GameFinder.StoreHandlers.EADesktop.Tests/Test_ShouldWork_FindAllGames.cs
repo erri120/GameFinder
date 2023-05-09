@@ -21,4 +21,12 @@ public partial class EADesktopTests
         var expectedGames = SetupGames(fs, hardwareInfoProvider, dataFolder).ToArray();
         handler.ShouldFindAllGamesById(expectedGames, game => game.EADesktopGameId);
     }
+
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_FindAllInterfacesGames(InMemoryFileSystem fs)
+    {
+        var (handler, hardwareInfoProvider, dataFolder) = SetupHandler(fs);
+        var expectedGames = SetupGames(fs, hardwareInfoProvider, dataFolder).ToArray();
+        handler.ShouldFindAllInterfacesGames(expectedGames);
+    }
 }

@@ -21,4 +21,12 @@ public partial class SteamTests
         var expectedGames = SetupGames(fs, basePath, commonPath).ToArray();
         handler.ShouldFindAllGamesById(expectedGames, game => game.AppId);
     }
+
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_FindAllInterfaceGames(InMemoryFileSystem fs)
+    {
+        var (handler, basePath, commonPath) = SetupHandler(fs);
+        var expectedGames = SetupGames(fs, basePath, commonPath);
+        handler.ShouldFindAllInterfacesGames(expectedGames);
+    }
 }

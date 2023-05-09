@@ -21,4 +21,12 @@ public partial class OriginTests
         var expectedGames = SetupGames(fs, manifestDir).ToArray();
         handler.ShouldFindAllGamesById(expectedGames, game => game.Id);
     }
+
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_FindAllInterfaceGames(InMemoryFileSystem fs)
+    {
+        var (handler, manifestDir) = SetupHandler(fs);
+        var expectedGames = SetupGames(fs, manifestDir);
+        handler.ShouldFindAllInterfacesGames(expectedGames);
+    }
 }

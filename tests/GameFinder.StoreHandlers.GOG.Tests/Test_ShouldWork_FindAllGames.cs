@@ -24,4 +24,13 @@ public partial class GOGTests
 
         handler.ShouldFindAllGamesById(expectedGames, game => game.Id);
     }
+
+    [Theory, AutoFileSystem]
+    public void Test_ShouldWork_FindAllInterfaceGames(IFileSystem fileSystem, InMemoryRegistry registry)
+    {
+        var (handler, gogKey) = SetupHandler(fileSystem, registry);
+        var expectedGames = SetupGames(fileSystem, gogKey);
+
+        handler.ShouldFindAllInterfacesGames(expectedGames);
+    }
 }
