@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
@@ -34,48 +33,23 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         };
 
     /// <summary>
-    /// Factory for Linux.
+    /// Constructor.
     /// </summary>
-    /// <param name="fileSystem"></param>
-    /// <returns></returns>
-    [SupportedOSPlatform("linux")]
-    public static SteamHandler CreateForLinux(IFileSystem fileSystem) =>
-        new(fileSystem, registry: null);
-
-    /// <summary>
-    /// Factory for Windows that uses <see cref="WindowsRegistry"/>.
-    /// </summary>
-    /// <param name="fileSystem"></param>
-    /// <returns></returns>
-    [SupportedOSPlatform("windows")]
-    public static SteamHandler CreateForWindows(IFileSystem fileSystem) =>
-        new(fileSystem, new WindowsRegistry());
-
-    /// <summary>
-    /// Constructor. If you are on Windows, use <see cref="WindowsRegistry"/> for
-    /// <paramref name="registry"/>. If you are on Linux, use <c>null</c> instead.
-    /// </summary>
-    /// <param name="fileSystem"></param>
-    /// <param name="registry"></param>
+    /// <param name="fileSystem">
+    /// The implementation of <see cref="IFileSystem"/> to use. For a shared instance use
+    /// <see cref="FileSystem.Shared"/>. For tests either use <see cref="InMemoryFileSystem"/>,
+    /// a custom implementation or just a mock of the interface.
+    /// </param>
+    /// <param name="registry">
+    /// The implementation of <see cref="IRegistry"/> to use. For a shared instance
+    /// use <see cref="WindowsRegistry.Shared"/> on Windows. On Linux use <c>null</c>.
+    /// For tests either use <see cref="InMemoryRegistry"/>, a custom implementation or just a mock
+    /// of the interface.
+    /// </param>
     public SteamHandler(IFileSystem fileSystem, IRegistry? registry)
     {
         _fileSystem = fileSystem;
         _registry = registry;
-    }
-
-    /// <summary>
-    /// Constructor for specifying a custom Steam path. Only use this if this library can't
-    /// find Steam using the default paths and registry. The custom path will be the only path
-    /// this library looks at and should only be given if you known that Steam is located there.
-    /// </summary>
-    /// <param name="customSteamPath"></param>
-    /// <param name="fileSystem"></param>
-    /// <param name="registry"></param>
-    public SteamHandler(AbsolutePath customSteamPath, IFileSystem fileSystem, IRegistry? registry)
-    {
-        _fileSystem = fileSystem;
-        _registry = registry;
-        _customSteamPath = customSteamPath;
     }
 
     /// <inheritdoc/>

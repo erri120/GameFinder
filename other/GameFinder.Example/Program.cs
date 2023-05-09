@@ -88,7 +88,7 @@ public static class Program
 
         if (OperatingSystem.IsWindows())
         {
-            var windowsRegistry = new WindowsRegistry();
+            var windowsRegistry = WindowsRegistry.Shared;
             if (options.Steam) RunSteamHandler(realFileSystem, windowsRegistry);
             if (options.GOG) RunGOGHandler(windowsRegistry, realFileSystem);
             if (options.EGS) RunEGSHandler(windowsRegistry, realFileSystem);

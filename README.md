@@ -114,7 +114,7 @@ Steam is supported natively on Windows and Linux. Use [SteamDB](https://steamdb.
 **Usage (cross-platform):**
 
 ```csharp
-var handler = new SteamHandler(FileSystem.Shared, OperatingSystem.IsWindows() ? new WindowsRegistry() : null);
+var handler = new SteamHandler(FileSystem.Shared, OperatingSystem.IsWindows() ? WindowsRegistry.Shared : null);
 ```
 
 ### GOG Galaxy
@@ -124,7 +124,7 @@ GOG Galaxy is supported natively on Windows, and with [Wine](#wine) on Linux. Us
 **Usage (native on Windows):**
 
 ```csharp
-var handler = new GOGHandler(new WindowsRegistry(), FileSystem.Shared);
+var handler = new GOGHandler(WindowsRegistry.Shared, FileSystem.Shared);
 ```
 
 **Usage (Wine on Linux):**
@@ -146,7 +146,7 @@ The Epic Games Store is supported natively on Windows, and with [Wine](#wine) on
 **Usage (native on Windows):**
 
 ```csharp
-var handler = new EGSHandler(new WindowsRegistry(), FileSystem.Shared);
+var handler = new EGSHandler(WindowsRegistry.Shared, FileSystem.Shared);
 ```
 
 **Usage (Wine on Linux):**

@@ -28,8 +28,19 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="registry"></param>
-    /// <param name="fileSystem"></param>
+    /// <param name="registry">
+    /// The implementation of <see cref="IRegistry"/> to use. For a shared instance
+    /// use <see cref="WindowsRegistry.Shared"/> on Windows. For tests either use
+    /// <see cref="InMemoryRegistry"/>, a custom implementation or just a mock
+    /// of the interface. See the README for more information if you want to use
+    /// Wine.
+    /// </param>
+    /// <param name="fileSystem">
+    /// The implementation of <see cref="IFileSystem"/> to use. For a shared instance use
+    /// <see cref="FileSystem.Shared"/>. For tests either use <see cref="InMemoryFileSystem"/>,
+    /// a custom implementation or just a mock of the interface. See the README for more information
+    /// if you want to use Wine.
+    /// </param>
     public EGSHandler(IRegistry registry, IFileSystem fileSystem)
     {
         _registry = registry;

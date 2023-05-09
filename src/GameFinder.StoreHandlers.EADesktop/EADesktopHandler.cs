@@ -48,8 +48,16 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="fileSystem"></param>
-    /// <param name="hardwareInfoProvider"></param>
+    /// <param name="fileSystem">
+    /// The implementation of <see cref="IFileSystem"/> to use. For a shared instance use
+    /// <see cref="FileSystem.Shared"/>. For tests either use <see cref="InMemoryFileSystem"/>,
+    /// a custom implementation or just a mock of the interface.
+    /// </param>
+    /// <param name="hardwareInfoProvider">
+    /// The implementation of <see cref="IHardwareInfoProvider"/> to use. Currently only
+    /// <see cref="GameFinder.StoreHandlers.EADesktop.Crypto.Windows.HardwareInfoProvider"/>
+    /// is available and is Windows-only.
+    /// </param>
     public EADesktopHandler(IFileSystem fileSystem, IHardwareInfoProvider hardwareInfoProvider)
     {
         _fileSystem = fileSystem;

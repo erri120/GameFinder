@@ -14,21 +14,21 @@ This is a major release with big changes featuring Wine, Bottles and Proton supp
 
 **Breaking Changes**:
 
+- Reworked the constructors of all handlers and removed most overloads. All handlers now have a single constructor with no default values.
 - Updated `FindAllGames` to return `OneOf<TGame, ErrorMessage>` instead of `Result<TGame>` (using the [OneOf](https://github.com/mcintyre321/OneOf) library).
 - Replaced `System.IO.Abstraction` with `NexusMods.Path.IFileSystem`.
   - Paths are now of type `AbsolutePath` instead of `string`.
 - Changed `AHandler<TGame, TId>` to require `TId : notnull`.
-- Added `IGame` interface.
-- Changed `AHandler<TGame, TId>` to require `TGame : IGame`.
+- Added `IGame` interface and changed `AHandler<TGame, TId>` to require `TGame : IGame`.
 - Removed the extension functions `OnlyGame` and `OnlyError`.
 - Changed all game Ids to be value objects using [Vogen](https://github.com/SteveDunn/Vogen).
-- Added `Func<TGame, TId> IdSelector` and `IEqualityComparer<TId>? IdEqualityComparer` to `AHandler<TGame, TId>`. These can be used to construct key-value types like a dictionary.
 - Changed `FindAllGamesById` to return `IReadOnlyDictionary<TGame, TId>` instead of `IDictionary<TGame, TId>`.
-- Added `WindowsRegistry.Shared` for a shared instance of `IRegistry`.
 
-**Other Changes**:
+**(Hopefully) non-breaking changes**:
 
 - Re-added Xbox Game Pass.
+- Added `Func<TGame, TId> IdSelector` and `IEqualityComparer<TId>? IdEqualityComparer` to `AHandler<TGame, TId>`. These can be used to construct key-value types like a dictionary.
+- Added `WindowsRegistry.Shared` for a shared instance of `IRegistry`.
 - Wine: added `GetUserName`, `ProtonWinePrefix` will now use `steamuser`.
 - Enabled [Trimming](./README.md#trimming).
 

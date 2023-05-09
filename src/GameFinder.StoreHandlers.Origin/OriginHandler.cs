@@ -23,7 +23,12 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="fileSystem"></param>
+    /// <param name="fileSystem">
+    /// The implementation of <see cref="IFileSystem"/> to use. For a shared instance use
+    /// <see cref="FileSystem.Shared"/>. For tests either use <see cref="InMemoryFileSystem"/>,
+    /// a custom implementation or just a mock of the interface. See the README for more information
+    /// if you want to use Wine.
+    /// </param>
     public OriginHandler(IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
