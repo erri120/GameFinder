@@ -82,7 +82,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
     public override Func<SteamGame, SteamGameId> IdSelector => game => game.AppId;
 
     /// <inheritdoc/>
-    protected override IEqualityComparer<SteamGameId>? IdEqualityComparer => null;
+    public override IEqualityComparer<SteamGameId>? IdEqualityComparer => null;
 
     /// <inheritdoc/>
     public override IEnumerable<OneOf<SteamGame, ErrorMessage>> FindAllGames()

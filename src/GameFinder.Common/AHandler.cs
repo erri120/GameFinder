@@ -26,7 +26,7 @@ public abstract class AHandler<TGame, TId>
     /// Custom equality comparer for <typeparamref name="TId"/>. This is useful
     /// for constructing key-based data types like <see cref="IDictionary{TKey,TValue}"/>.
     /// </summary>
-    protected abstract IEqualityComparer<TId>? IdEqualityComparer { get; }
+    public abstract IEqualityComparer<TId>? IdEqualityComparer { get; }
 
     /// <summary>
     /// Finds all games installed with this store.

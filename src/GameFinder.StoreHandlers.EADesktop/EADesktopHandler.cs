@@ -57,7 +57,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
     }
 
     /// <inheritdoc/>
-    protected override IEqualityComparer<EADesktopGameId> IdEqualityComparer => EADesktopGameIdComparer.Default;
+    public override IEqualityComparer<EADesktopGameId> IdEqualityComparer => EADesktopGameIdComparer.Default;
 
     /// <inheritdoc/>
     public override Func<EADesktopGame, EADesktopGameId> IdSelector => game => game.EADesktopGameId;

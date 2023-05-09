@@ -36,7 +36,7 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
     public override Func<GOGGame, GOGGameId> IdSelector => game => game.Id;
 
     /// <inheritdoc/>
-    protected override IEqualityComparer<GOGGameId>? IdEqualityComparer => null;
+    public override IEqualityComparer<GOGGameId>? IdEqualityComparer => null;
 
     /// <inheritdoc/>
     public override IEnumerable<OneOf<GOGGame, ErrorMessage>> FindAllGames()

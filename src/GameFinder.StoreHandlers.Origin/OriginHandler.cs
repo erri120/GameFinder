@@ -40,7 +40,7 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
     public override Func<OriginGame, OriginGameId> IdSelector => game => game.Id;
 
     /// <inheritdoc/>
-    protected override IEqualityComparer<OriginGameId> IdEqualityComparer => OriginGameIdComparer.Default;
+    public override IEqualityComparer<OriginGameId> IdEqualityComparer => OriginGameIdComparer.Default;
 
     /// <inheritdoc/>
     public override IEnumerable<OneOf<OriginGame, ErrorMessage>> FindAllGames()

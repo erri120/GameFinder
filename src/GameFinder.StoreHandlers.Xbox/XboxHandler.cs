@@ -38,7 +38,7 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
     public override Func<XboxGame, XboxGameId> IdSelector => game => game.Id;
 
     /// <inheritdoc/>
-    protected override IEqualityComparer<XboxGameId> IdEqualityComparer => XboxGameIdComparer.Default;
+    public override IEqualityComparer<XboxGameId> IdEqualityComparer => XboxGameIdComparer.Default;
 
     /// <inheritdoc/>
     public override IEnumerable<OneOf<XboxGame, ErrorMessage>> FindAllGames()

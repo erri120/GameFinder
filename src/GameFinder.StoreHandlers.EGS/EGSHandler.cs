@@ -37,7 +37,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
     }
 
     /// <inheritdoc/>
-    protected override IEqualityComparer<EGSGameId> IdEqualityComparer => EGSGameIdComparer.Default;
+    public override IEqualityComparer<EGSGameId> IdEqualityComparer => EGSGameIdComparer.Default;
 
     /// <inheritdoc/>
     public override Func<EGSGame, EGSGameId> IdSelector => game => game.CatalogItemId;
