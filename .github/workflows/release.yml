@@ -18,7 +18,8 @@ jobs:
       env:
         INPUT_VERSION: ${{ github.event.inputs.version }}
       run: |
-        echo "current_version=${INPUT_VERSION}" >> $env:GITHUB_OUTPUT
+        $current_version = $env:INPUT_VERSION.StartsWith('v') ? $env:INPUT_VERSION.Substring(1) : $env:INPUT_VERSION
+        echo "current_version=$current_version" >> $env:GITHUB_OUTPUT
 
     - uses: actions/checkout@v3
 
