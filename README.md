@@ -196,7 +196,7 @@ var handler = new EADesktopHandler(FileSystem.Shared, new HardwareInfoProvider()
 
 ### Xbox Game Pass
 
-This package used to be deprecated, but I've re-added support in GameFinder 3.0.0. Xbox Game Pass used to install games inside a `SYSTEM` protected folder, making modding not feasible for the average user. You can read more about this [here](https://github.com/Nexus-Mods/NexusMods.App/issues/175).
+This package used to be deprecated, but I've re-added support in GameFinder [3.0.0](./CHANGELOG.md#300---2023-05-09). Xbox Game Pass used to install games inside a `SYSTEM` protected folder, making modding not feasible for the average user. You can read more about this [here](https://github.com/Nexus-Mods/NexusMods.App/issues/175).
 
 Xbox Game Pass is only supported on Windows.
 

@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.org) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v2.6.0...master)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.0.0...master)
 
-## 3.0.0 - TBD
+## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [3.0.0](https://github.com/erri120/GameFinder/compare/v2.6.0...v3.0.0) - 2023-05-09
 
 This is a major release with big changes featuring Wine, Bottles and Proton support for GOG, EGS and Origin. This release also replaces [`System.IO.Abstraction`](https://github.com/TestableIO/System.IO.Abstractions) with `NexusMods.Paths` from the new [Nexus Mods App](https://github.com/Nexus-Mods/NexusMods.App), changes how results are handled and re-adds [Xbox Game Pass](./README.md#xbox-game-pass) support.
 
@@ -49,8 +51,6 @@ Since `AHandler<TGame, TId>` has changed, you might need to update the constrain
 **How to use with Wine on Linux**:
 
 See the updated [README](./README.md#wine).
-
-## [Released](https://github.com/erri120/GameFinder/releases)
 
 ## [2.6.0](https://github.com/erri120/GameFinder/compare/v2.5.0...v2.6.0) - 2023-03-07
 
