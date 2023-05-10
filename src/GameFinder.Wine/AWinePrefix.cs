@@ -12,21 +12,12 @@ namespace GameFinder.Wine;
 /// Abstract class for wine prefixes.
 /// </summary>
 [PublicAPI]
-public abstract class AWinePrefix
+public abstract record AWinePrefix
 {
     /// <summary>
     /// Absolute path to the Wine prefix directory.
     /// </summary>
-    public readonly AbsolutePath ConfigurationDirectory;
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="configurationDirectory"></param>
-    protected AWinePrefix(AbsolutePath configurationDirectory)
-    {
-        ConfigurationDirectory = configurationDirectory;
-    }
+    public required AbsolutePath ConfigurationDirectory { get; init; }
 
     /// <summary>
     /// Returns the absolute path to the virtual drive directory of the prefix.

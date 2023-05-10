@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using JetBrains.Annotations;
 
 namespace GameFinder.Common;
@@ -7,6 +8,7 @@ namespace GameFinder.Common;
 /// Represents a generic error.
 /// </summary>
 [PublicAPI]
+[DebuggerDisplay("{Message}")]
 public readonly struct ErrorMessage
 {
     /// <summary>

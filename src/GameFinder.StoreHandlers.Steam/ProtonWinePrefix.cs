@@ -9,7 +9,7 @@ namespace GameFinder.StoreHandlers.Steam;
 /// Represents a Wine prefix managed by Valve's Proton library.
 /// </summary>
 [PublicAPI]
-public class ProtonWinePrefix : AWinePrefix
+public record ProtonWinePrefix : AWinePrefix
 {
     /// <summary>
     /// This is the parent directory of <see cref="AWinePrefix.ConfigurationDirectory"/>.
@@ -17,17 +17,7 @@ public class ProtonWinePrefix : AWinePrefix
     /// prefix is the sub directory <c>pfx</c>, which you can access using
     /// <see cref="AWinePrefix.ConfigurationDirectory"/>.
     /// </summary>
-    public readonly AbsolutePath ProtonDirectory;
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="protonDirectory"></param>
-    /// <param name="configurationDirectory"></param>
-    public ProtonWinePrefix(AbsolutePath protonDirectory, AbsolutePath configurationDirectory) : base(configurationDirectory)
-    {
-        ProtonDirectory = protonDirectory;
-    }
+    public required AbsolutePath ProtonDirectory { get; init; }
 
     /// <inheritdoc/>
     [SuppressMessage("ReSharper", "StringLiteralTypo")]

@@ -39,7 +39,10 @@ public class BottlesWinePrefixManager : IWinePrefixManager<BottlesWinePrefix>
         {
             var res = IsValidBottlesPrefix(_fileSystem, bottle);
             yield return res.Match<OneOf<BottlesWinePrefix, ErrorMessage>>(
-                _ => new BottlesWinePrefix(bottle),
+                _ => new BottlesWinePrefix
+                {
+                    ConfigurationDirectory = bottle,
+                },
                 error => error);
         }
     }

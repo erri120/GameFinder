@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using NexusMods.Paths;
 
 namespace GameFinder.Wine;
 
@@ -7,7 +6,4 @@ namespace GameFinder.Wine;
 /// Represents a wine prefix.
 /// </summary>
 [PublicAPI]
-public class WinePrefix : AWinePrefix
-{
-    internal WinePrefix(AbsolutePath configurationDirectory) : base(configurationDirectory) { }
-}
+public record WinePrefix : AWinePrefix;

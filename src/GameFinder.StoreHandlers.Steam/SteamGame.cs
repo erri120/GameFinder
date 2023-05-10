@@ -37,6 +37,10 @@ public record SteamGame(SteamGameId AppId, string Name, AbsolutePath Path) : IGa
             .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
 
         var configurationDirectory = protonDirectory.CombineUnchecked("pfx");
-        return new ProtonWinePrefix(protonDirectory, configurationDirectory);
+        return new ProtonWinePrefix
+        {
+            ConfigurationDirectory = configurationDirectory,
+            ProtonDirectory = protonDirectory,
+        };
     }
 }

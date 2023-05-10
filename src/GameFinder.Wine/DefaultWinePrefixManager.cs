@@ -35,7 +35,10 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
 
             var res = IsValidPrefix(_fileSystem, defaultWinePrefixLocation);
             yield return res.Match<OneOf<WinePrefix, ErrorMessage>>(
-                _ => new WinePrefix(defaultWinePrefixLocation),
+                _ => new WinePrefix
+                {
+                    ConfigurationDirectory = defaultWinePrefixLocation,
+                },
                 error => error);
         }
     }

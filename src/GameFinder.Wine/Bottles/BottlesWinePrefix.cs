@@ -7,14 +7,8 @@ namespace GameFinder.Wine.Bottles;
 /// Represents a Wineprefix managed by Bottles.
 /// </summary>
 [PublicAPI]
-public class BottlesWinePrefix : AWinePrefix
+public record BottlesWinePrefix : AWinePrefix
 {
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="configurationDirectory"></param>
-    public BottlesWinePrefix(AbsolutePath configurationDirectory) : base(configurationDirectory) { }
-
     /// <summary>
     /// Returns the absolute path to <c>bottle.yml</c>.
     /// </summary>

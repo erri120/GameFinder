@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.org) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
+## [3.0.2](https://github.com/erri120/GameFinder/compare/v3.0.1...v3.0.2) - 2023-05-10
+
+**Changes**:
+
+- Converted `AWinePrefix` and all inheritors into record types.
+- Added `DebuggerDisplay` to `ErrorMessage`.
+
 ## [3.0.1](https://github.com/erri120/GameFinder/compare/v3.0.0...v3.0.1) - 2023-05-10
 
 First small release after the major [3.0.0](#300---2023-05-09) release.

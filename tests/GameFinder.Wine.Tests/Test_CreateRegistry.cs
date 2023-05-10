@@ -10,7 +10,7 @@ public partial class WineTests
     public void Test_CreateRegistry(InMemoryFileSystem fs, AbsolutePath configurationDirectory)
     {
         fs.AddDirectory(configurationDirectory);
-        var prefix = new WinePrefix(configurationDirectory);
+        var prefix = new WinePrefix { ConfigurationDirectory = configurationDirectory };
 
         fs.AddFile(configurationDirectory.CombineUnchecked("system.reg"), """
 WINE REGISTRY VERSION 2
