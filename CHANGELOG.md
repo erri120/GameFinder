@@ -2,9 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.org) and this project adheres to [Semantic Versioning](https://semver.org).
+The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.0.0...master)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.0.3...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
