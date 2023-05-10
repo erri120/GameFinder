@@ -38,4 +38,14 @@ WINE REGISTRY VERSION 2
 
         subKey2!.GetValue("4").Should().Be("5");
     }
+
+    [Theory, AutoFileSystem]
+    public void Test_CreateRegistry_NoFile(InMemoryFileSystem fs, AbsolutePath configurationDirectory)
+    {
+        var prefix = new WinePrefix { ConfigurationDirectory = configurationDirectory };
+        prefix
+            .Invoking(x => x.CreateRegistry(fs))
+            .Should()
+            .NotThrow();
+    }
 }

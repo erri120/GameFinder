@@ -89,7 +89,10 @@ public abstract record AWinePrefix
     {
         var registry = new InMemoryRegistry();
 
-        using var stream = fileSystem.ReadFile(GetSystemRegistryFile());
+        var registryFile = GetSystemRegistryFile();
+        if (!fileSystem.FileExists(registryFile)) return registry;
+
+        using var stream = fileSystem.ReadFile(registryFile);
         using var reader = new StreamReader(stream, Encoding.UTF8);
 
         InMemoryRegistryKey? currentKey = null;
