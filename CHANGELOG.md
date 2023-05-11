@@ -8,11 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
-## [3.0.3](https://github.com/erri120/GameFinder/compare/v3.0.2...v3.0.3) - 2023-05-10
+## [3.0.3](https://github.com/erri120/GameFinder/compare/v3.0.2...v3.0.3) - 2023-05-11
 
 **Changes**:
 
 - Fixed `AWinePrefix.CreateRegistry` throwing an exception when the file doesn't exist. It will now do a check and early exist with an empty registry, if the registry file doesn't exist.
+- Fixed `WMIHelper` throwing an exception when WMI returns more than one element.
 
 ## [3.0.2](https://github.com/erri120/GameFinder/compare/v3.0.1...v3.0.2) - 2023-05-10
 

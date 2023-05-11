@@ -34,10 +34,6 @@ internal static class WMIHelper
             var searcher = new ManagementObjectSearcher(selectQuery);
 
             using var results = searcher.Get();
-            if (results.Count != 1)
-            {
-                throw new Exception($"Query returned {results.Count} elements instead of one");
-            }
 
             var arr = new ManagementBaseObject[1];
             results.CopyTo(arr, 0);
@@ -47,7 +43,7 @@ internal static class WMIHelper
             var propertyData = baseObject.Properties[propertyName];
             if (propertyData.Type == CimType.String) return (string)propertyData.Value;
 
-            throw new Exception("Property from query is not of type {nameof(CimType.String)} but {propertyData.Type}");
+            throw new Exception($"Property from query is not of type {nameof(CimType.String)} but {propertyData.Type}");
 
         }
         catch (Exception e)
