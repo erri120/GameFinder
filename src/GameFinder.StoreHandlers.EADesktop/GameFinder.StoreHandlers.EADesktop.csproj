@@ -4,6 +4,10 @@
         <PackageTags>ea ea-desktop ea-app games</PackageTags>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IsTrimmable>false</IsTrimmable>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="SHA3.Net" Version="2.0.0" />
         <PackageReference Include="System.Management" Version="7.0.*" />

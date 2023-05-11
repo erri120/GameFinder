@@ -1,12 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.EADesktop\GameFinder.StoreHandlers.EADesktop.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.EGS\GameFinder.StoreHandlers.EGS.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.GOG\GameFinder.StoreHandlers.GOG.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.Origin\GameFinder.StoreHandlers.Origin.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.Steam\GameFinder.StoreHandlers.Steam.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.Xbox\GameFinder.StoreHandlers.Xbox.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.Wine\GameFinder.Wine.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.EADesktop\GameFinder.StoreHandlers.EADesktop.csproj" />
+        <TrimmerRootAssembly Include="GameFinder.StoreHandlers.EADesktop" />
+        <TrimmerRootAssembly Include="System.Management" />
     </ItemGroup>
 
     <ItemGroup>

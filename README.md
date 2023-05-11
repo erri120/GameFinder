@@ -294,7 +294,21 @@ if (protonDirectory != default && fileSystem.DirectoryExists(protonDirectory))
 
 ## Trimming
 
-Self-contained deployments and executables can be [trimmed](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trim-self-contained) starting with .NET 6. This feature is _only_ available to applications that are published self-contained. All published GameFinder libraries support trimming.
+Self-contained deployments and executables can be [trimmed](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trim-self-contained) starting with .NET 6. This feature is _only_ available to applications that are published self-contained.
+
+**Trimmable**:
+
+- `GameFinder.Common`
+- `GameFinder.RegistryUtils`
+- `GameFinder.Wine`
+- `GameFinder.StoreHandlers.Steam`
+- `GameFinder.StoreHandlers.GOG`
+- `GameFinder.StoreHandlers.EGS`
+- `GameFinder.StoreHandlers.Origin`
+
+**NOT Trimmable**:
+
+- `GameFinder.StoreHandlers.EADesktop`: This package references `System.Management`, which is **not trimmable** due to COM interop issues. See [dotnet/runtime#78038](https://github.com/dotnet/runtime/issues/78038), [dotnet/runtime#75176](https://github.com/dotnet/runtime/pull/75176) and [dotnet/runtime#61960](https://github.com/dotnet/runtime/issues/61960) for more details.
 
 The [example](./other/GameFinder.Example) project is being published trimmed in the [CI](./.github/workflows/ci.yml) using this command:
 
