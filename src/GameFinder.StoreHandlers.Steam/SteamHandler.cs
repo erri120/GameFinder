@@ -23,7 +23,6 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
     private readonly IRegistry? _registry;
     private readonly IFileSystem _fileSystem;
-    private readonly AbsolutePath _customSteamPath;
 
     private static readonly KVSerializerOptions KvSerializerOptions =
         new()
@@ -104,11 +103,6 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
     private OneOf<AbsolutePath, ErrorMessage> FindSteam()
     {
-        if (_customSteamPath != default)
-        {
-            return GetLibraryFoldersFile(_customSteamPath);
-        }
-
         try
         {
             var defaultSteamDirs = GetDefaultSteamDirectories(_fileSystem)

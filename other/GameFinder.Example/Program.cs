@@ -99,7 +99,7 @@ public static class Program
                 var hardwareInfoProvider = new HardwareInfoProvider();
                 var decryptionKey = Decryption.CreateDecryptionKey(new HardwareInfoProvider());
                 var sDecryptionKey = Convert.ToHexString(decryptionKey).ToLower(CultureInfo.InvariantCulture);
-                logger.LogDebug("EA Decryption Key: {}", sDecryptionKey);
+                logger.LogDebug("EA Decryption Key: {DecryptionKey}", sDecryptionKey);
 
                 RunEADesktopHandler(realFileSystem, hardwareInfoProvider);
             }
