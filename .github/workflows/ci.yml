@@ -43,7 +43,8 @@ jobs:
         no_restore: true
         no_build: true
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        extra_test_parameters: '--verbosity normal --collect:"XPlat Code Coverage;Format=opencover"'
+        extra_test_parameters: '--collect:"XPlat Code Coverage;Format=opencover"'
+        report_title: ${{ runner.os }}
 
     - name: Codecov
       uses: codecov/codecov-action@v3
