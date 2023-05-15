@@ -37,11 +37,13 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
 
-    - name: Setup code coverage
-      run: dotnet tool install --global dotnet-coverage
-
-    - name: Test and generate code coverage
-      run: dotnet-coverage collect 'dotnet test --no-build --verbosity normal' -f xml -o 'coverage.xml'
+    - name: Run Tests
+      uses: zyborg/dotnet-tests-report@v1
+      with:
+        no_restore: true
+        no_build: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        extra_test_parameters: '--verbosity normal --collect:"XPlat Code Coverage;Format=opencover"'
 
     - name: Codecov
       uses: codecov/codecov-action@v3
