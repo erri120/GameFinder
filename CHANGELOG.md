@@ -4,17 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.0.3...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.0.2...HEAD)
 
-## [Released](https://github.com/erri120/GameFinder/releases)
-
-## [3.0.3](https://github.com/erri120/GameFinder/compare/v3.0.2...v3.0.3) - 2023-05-11
+## [3.0.3](https://github.com/erri120/GameFinder/compare/v3.0.2...HEAD) - TBD
 
 **Changes**:
 
 - Fixed `AWinePrefix.CreateRegistry` throwing an exception when the file doesn't exist. It will now do a check and early exist with an empty registry, if the registry file doesn't exist.
 - Fixed `WMIHelper` throwing an exception when WMI returns more than one element.
 - Marked `GameFinder.StoreHandlers.EADesktop` as non-trimmable.
+
+## [Released](https://github.com/erri120/GameFinder/releases)
 
 ## [3.0.2](https://github.com/erri120/GameFinder/compare/v3.0.1...v3.0.2) - 2023-05-10
 
