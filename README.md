@@ -310,12 +310,6 @@ Self-contained deployments and executables can be [trimmed](https://learn.micros
 
 - `GameFinder.StoreHandlers.EADesktop`: This package references `System.Management`, which is **not trimmable** due to COM interop issues. See [dotnet/runtime#78038](https://github.com/dotnet/runtime/issues/78038), [dotnet/runtime#75176](https://github.com/dotnet/runtime/pull/75176) and [dotnet/runtime#61960](https://github.com/dotnet/runtime/issues/61960) for more details.
 
-The [example](./other/GameFinder.Example) project is being published trimmed in the [CI](./.github/workflows/ci.yml) using this command:
-
-```bash
-dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -r linux-x64 -o bin/linux --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true
-```
-
 I recommend looking at the [project file](./other/GameFinder.Example/GameFinder.Example.csproj) of the example project, if you run into warnings or errors with trimming.
 
 ## Contributing
