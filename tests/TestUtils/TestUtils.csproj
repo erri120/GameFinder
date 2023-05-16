@@ -2,8 +2,4 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\GameFinder.Common\GameFinder.Common.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Remove="GitHubActionsTestLogger" />
-    </ItemGroup>
 </Project>
