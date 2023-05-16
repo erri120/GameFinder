@@ -11,7 +11,7 @@ public class HandlerTests
     [InlineData("C:/foo/bar", "C:\\foo\\bar", false)]
     [InlineData("/foo/", "/foo", true)]
     [InlineData("/foo//////////////", "/foo", true)]
-    [InlineData("/", "/", true)]
+    [InlineData("/", "/s", true)]
     [InlineData("C:\\foo\\", "C:\\foo", false)]
     [InlineData("C:\\foo\\\\\\\\\\\\\\\\\\\\\\\\", "C:\\foo", false)]
     [InlineData("C:\\", "C:\\", false)]
