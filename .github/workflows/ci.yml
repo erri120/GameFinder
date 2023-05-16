@@ -38,7 +38,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Run Tests
-      run: dotnet test --no-build --no-restore --logger "GitHubActions;annotations.titleFormat=$test (${{ runner.os }});annotations.messageFormat=$error\n$trace" --collect:"XPlat Code Coverage;Format=opencover"
+      run: dotnet test --no-build --no-restore --logger "GitHubActions" --collect:"XPlat Code Coverage;Format=opencover"
 
     - name: Codecov
       uses: codecov/codecov-action@v3
