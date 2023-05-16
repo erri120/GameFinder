@@ -51,11 +51,11 @@ jobs:
 
     - name: Publish (Linux)
       if: runner.os == 'Linux'
-      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -r linux-x64 -o ${{ github.workspace }}/bin/${{ runner.os }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true
+      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
 
     - name: Publish (Windows)
       if: runner.os == 'Windows'
-      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -r win-x64 -o ${{ github.workspace }}/bin/${{ runner.os }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true
+      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
