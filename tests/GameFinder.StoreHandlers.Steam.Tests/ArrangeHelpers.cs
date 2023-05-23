@@ -36,6 +36,14 @@ public partial class SteamTests
             {
                 var path = commonPath.CombineUnchecked(name);
 
+                var userDataDirectory = basePath.Parent.CombineUnchecked("userdata");
+                fs.AddDirectory(userDataDirectory.CombineUnchecked("0").CombineUnchecked(appId.ToString(CultureInfo.InvariantCulture)));
+
+                var cloudSavesDirectory = userDataDirectory
+                    .CombineUnchecked(fixture.Create<int>().ToString(CultureInfo.InvariantCulture))
+                    .CombineUnchecked(appId.ToString(CultureInfo.InvariantCulture));
+                fs.AddDirectory(cloudSavesDirectory);
+
                 var manifest = basePath.CombineUnchecked($"{appId.ToString(CultureInfo.InvariantCulture)}.acf");
                 fs.AddFile(manifest, @$"
 ""AppState""
@@ -45,7 +53,7 @@ public partial class SteamTests
     ""installdir""      ""{name}""
 }}");
 
-                return new SteamGame(SteamGameId.From(appId), name, path, CloudSavesDirectory: null);
+                return new SteamGame(SteamGameId.From(appId), name, path, cloudSavesDirectory);
             })
             .OmitAutoProperties());
 
