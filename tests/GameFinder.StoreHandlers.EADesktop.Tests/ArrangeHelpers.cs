@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text.Json;
 using AutoFixture.AutoMoq;
+using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EADesktop.Crypto;
 using NexusMods.Paths;
 
@@ -9,6 +10,8 @@ namespace GameFinder.StoreHandlers.EADesktop.Tests;
 
 public partial class EADesktopTests
 {
+    internal const string RegKey = @"SOFTWARE\EA Games\";
+
     private static IHardwareInfoProvider SetupHardwareInfoProvider()
     {
         var fixture = new Fixture();
@@ -18,21 +21,23 @@ public partial class EADesktopTests
 
     private static (
         EADesktopHandler handler,
+        InMemoryRegistryKey gameKey,
         IHardwareInfoProvider hardwareInfoProvider,
         AbsolutePath parentFolder)
-        SetupHandler(InMemoryFileSystem fs)
+        SetupHandler(InMemoryFileSystem fs, InMemoryRegistry registry)
     {
         var dataFolder = EADesktopHandler.GetDataFolder(fs);
         fs.AddDirectory(dataFolder);
 
         var hardwareInfoProvider = SetupHardwareInfoProvider();
-        var handler = new EADesktopHandler(fs, hardwareInfoProvider);
-        return (handler, hardwareInfoProvider, dataFolder);
+        var eaGameKey = registry.AddKey(RegistryHive.LocalMachine, RegKey);
+        var handler = new EADesktopHandler(registry, fs, hardwareInfoProvider);
+        return (handler, eaGameKey, hardwareInfoProvider, dataFolder);
     }
 
     [SuppressMessage("Design", "MA0051:Method is too long")]
     private static IEnumerable<EADesktopGame> SetupGames(
-        InMemoryFileSystem fs, IHardwareInfoProvider hardwareInfoProvider, AbsolutePath dataFolder)
+        InMemoryFileSystem fs, InMemoryRegistryKey eaGameKey, IHardwareInfoProvider hardwareInfoProvider, AbsolutePath dataFolder)
     {
         var fixture = new Fixture();
 
@@ -40,7 +45,7 @@ public partial class EADesktopTests
         fs.AddDirectory(installInfoFile.Parent);
 
         fixture.Customize<EADesktopGame>(composer => composer
-            .FromFactory<string, string>((softwareId, baseSlug) =>
+            .FromFactory<string, string, AbsolutePath>((softwareId, baseSlug, path) =>
             {
                 var baseInstallPath = fs
                     .GetKnownPath(KnownPath.TempDirectory)
@@ -53,6 +58,9 @@ public partial class EADesktopTests
                 fs.AddDirectory(baseInstallPath);
                 fs.AddFile(installerDataPath, "");
 
+                var gameKey = eaGameKey.AddSubKey(baseSlug);
+                gameKey.AddValue("Install Dir", path.GetFullPath());
+
                 var game = new EADesktopGame(EADesktopGameId.From(softwareId), baseSlug, baseInstallPath);
                 return game;
             })
@@ -63,8 +71,10 @@ public partial class EADesktopTests
         var installInfos = games.Select(game => new InstallInfo(
             game.BaseInstallPath + "\\",
             game.BaseSlug,
+            DLCSubPath: null,
             InstallCheck: null,
-            game.EADesktopGameId.Value))
+            game.EADesktopGameId.Value,
+            ExecutableCheck: null))
             .ToList();
 
         var installInfo = new InstallInfoFile(

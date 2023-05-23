@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GameFinder.Common;
+using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EADesktop.Crypto;
 using JetBrains.Annotations;
 using NexusMods.Paths;
@@ -13,7 +14,7 @@ using OneOf;
 namespace GameFinder.StoreHandlers.EADesktop;
 
 /// <summary>
-/// Handler for finding games installed with EA Desktop.
+/// Handler for finding games installed with the EA app.
 /// </summary>
 [PublicAPI]
 public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
@@ -30,6 +31,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         TypeInfoResolver = SourceGenerationContext.Default,
     };
 
+    private readonly IRegistry _registry;
     private readonly IFileSystem _fileSystem;
     private readonly IHardwareInfoProvider _hardwareInfoProvider;
 
@@ -48,6 +50,12 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="registry">
+    /// The implementation of <see cref="IRegistry"/> to use. For a shared instance
+    /// use <see cref="WindowsRegistry.Shared"/> on Windows. For tests either use
+    /// <see cref="InMemoryRegistry"/>, a custom implementation or just a mock
+    /// of the interface.
+    /// </param>
     /// <param name="fileSystem">
     /// The implementation of <see cref="IFileSystem"/> to use. For a shared instance use
     /// <see cref="FileSystem.Shared"/>. For tests either use <see cref="InMemoryFileSystem"/>,
@@ -58,8 +66,9 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
     /// <see cref="GameFinder.StoreHandlers.EADesktop.Crypto.Windows.HardwareInfoProvider"/>
     /// is available and is Windows-only.
     /// </param>
-    public EADesktopHandler(IFileSystem fileSystem, IHardwareInfoProvider hardwareInfoProvider)
+    public EADesktopHandler(IRegistry registry, IFileSystem fileSystem, IHardwareInfoProvider hardwareInfoProvider)
     {
+        _registry = registry;
         _fileSystem = fileSystem;
         _hardwareInfoProvider = hardwareInfoProvider;
     }
@@ -189,7 +198,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
 
         for (var i = 0; i < installInfos.Count; i++)
         {
-            yield return InstallInfoToGame(_fileSystem, installInfos[i], i, installInfoFile);
+            yield return InstallInfoToGame(_registry, _fileSystem, installInfos[i], i, installInfoFile);
         }
     }
 
@@ -217,7 +226,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         };
     }
 
-    internal static OneOf<EADesktopGame, ErrorMessage> InstallInfoToGame(IFileSystem fileSystem, InstallInfo installInfo, int i, AbsolutePath installInfoFilePath)
+    internal static OneOf<EADesktopGame, ErrorMessage> InstallInfoToGame(IRegistry registry, IFileSystem fileSystem, InstallInfo installInfo, int i, AbsolutePath installInfoFilePath)
     {
         var num = i.ToString(CultureInfo.InvariantCulture);
 
@@ -228,22 +237,52 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
 
         var softwareId = installInfo.SoftwareId;
 
-        if (string.IsNullOrEmpty(installInfo.BaseSlug))
-        {
-            return new ErrorMessage($"InstallInfo #{num} for {softwareId} does not have the value \"baseSlug\"");
-        }
+        var baseSlug = installInfo.BaseSlug ?? "";
 
-        var baseSlug = installInfo.BaseSlug;
+        if (!string.IsNullOrEmpty(installInfo.DLCSubPath))
+        {
+            return new ErrorMessage($"InstallInfo #{num} for {softwareId} ({baseSlug}) is a DLC");
+        }
 
         if (string.IsNullOrEmpty(installInfo.BaseInstallPath))
         {
             return new ErrorMessage($"InstallInfo #{num} for {softwareId} ({baseSlug}) does not have the value \"baseInstallPath\"");
         }
 
+        var executableCheck = installInfo.ExecutableCheck;
+        var sRegKey = "";
+        if (executableCheck.StartsWith('['))
+        {
+            int j = executableCheck.IndexOf(']');
+            if (j > 1)
+                sRegKey = executableCheck.Substring(1, j - 1);
+        }
+        var name = "";
+        if (!string.IsNullOrEmpty(sRegKey))
+        {
+            try
+            {
+                var k = sRegKey.IndexOf('\\', StringComparison.Ordinal);
+                var l = sRegKey.LastIndexOf('\\');
+                if (k > 1 && l > k)
+                {
+                    var regRoot = registry.OpenBaseKey(RegistryHelpers.RegistryHiveFromString(sRegKey[..k].ToUpperInvariant()), RegistryView.Registry32);
+                    var sSubKey = sRegKey[(k + 1)..l];
+                    var subKey = regRoot.OpenSubKey(sSubKey);
+                    subKey?.TryGetString("DisplayName", out name);
+                }
+            }
+            catch (Exception) { }
+        }
+        if (string.IsNullOrEmpty(name))
+        {
+            name = baseSlug;
+        }
+
         var baseInstallPath = installInfo.BaseInstallPath;
         var game = new EADesktopGame(
             EADesktopGameId.From(softwareId),
-            baseSlug,
+            name,
             fileSystem.FromFullPath(SanitizeInputPath(baseInstallPath)));
 
         return game;

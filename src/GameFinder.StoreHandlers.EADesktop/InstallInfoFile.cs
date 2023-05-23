@@ -13,9 +13,11 @@ internal record InstallInfoFile(
 internal record InstallInfo(
     string? BaseInstallPath,
     string? BaseSlug,
+    string? DLCSubPath,
     string? InstallCheck,
     [property: JsonPropertyName("softwareId")]
-    string? SoftwareId);
+    string? SoftwareId,
+    string? ExecutableCheck);
 
 [UsedImplicitly]
 internal record Schema(int Version);
