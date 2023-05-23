@@ -69,6 +69,9 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
         var libraryFoldersFile = steamSearchResult.AsT0;
 
+        var userDataPath = GetUserDataDirectory(libraryFoldersFile);
+        var cloudSavesDirectories = CacheCloudSaveDirectories(userDataPath);
+
         var libraryFolderPaths = ParseLibraryFoldersFile(libraryFoldersFile);
         if (libraryFolderPaths is null || libraryFolderPaths.Count == 0)
         {
@@ -96,9 +99,44 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
             foreach (var acfFile in acfFiles)
             {
-                yield return ParseAppManifestFile(acfFile, libraryFolderPath);
+                yield return ParseAppManifestFile(acfFile, libraryFolderPath, cloudSavesDirectories);
             }
         }
+    }
+
+    private AbsolutePath GetUserDataDirectory(AbsolutePath libraryFoldersFile)
+    {
+        return libraryFoldersFile
+            .Parent
+            .Parent
+            .CombineUnchecked("userdata");
+    }
+
+    private IReadOnlyDictionary<SteamGameId, AbsolutePath> CacheCloudSaveDirectories(AbsolutePath userDataDirectory)
+    {
+        if (!_fileSystem.DirectoryExists(userDataDirectory))
+            return new Dictionary<SteamGameId, AbsolutePath>();
+
+        var userDirectories = _fileSystem.EnumerateDirectories(userDataDirectory, recursive: false);
+
+        var dictionary = userDirectories
+            .Where(userDirectory => !string.Equals(userDirectory.FileName, "0", StringComparison.OrdinalIgnoreCase))
+            .SelectMany(userDirectory => _fileSystem
+                .EnumerateDirectories(userDirectory, recursive: false)
+                .Select(cloudSaveDirectory => cloudSaveDirectory)
+                .Select(cloudSaveDirectory =>
+                {
+                    var res = int.TryParse(cloudSaveDirectory.FileName, CultureInfo.InvariantCulture, out var gameId);
+                    return (isValid: res, gameId, cloudSaveDirectory);
+                })
+                .Where(tuple => tuple.isValid)
+                .Select(tuple => (gameId: SteamGameId.From(tuple.gameId), tuple.cloudSaveDirectory))
+            )
+            .GroupBy(x => x.gameId)
+            .Select(x => x.First())
+            .ToDictionary(x => x.gameId, x => x.cloudSaveDirectory);
+
+        return dictionary;
     }
 
     private OneOf<AbsolutePath, ErrorMessage> FindSteam()
@@ -249,7 +287,10 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         }
     }
 
-    private OneOf<SteamGame, ErrorMessage> ParseAppManifestFile(AbsolutePath manifestFile, AbsolutePath libraryFolder)
+    private OneOf<SteamGame, ErrorMessage> ParseAppManifestFile(
+        AbsolutePath manifestFile,
+        AbsolutePath libraryFolder,
+        IReadOnlyDictionary<SteamGameId, AbsolutePath> cloudSavesDirectories)
     {
         try
         {
@@ -289,7 +330,12 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
                 .CombineUnchecked("common")
                 .CombineUnchecked(installDir);
 
-            var game = new SteamGame(SteamGameId.From(appId), name, gamePath);
+            var gameId = SteamGameId.From(appId);
+            AbsolutePath? cloudSavesDirectory = cloudSavesDirectories.TryGetValue(gameId, out var tmp)
+                ? tmp
+                : null;
+
+            var game = new SteamGame(gameId, name, gamePath, cloudSavesDirectory);
             return game;
         }
         catch (Exception e)

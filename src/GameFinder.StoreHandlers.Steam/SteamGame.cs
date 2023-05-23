@@ -8,11 +8,12 @@ namespace GameFinder.StoreHandlers.Steam;
 /// <summary>
 /// Represents a game installed with Steam.
 /// </summary>
-/// <param name="AppId">ID of the game</param>
-/// <param name="Name">Name of the game</param>
-/// <param name="Path">Absolute path to the game installation folder</param>
+/// <param name="AppId">ID of the game.</param>
+/// <param name="Name">Name of the game.</param>
+/// <param name="Path">Absolute path to the game installation directory.</param>
+/// <param name="CloudSavesDirectory">Absolute path to the cloud saves directory.</param>
 [PublicAPI]
-public record SteamGame(SteamGameId AppId, string Name, AbsolutePath Path) : IGame
+public record SteamGame(SteamGameId AppId, string Name, AbsolutePath Path, AbsolutePath? CloudSavesDirectory) : IGame
 {
     /// <summary>
     /// Returns the absolute path of the manifest for this game.

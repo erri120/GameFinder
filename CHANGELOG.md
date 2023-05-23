@@ -6,10 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.0.2...HEAD)
 
-## [3.0.3](https://github.com/erri120/GameFinder/compare/v3.0.2...HEAD) - TBD
+## [3.1.0](https://github.com/erri120/GameFinder/compare/v3.0.2...HEAD) - TBD
 
 **Changes**:
 
+- Steam: added `CloudSavesDirectory` to `SteamGame`.
 - Fixed `AWinePrefix.CreateRegistry` throwing an exception when the file doesn't exist. It will now do a check and early exist with an empty registry, if the registry file doesn't exist.
 - Fixed `WMIHelper` throwing an exception when WMI returns more than one element.
 - Marked `GameFinder.StoreHandlers.EADesktop` as non-trimmable.

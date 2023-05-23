@@ -17,7 +17,7 @@ public partial class SteamTests
             .GetKnownPath(KnownPath.TempDirectory)
             .CombineUnchecked($"{id.ToString(CultureInfo.InvariantCulture)}.acf");
 
-        var game = new SteamGame(SteamGameId.From(id), name, path);
+        var game = new SteamGame(SteamGameId.From(id), name, path, CloudSavesDirectory: null);
         game.GetManifestPath().Should().Be(expectedManifestPath);
     }
 }
