@@ -249,11 +249,11 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
             return new ErrorMessage($"InstallInfo #{num} for {softwareId} ({baseSlug}) does not have the value \"baseInstallPath\"");
         }
 
-        var executableCheck = installInfo.ExecutableCheck;
+        var executableCheck = installInfo.ExecutableCheck ?? "";
         var sRegKey = "";
         if (executableCheck.StartsWith('['))
         {
-            int j = executableCheck.IndexOf(']');
+            var j = executableCheck.IndexOf(']');
             if (j > 1)
                 sRegKey = executableCheck.Substring(1, j - 1);
         }
