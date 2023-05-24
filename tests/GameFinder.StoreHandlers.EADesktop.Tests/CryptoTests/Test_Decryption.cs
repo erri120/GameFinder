@@ -16,8 +16,8 @@ public partial class CryptoTests
 
         var iv = Decryption.CreateDecryptionIV();
 
-        var cipherText = File.ReadAllBytes(Path.Combine("files", "IS_erri120.encrypted"));
-        var expectedPlainText = File.ReadAllText(Path.Combine("files", "IS_erri120.decrypted"));
+        var cipherText = File.ReadAllBytes(Path.Combine("files", "IS_Nutzzz.encrypted"));
+        var expectedPlainText = File.ReadAllText(Path.Combine("files", "IS_Nutzzz.decrypted"));
 
         var plainText = Decryption.DecryptFile(cipherText, key, iv);
         plainText.Should().Be(expectedPlainText);
