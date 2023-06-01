@@ -1,5 +1,3 @@
-using System;
-using System.Diagnostics;
 using System.Globalization;
 using JetBrains.Annotations;
 
@@ -90,13 +88,13 @@ public readonly struct SteamId
     /// URL to the community profile of the account using <see cref="RawId"/>.
     /// </summary>
     /// <example>https://steamcommunity.com/profiles/76561198110222274</example>
-    public string ProfileUrl => $"https://steamcommunity.com/profiles/{RawId}";
+    public string ProfileUrl => $"{Constants.SteamCommunityBaseUrl}/profiles/{RawId}";
 
     /// <summary>
     /// URL to the community profile of the account using the <see cref="Steam3Id"/>.
     /// </summary>
     /// <example>https://steamcommunity.com/profiles/[U:1:149956546]</example>
-    public string Steam3IdProfileUrl => $"https://steamcommunity.com/profiles/{Steam3Id}";
+    public string Steam3IdProfileUrl => $"{Constants.SteamCommunityBaseUrl}/profiles/{Steam3Id}";
 
     /// <inheritdoc/>
     public override string ToString() => Steam3Id;
