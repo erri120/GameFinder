@@ -13,7 +13,7 @@ namespace GameFinder.StoreHandlers.Steam.Models;
 public readonly struct SteamId
 {
     /// <summary>
-    /// Empty id.
+    /// Represents an empty ID of an invalid user.
     /// </summary>
     public static readonly SteamId Empty = new(0);
 
@@ -33,12 +33,12 @@ public readonly struct SteamId
     }
 
     /// <summary>
-    /// Universe of the account.
+    /// Gets the universe of the account.
     /// </summary>
     public SteamUniverse Universe => (SteamUniverse)(int)(RawId >> 56);
 
     /// <summary>
-    /// Account type.
+    /// Gets the account type.
     /// </summary>
     public SteamAccountType AccountType => (SteamAccountType)((byte)(RawId >> 52) & 0xF);
 
@@ -61,37 +61,46 @@ public readonly struct SteamId
     };
 
     /// <summary>
-    /// Account id.
+    /// Gets the account identifier.
     /// </summary>
+    /// <remarks>
+    /// This identifier can be used to get the current user data in the Steam installation directory.
+    /// It's also used by <see cref="Steam3Id"/>.
+    /// </remarks>
     /// <example>149956546</example>
     public int AccountId => (int)(RawId << 32 >> 32);
 
     /// <summary>
-    /// Account number.
+    /// Gets the account number.
     /// </summary>
-    /// <example></example>
+    /// <remarks>
+    /// This is only useful for <see cref="Steam2Id"/>.
+    /// </remarks>
+    /// <example>74978273</example>
     public int AccountNumber => (int)(RawId << 32 >> 33);
 
     /// <summary>
-    /// Textually representation in the Steam2 ID format.
+    /// Gets the textually representation in the Steam2 ID format.
     /// </summary>
     /// <example>STEAM_1:0:74978273</example>
+    /// <seealso cref="Steam3Id"/>
     public string Steam2Id => $"STEAM_{((int)Universe).ToString(CultureInfo.InvariantCulture)}:{((int)(RawId << 63 >> 63)).ToString(CultureInfo.InvariantCulture)}:{AccountNumber.ToString(CultureInfo.InvariantCulture)}";
 
     /// <summary>
-    /// Textually representation in the Steam3 ID format.
+    /// Gets the textually representation in the Steam3 ID format.
     /// </summary>
     /// <example>[U:1:149956546]</example>
+    /// <seealso cref="Steam2Id"/>
     public string Steam3Id => $"[{AccountTypeLetter}:1:{AccountId.ToString(CultureInfo.InvariantCulture)}]";
 
     /// <summary>
-    /// URL to the community profile of the account using <see cref="RawId"/>.
+    /// Gets the URL to the community profile page of the account using <see cref="RawId"/>.
     /// </summary>
     /// <example>https://steamcommunity.com/profiles/76561198110222274</example>
     public string ProfileUrl => $"{Constants.SteamCommunityBaseUrl}/profiles/{RawId}";
 
     /// <summary>
-    /// URL to the community profile of the account using the <see cref="Steam3Id"/>.
+    /// Gets the URL to the community profile page of the account using the <see cref="Steam3Id"/>.
     /// </summary>
     /// <example>https://steamcommunity.com/profiles/[U:1:149956546]</example>
     public string Steam3IdProfileUrl => $"{Constants.SteamCommunityBaseUrl}/profiles/{Steam3Id}";
