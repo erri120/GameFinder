@@ -43,24 +43,6 @@ public readonly struct SteamId
     public SteamAccountType AccountType => (SteamAccountType)((byte)(RawId >> 52) & 0xF);
 
     /// <summary>
-    /// Gets the account type letter for the current <see cref="AccountType"/>.
-    /// </summary>
-    public char AccountTypeLetter => AccountType switch
-    {
-        SteamAccountType.Invalid => 'I',
-        SteamAccountType.Individual => 'U',
-        SteamAccountType.Multiseat => 'M',
-        SteamAccountType.GameServer => 'G',
-        SteamAccountType.AnonGameServer => 'A',
-        SteamAccountType.Pending => 'P',
-        SteamAccountType.ContentServer => 'C',
-        SteamAccountType.Clan => 'g',
-        SteamAccountType.Chat => 'T',
-        SteamAccountType.AnonUser => 'a',
-        _ => '?'
-    };
-
-    /// <summary>
     /// Gets the account identifier.
     /// </summary>
     /// <remarks>
@@ -91,7 +73,7 @@ public readonly struct SteamId
     /// </summary>
     /// <example>[U:1:149956546]</example>
     /// <seealso cref="Steam2Id"/>
-    public string Steam3Id => $"[{AccountTypeLetter}:1:{AccountId.ToString(CultureInfo.InvariantCulture)}]";
+    public string Steam3Id => $"[{AccountType.GetLetter()}:1:{AccountId.ToString(CultureInfo.InvariantCulture)}]";
 
     /// <summary>
     /// Gets the URL to the community profile page of the account using <see cref="RawId"/>.

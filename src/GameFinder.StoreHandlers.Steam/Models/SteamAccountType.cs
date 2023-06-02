@@ -70,3 +70,34 @@ public enum SteamAccountType : byte
     /// </summary>
     AnonUser = 10,
 }
+
+/// <summary>
+/// Extension methods for <see cref="SteamAccountType"/>.
+/// </summary>
+[PublicAPI]
+public static class SteamAccountTypeExtensions
+{
+    /// <summary>
+    /// Gets the letter assigned to the provided account type.
+    /// </summary>
+    /// <remarks>
+    /// Returns <c>?</c> if the account type is unknown or doesn't have
+    /// a letter associated with it.
+    /// </remarks>
+    /// <param name="accountType"></param>
+    /// <returns></returns>
+    public static char GetLetter(this SteamAccountType accountType) => accountType switch
+    {
+        SteamAccountType.Invalid => 'I',
+        SteamAccountType.Individual => 'U',
+        SteamAccountType.Multiseat => 'M',
+        SteamAccountType.GameServer => 'G',
+        SteamAccountType.AnonGameServer => 'A',
+        SteamAccountType.Pending => 'P',
+        SteamAccountType.ContentServer => 'C',
+        SteamAccountType.Clan => 'g',
+        SteamAccountType.Chat => 'T',
+        SteamAccountType.AnonUser => 'a',
+        _ => '?'
+    };
+}

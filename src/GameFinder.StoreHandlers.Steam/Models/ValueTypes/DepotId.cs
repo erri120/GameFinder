@@ -13,6 +13,11 @@ namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 public readonly partial struct DepotId
 {
     /// <summary>
+    /// Empty or default value of <c>0</c>.
+    /// </summary>
+    public static readonly DepotId Empty = From(0);
+
+    /// <summary>
     /// Gets the URL to the SteamDB page of this depot.
     /// </summary>
     /// <example><c>https://steamdb.info/depot/262061</c></example>
