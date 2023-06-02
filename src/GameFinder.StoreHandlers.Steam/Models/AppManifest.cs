@@ -48,6 +48,11 @@ public record AppManifest
     public required string Name { get; init; }
 
     /// <summary>
+    /// Gets the current state of the app.
+    /// </summary>
+    public required StateFlags StateFlags { get; init; }
+
+    /// <summary>
     /// Gets the name of the installation directory of the app.
     /// </summary>
     /// <remarks>
@@ -178,6 +183,38 @@ public record AppManifest
     /// Gets all locally installed depots.
     /// </summary>
     public IReadOnlyDictionary<DepotId, InstalledDepot> InstalledDepots { get; init; } = ImmutableDictionary<DepotId, InstalledDepot>.Empty;
+
+    /// <summary>
+    /// Gets all locally installed shared depots.
+    /// </summary>
+    /// <remarks>
+    /// Shared depots are depots from another app and are commonly used for the Steamworks Common Redistributables.
+    /// </remarks>
+    public IReadOnlyList<KeyValuePair<DepotId, AppId>> SharedDepots { get; init; } = ImmutableList<KeyValuePair<DepotId, AppId>>.Empty;
+
+    /// <summary>
+    /// Gets the local user config.
+    /// </summary>
+    /// <remarks>
+    /// This can contains keys like <c>language</c> or <c>BetaKey</c>. It should be noted
+    /// that the existence of a key shouldn't be used to infer a config value. As an example:
+    /// If the user opts into a beta, the <c>BetaKey</c> value will be set to the beta they
+    /// want to participate in. However, once they opt out of the beta, the key <c>BetaKey</c>
+    /// will still exist but the value will be an empty string. As such, you shouldn't make
+    /// assumption using the existence of a key alone.
+    /// </remarks>
+    /// <seealso cref="MountedConfig"/>
+    public IReadOnlyDictionary<string, string> UserConfig { get; init; } = ImmutableDictionary<string, string>.Empty;
+
+    /// <summary>
+    /// Gets the local mounted config.
+    /// </summary>
+    /// <remarks>
+    /// The meaning of these values are unknown. You'd think they have something to do with <see cref="UserConfig"/>
+    /// but at the time of writing, I couldn't make out a clear connection since these values aren't being updated at all.
+    /// </remarks>
+    /// <seealso cref="UserConfig"/>
+    public IReadOnlyDictionary<string, string> MountedConfig { get; init; } = ImmutableDictionary<string, string>.Empty;
 
     #endregion
 
