@@ -58,12 +58,12 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
     public override IEqualityComparer<SteamGameId>? IdEqualityComparer => null;
 
     /// <inheritdoc/>
-    public override IEnumerable<OneOf<SteamGame, ErrorMessage>> FindAllGames()
+    public override IEnumerable<OneOf<SteamGame, LogMessage>> FindAllGames()
     {
         var steamSearchResult = FindSteam();
-        if (steamSearchResult.TryGetError(out var error))
+        if (steamSearchResult.TryGetMessage(out var message))
         {
-            yield return error;
+            yield return message;
             yield break;
         }
 
@@ -75,7 +75,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         var libraryFolderPaths = ParseLibraryFoldersFile(libraryFoldersFile);
         if (libraryFolderPaths is null || libraryFolderPaths.Count == 0)
         {
-            yield return new ErrorMessage($"Found no Steam Libraries in {libraryFoldersFile}");
+            yield return new LogMessage($"Found no Steam Libraries in {libraryFoldersFile}");
             yield break;
         }
 
@@ -83,7 +83,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         {
             if (!_fileSystem.DirectoryExists(libraryFolderPath))
             {
-                yield return new ErrorMessage($"Steam Library {libraryFolderPath} does not exist!");
+                yield return new LogMessage($"Steam Library {libraryFolderPath} does not exist!");
                 continue;
             }
 
@@ -93,7 +93,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
             if (acfFiles.Length == 0)
             {
-                yield return new ErrorMessage($"Library folder {libraryFolderPath} does not contain any manifests");
+                yield return new LogMessage($"Library folder {libraryFolderPath} does not contain any manifests");
                 continue;
             }
 
@@ -139,7 +139,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         return dictionary;
     }
 
-    private OneOf<AbsolutePath, ErrorMessage> FindSteam()
+    private OneOf<AbsolutePath, LogMessage> FindSteam()
     {
         try
         {
@@ -157,31 +157,31 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
             if (_registry is null)
             {
-                return new ErrorMessage("Unable to find Steam in one of the default paths");
+                return new LogMessage("Unable to find Steam in one of the default paths");
             }
 
             var steamDir = FindSteamInRegistry(_registry);
             if (steamDir == default)
             {
-                return new ErrorMessage("Unable to find Steam in the registry and one of the default paths");
+                return new LogMessage("Unable to find Steam in the registry and one of the default paths");
             }
 
             if (!_fileSystem.DirectoryExists(steamDir))
             {
-                return new ErrorMessage($"Unable to find Steam in one of the default paths and the path from the registry does not exist: {steamDir}");
+                return new LogMessage($"Unable to find Steam in one of the default paths and the path from the registry does not exist: {steamDir}");
             }
 
             libraryFoldersFile = GetLibraryFoldersFile(steamDir);
             if (!_fileSystem.FileExists(libraryFoldersFile))
             {
-                return new ErrorMessage($"Unable to find Steam in one of the default paths and the path from the registry is not a valid Steam installation because {libraryFoldersFile} does not exist");
+                return new LogMessage($"Unable to find Steam in one of the default paths and the path from the registry is not a valid Steam installation because {libraryFoldersFile} does not exist");
             }
 
             return libraryFoldersFile;
         }
         catch (Exception e)
         {
-            return new ErrorMessage(e, "Exception while searching for Steam");
+            return new LogMessage(e, "Exception while searching for Steam");
         }
     }
 
@@ -287,7 +287,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         }
     }
 
-    private OneOf<SteamGame, ErrorMessage> ParseAppManifestFile(
+    private OneOf<SteamGame, LogMessage> ParseAppManifestFile(
         AbsolutePath manifestFile,
         AbsolutePath libraryFolder,
         IReadOnlyDictionary<SteamGameId, AbsolutePath> cloudSavesDirectories)
@@ -301,25 +301,25 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
 
             if (!data.Name.Equals("AppState", StringComparison.OrdinalIgnoreCase))
             {
-                return new ErrorMessage($"Manifest {manifestFile.GetFullPath()} is not a valid format!");
+                return new LogMessage($"Manifest {manifestFile.GetFullPath()} is not a valid format!");
             }
 
             var appIdValue = data["appid"];
             if (appIdValue is null)
             {
-                return new ErrorMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"appid\"");
+                return new LogMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"appid\"");
             }
 
             var nameValue = data["name"];
             if (nameValue is null)
             {
-                return new ErrorMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"name\"");
+                return new LogMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"name\"");
             }
 
             var installDirValue = data["installdir"];
             if (installDirValue is null)
             {
-                return new ErrorMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"installdir\"");
+                return new LogMessage($"Manifest {manifestFile.GetFullPath()} does not have the value \"installdir\"");
             }
 
             var appId = appIdValue.ToInt32(NumberFormatInfo.InvariantInfo);
@@ -340,7 +340,7 @@ public class SteamHandler : AHandler<SteamGame, SteamGameId>
         }
         catch (Exception e)
         {
-            return new ErrorMessage(e, $"Exception while parsing file {manifestFile.GetFullPath()}");
+            return new LogMessage(e, $"Exception while parsing file {manifestFile.GetFullPath()}");
         }
     }
 }

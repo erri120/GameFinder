@@ -6,32 +6,32 @@ namespace TestUtils;
 
 public static class AssertionHelpers
 {
-    public static IEnumerable<TGame> ShouldOnlyBeGames<TGame>(this ICollection<OneOf<TGame, ErrorMessage>> results)
+    public static IEnumerable<TGame> ShouldOnlyBeGames<TGame>(this ICollection<OneOf<TGame, LogMessage>> results)
         where TGame : class, IGame
     {
         results.Should().AllSatisfy(result =>
         {
-            result.IsGame().Should().BeTrue(result.IsError() ? result.AsError().Message : string.Empty);
-            result.IsError().Should().BeFalse();
+            result.IsGame().Should().BeTrue(result.IsMessage() ? result.AsMessage().Message : string.Empty);
+            result.IsMessage().Should().BeFalse();
         });
 
         return results.Select(result => result.AsGame());
     }
 
-    private static ErrorMessage ShouldOnlyBeOneError<TGame>(
-        this ICollection<OneOf<TGame, ErrorMessage>> results)
+    private static LogMessage ShouldOnlyBeOneError<TGame>(
+        this ICollection<OneOf<TGame, LogMessage>> results)
         where TGame : class, IGame
     {
         results.Should().ContainSingle();
 
         var result = results.First();
-        result.IsError().Should().BeTrue();
+        result.IsMessage().Should().BeTrue();
         result.IsGame().Should().BeFalse();
 
-        return result.AsError();
+        return result.AsMessage();
     }
 
-    public static ErrorMessage ShouldOnlyBeOneError<TGame, TId>(
+    public static LogMessage ShouldOnlyBeOneError<TGame, TId>(
         this AHandler<TGame, TId> handler)
         where TGame : class, IGame
         where TId : notnull
@@ -59,8 +59,8 @@ public static class AssertionHelpers
         where TGame : class, IGame
         where TId : notnull
     {
-        var results = handler.FindAllGamesById(out var errors);
-        errors.Should().BeEmpty();
+        var results = handler.FindAllGamesById(out var messages);
+        messages.Should().BeEmpty();
 
         results.Should().ContainKeys(expectedGames.Select(keySelector));
         results.Should().ContainValues(expectedGames);

@@ -20,8 +20,8 @@ public partial class XboxTests
             })
             .ToArray();
 
-        var (paths, errors) = XboxHandler.GetAppFolders(fs);
-        errors.Should().BeEmpty();
+        var (paths, messages) = XboxHandler.GetAppFolders(fs);
+        messages.Should().BeEmpty();
         paths.Should().BeEquivalentTo(expectedPaths);
     }
 }

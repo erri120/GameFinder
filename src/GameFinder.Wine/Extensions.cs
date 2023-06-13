@@ -18,7 +18,7 @@ public static class Extensions
     /// <param name="result"></param>
     /// <typeparam name="TPrefix"></typeparam>
     /// <returns></returns>
-    public static bool IsPrefix<TPrefix>(this OneOf<TPrefix, ErrorMessage> result)
+    public static bool IsPrefix<TPrefix>(this OneOf<TPrefix, LogMessage> result)
         where TPrefix : AWinePrefix
     {
         return result.IsT0;
@@ -35,7 +35,7 @@ public static class Extensions
     /// <exception cref="InvalidOperationException">
     /// Thrown when the result is not of type <typeparamref name="TPrefix"/>.
     /// </exception>
-    public static TPrefix AsPrefix<TPrefix>(this OneOf<TPrefix, ErrorMessage> result)
+    public static TPrefix AsPrefix<TPrefix>(this OneOf<TPrefix, LogMessage> result)
         where TPrefix : AWinePrefix
     {
         return result.AsT0;
@@ -50,7 +50,7 @@ public static class Extensions
     /// <typeparam name="TPrefix"></typeparam>
     /// <returns></returns>
     public static bool TryGetPrefix<TPrefix>(
-        this OneOf<TPrefix, ErrorMessage> result,
+        this OneOf<TPrefix, LogMessage> result,
         [MaybeNullWhen(false)] out TPrefix prefix)
         where TPrefix : AWinePrefix
     {

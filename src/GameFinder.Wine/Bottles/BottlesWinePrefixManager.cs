@@ -23,14 +23,14 @@ public class BottlesWinePrefixManager : IWinePrefixManager<BottlesWinePrefix>
     }
 
     /// <inheritdoc/>
-    public IEnumerable<OneOf<BottlesWinePrefix, ErrorMessage>> FindPrefixes()
+    public IEnumerable<OneOf<BottlesWinePrefix, LogMessage>> FindPrefixes()
     {
         var defaultLocation = GetDefaultLocations(_fileSystem)
             .FirstOrDefault(x => _fileSystem.DirectoryExists(x));
 
         if (string.IsNullOrEmpty(defaultLocation.Directory))
         {
-            yield return new ErrorMessage("Unable to find any bottles installation.");
+            yield return new LogMessage("Unable to find any bottles installation.");
             yield break;
         }
 
@@ -38,27 +38,27 @@ public class BottlesWinePrefixManager : IWinePrefixManager<BottlesWinePrefix>
         foreach (var bottle in _fileSystem.EnumerateDirectories(bottles, recursive: false))
         {
             var res = IsValidBottlesPrefix(_fileSystem, bottle);
-            yield return res.Match<OneOf<BottlesWinePrefix, ErrorMessage>>(
+            yield return res.Match<OneOf<BottlesWinePrefix, LogMessage>>(
                 _ => new BottlesWinePrefix
                 {
                     ConfigurationDirectory = bottle,
                 },
-                error => error);
+                message => message);
         }
     }
 
-    internal static OneOf<bool, ErrorMessage> IsValidBottlesPrefix(IFileSystem fs, AbsolutePath directory)
+    internal static OneOf<bool, LogMessage> IsValidBottlesPrefix(IFileSystem fs, AbsolutePath directory)
     {
         var defaultWinePrefixRes = DefaultWinePrefixManager.IsValidPrefix(fs, directory);
-        if (defaultWinePrefixRes.IsError())
+        if (defaultWinePrefixRes.IsMessage())
         {
-            return defaultWinePrefixRes.AsError();
+            return defaultWinePrefixRes.AsMessage();
         }
 
         var bottlesConfigFile = directory.CombineUnchecked("bottle.yml");
         if (!fs.FileExists(bottlesConfigFile))
         {
-            return new ErrorMessage($"Bottles configuration file is missing at {bottlesConfigFile}");
+            return new LogMessage($"Bottles configuration file is missing at {bottlesConfigFile}");
         }
 
         return true;

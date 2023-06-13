@@ -48,20 +48,20 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
     public override IEqualityComparer<OriginGameId> IdEqualityComparer => OriginGameIdComparer.Default;
 
     /// <inheritdoc/>
-    public override IEnumerable<OneOf<OriginGame, ErrorMessage>> FindAllGames()
+    public override IEnumerable<OneOf<OriginGame, LogMessage>> FindAllGames()
     {
         var manifestDir = GetManifestDir(_fileSystem);
 
         if (!_fileSystem.DirectoryExists(manifestDir))
         {
-            yield return new ErrorMessage($"Manifest folder {manifestDir} does not exist!");
+            yield return new LogMessage($"Manifest folder {manifestDir} does not exist!");
             yield break;
         }
 
         var mfstFiles = _fileSystem.EnumerateFiles(manifestDir, "*.mfst").ToList();
         if (mfstFiles.Count == 0)
         {
-            yield return new ErrorMessage($"Manifest folder {manifestDir} does not contain any .mfst files");
+            yield return new LogMessage($"Manifest folder {manifestDir} does not contain any .mfst files");
             yield break;
         }
 
@@ -83,7 +83,7 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
     }
 
     [SuppressMessage("ReSharper", "IdentifierTypo")]
-    private OneOf<OriginGame, ErrorMessage, bool> ParseMfstFile(AbsolutePath filePath)
+    private OneOf<OriginGame, LogMessage, bool> ParseMfstFile(AbsolutePath filePath)
     {
         try
         {
@@ -97,7 +97,7 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
             var ids = query.GetValues("id");
             if (ids is null || ids.Length == 0)
             {
-                return new ErrorMessage($"Manifest {filePath} does not have a value \"id\"");
+                return new LogMessage($"Manifest {filePath} does not have a value \"id\"");
             }
 
             var id = ids[0];
@@ -107,7 +107,7 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
             var installPaths = query.GetValues("dipInstallPath");
             if (installPaths is null || installPaths.Length == 0)
             {
-                return new ErrorMessage($"Manifest {filePath} does not have a value \"dipInstallPath\"");
+                return new LogMessage($"Manifest {filePath} does not have a value \"dipInstallPath\"");
             }
 
             var path = installPaths
@@ -123,7 +123,7 @@ public class OriginHandler : AHandler<OriginGame, OriginGameId>
         }
         catch (Exception e)
         {
-            return new ErrorMessage(e, $"Exception while parsing {filePath}");
+            return new LogMessage(e, $"Exception while parsing {filePath}");
         }
     }
 }

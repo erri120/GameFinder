@@ -20,8 +20,8 @@ public static class Extensions
     /// <param name="results"></param>
     /// <typeparam name="TGame"></typeparam>
     /// <returns></returns>
-    public static (TGame[] games, ErrorMessage[] errors) SplitResults<TGame>(
-        [InstantHandle] this IEnumerable<OneOf<TGame, ErrorMessage>> results)
+    public static (TGame[] games, LogMessage[] messages) SplitResults<TGame>(
+        [InstantHandle] this IEnumerable<OneOf<TGame, LogMessage>> results)
         where TGame : class, IGame
     {
         var allResults = results.ToArray();
@@ -31,12 +31,12 @@ public static class Extensions
             .Select(x => x.AsT0)
             .ToArray();
 
-        var errors = allResults
+        var messages = allResults
             .Where(x => x.IsT1)
             .Select(x => x.AsT1)
             .ToArray();
 
-        return (games, errors);
+        return (games, messages);
     }
 
     /// <summary>
@@ -75,19 +75,19 @@ public static class Extensions
     /// <param name="result"></param>
     /// <typeparam name="TGame"></typeparam>
     /// <returns></returns>
-    public static bool IsGame<TGame>(this OneOf<TGame, ErrorMessage> result)
+    public static bool IsGame<TGame>(this OneOf<TGame, LogMessage> result)
         where TGame : class, IGame
     {
         return result.IsT0;
     }
 
     /// <summary>
-    /// Returns <c>true</c> if the result is of type <see cref="ErrorMessage"/>.
+    /// Returns <c>true</c> if the result is of type <see cref="LogMessage"/>.
     /// </summary>
     /// <param name="result"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static bool IsError<T>(this OneOf<T, ErrorMessage> result)
+    public static bool IsMessage<T>(this OneOf<T, LogMessage> result)
     {
         return result.IsT1;
     }
@@ -103,24 +103,24 @@ public static class Extensions
     /// <exception cref="InvalidOperationException">
     /// Thrown when the result is not of type <typeparamref name="TGame"/>.
     /// </exception>
-    public static TGame AsGame<TGame>(this OneOf<TGame, ErrorMessage> result)
+    public static TGame AsGame<TGame>(this OneOf<TGame, LogMessage> result)
         where TGame : class, IGame
     {
         return result.AsT0;
     }
 
     /// <summary>
-    /// Returns the <see cref="ErrorMessage"/> part of the result. This can
-    /// throw if the result is not of type <see cref="ErrorMessage"/>. Use
-    /// <see cref="TryGetError{T}"/> instead.
+    /// Returns the <see cref="LogMessage"/> part of the result. This can
+    /// throw if the result is not of type <see cref="LogMessage"/>. Use
+    /// <see cref="TryGetMessage{T}"/> instead.
     /// </summary>
     /// <param name="result"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException">
-    /// Thrown when the result is not of type <see cref="ErrorMessage"/>.
+    /// Thrown when the result is not of type <see cref="LogMessage"/>.
     /// </exception>
-    public static ErrorMessage AsError<T>(this OneOf<T, ErrorMessage> result)
+    public static LogMessage AsMessage<T>(this OneOf<T, LogMessage> result)
     {
         return result.AsT1;
     }
@@ -133,7 +133,7 @@ public static class Extensions
     /// <param name="game"></param>
     /// <typeparam name="TGame"></typeparam>
     /// <returns></returns>
-    public static bool TryGetGame<TGame>(this OneOf<TGame, ErrorMessage> result,
+    public static bool TryGetGame<TGame>(this OneOf<TGame, LogMessage> result,
         [MaybeNullWhen(false)] out TGame game)
         where TGame : class, IGame
     {
@@ -145,19 +145,19 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Returns the <see cref="ErrorMessage"/> part of the result using the
+    /// Returns the <see cref="LogMessage"/> part of the result using the
     /// try-get pattern.
     /// </summary>
     /// <param name="result"></param>
-    /// <param name="error"></param>
+    /// <param name="message"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static bool TryGetError<T>(this OneOf<T, ErrorMessage> result, out ErrorMessage error)
+    public static bool TryGetMessage<T>(this OneOf<T, LogMessage> result, out LogMessage message)
     {
-        error = default;
-        if (!result.IsError()) return false;
+        message = default;
+        if (!result.IsMessage()) return false;
 
-        error = result.AsError();
+        message = result.AsMessage();
         return true;
     }
 }

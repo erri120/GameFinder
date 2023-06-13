@@ -16,5 +16,5 @@ public interface IWinePrefixManager<TPrefix> where TPrefix : AWinePrefix
     /// Finds all prefixes associated with this manager.
     /// </summary>
     /// <returns></returns>
-    IEnumerable<OneOf<TPrefix, ErrorMessage>> FindPrefixes();
+    IEnumerable<OneOf<TPrefix, LogMessage>> FindPrefixes();
 }

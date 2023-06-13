@@ -6,10 +6,10 @@ namespace GameFinder.Common.Tests;
 public class ExtensionTests
 {
     private static readonly IGame Game = new Mock<IGame>().Object;
-    private static readonly ErrorMessage Error = new(string.Empty);
+    private static readonly LogMessage Message = new(string.Empty);
 
-    private static readonly OneOf<IGame, ErrorMessage> GameResult = OneOf<IGame, ErrorMessage>.FromT0(Game);
-    private static readonly OneOf<IGame, ErrorMessage> ErrorResult = OneOf<IGame, ErrorMessage>.FromT1(Error);
+    private static readonly OneOf<IGame, LogMessage> GameResult = OneOf<IGame, LogMessage>.FromT0(Game);
+    private static readonly OneOf<IGame, LogMessage> MessageResult = OneOf<IGame, LogMessage>.FromT1(Message);
 
     [Fact]
     public void Test_CustomToDictionary()
@@ -30,22 +30,22 @@ public class ExtensionTests
     [Fact]
     public void Test_IsGame_False()
     {
-        var result = ErrorResult;
+        var result = MessageResult;
         result.IsGame().Should().BeFalse();
     }
 
     [Fact]
-    public void Test_IsError_True()
+    public void Test_IsMessage_True()
     {
-        var result = ErrorResult;
-        result.IsError().Should().BeTrue();
+        var result = MessageResult;
+        result.IsMessage().Should().BeTrue();
     }
 
     [Fact]
-    public void Test_IsError_False()
+    public void Test_IsMessage_False()
     {
         var result = GameResult;
-        result.IsError().Should().BeFalse();
+        result.IsMessage().Should().BeFalse();
     }
 
     [Fact]
@@ -58,25 +58,25 @@ public class ExtensionTests
     [Fact]
     public void Test_AsGame_InvalidOperationException()
     {
-        var result = ErrorResult;
+        var result = MessageResult;
         result
             .Invoking(x => x.AsGame())
             .Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]
-    public void Test_AsError()
+    public void Test_AsMessage()
     {
-        var result = ErrorResult;
-        result.AsError().Should().Be(string.Empty);
+        var result = MessageResult;
+        result.AsMessage().Should().Be(string.Empty);
     }
 
     [Fact]
-    public void Test_AsError_InvalidOperationException()
+    public void Test_AsMessage_InvalidOperationException()
     {
         var result = GameResult;
         result
-            .Invoking(x => x.AsError())
+            .Invoking(x => x.AsMessage())
             .Should().ThrowExactly<InvalidOperationException>();
     }
 
@@ -90,23 +90,23 @@ public class ExtensionTests
     [Fact]
     public void Test_TryGetGame_False()
     {
-        var result = ErrorResult;
+        var result = MessageResult;
         result.TryGetGame(out var game).Should().BeFalse();
         game.Should().BeNull();
     }
 
     [Fact]
-    public void Test_TryGetError_True()
+    public void Test_TryGetMessage_True()
     {
-        var result = ErrorResult;
-        result.TryGetError(out _).Should().BeTrue();
+        var result = MessageResult;
+        result.TryGetMessage(out _).Should().BeTrue();
     }
 
     [Fact]
-    public void Test_TryGetError_False()
+    public void Test_TryGetMessage_False()
     {
         var result = GameResult;
-        result.TryGetError(out var error).Should().BeFalse();
-        error.Should().Be(default(ErrorMessage));
+        result.TryGetMessage(out var message).Should().BeFalse();
+        message.Should().Be(default(LogMessage));
     }
 }

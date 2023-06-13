@@ -50,7 +50,7 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
     public override IEqualityComparer<GOGGameId>? IdEqualityComparer => null;
 
     /// <inheritdoc/>
-    public override IEnumerable<OneOf<GOGGame, ErrorMessage>> FindAllGames()
+    public override IEnumerable<OneOf<GOGGame, LogMessage>> FindAllGames()
     {
         try
         {
@@ -59,18 +59,18 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
             using var gogKey = localMachine.OpenSubKey(GOGRegKey);
             if (gogKey is null)
             {
-                return new OneOf<GOGGame, ErrorMessage>[]
+                return new OneOf<GOGGame, LogMessage>[]
                 {
-                    new ErrorMessage($"Unable to open HKEY_LOCAL_MACHINE\\{GOGRegKey}"),
+                    new LogMessage($"Unable to open HKEY_LOCAL_MACHINE\\{GOGRegKey}"),
                 };
             }
 
             var subKeyNames = gogKey.GetSubKeyNames().ToArray();
             if (subKeyNames.Length == 0)
             {
-                return new OneOf<GOGGame, ErrorMessage>[]
+                return new OneOf<GOGGame, LogMessage>[]
                 {
-                    new ErrorMessage($"Registry key {gogKey.GetName()} has no sub-keys"),
+                    new LogMessage($"Registry key {gogKey.GetName()} has no sub-keys"),
                 };
             }
 
@@ -80,41 +80,41 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
         }
         catch (Exception e)
         {
-            return new OneOf<GOGGame, ErrorMessage>[]
+            return new OneOf<GOGGame, LogMessage>[]
             {
-                new ErrorMessage(e, "Exception looking for GOG games"),
+                new LogMessage(e, "Exception looking for GOG games"),
             };
         }
     }
 
-    private OneOf<GOGGame, ErrorMessage> ParseSubKey(IRegistryKey gogKey, string subKeyName)
+    private OneOf<GOGGame, LogMessage> ParseSubKey(IRegistryKey gogKey, string subKeyName)
     {
         try
         {
             using var subKey = gogKey.OpenSubKey(subKeyName);
             if (subKey is null)
             {
-                return new ErrorMessage($"Unable to open {gogKey}\\{subKeyName}");
+                return new LogMessage($"Unable to open {gogKey}\\{subKeyName}");
             }
 
             if (!subKey.TryGetString("gameID", out var sId))
             {
-                return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"gameID\"");
+                return new LogMessage($"{subKey.GetName()} doesn't have a string value \"gameID\"");
             }
 
             if (!long.TryParse(sId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
             {
-                return new ErrorMessage($"The value \"gameID\" of {subKey.GetName()} is not a number: \"{sId}\"");
+                return new LogMessage($"The value \"gameID\" of {subKey.GetName()} is not a number: \"{sId}\"");
             }
 
             if (!subKey.TryGetString("gameName", out var name))
             {
-                return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"gameName\"");
+                return new LogMessage($"{subKey.GetName()} doesn't have a string value \"gameName\"");
             }
 
             if (!subKey.TryGetString("path", out var path))
             {
-                return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"path\"");
+                return new LogMessage($"{subKey.GetName()} doesn't have a string value \"path\"");
             }
 
             var game = new GOGGame(
@@ -127,7 +127,7 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
         }
         catch (Exception e)
         {
-            return new ErrorMessage(e, $"Exception while parsing registry key {gogKey}\\{subKeyName}");
+            return new LogMessage(e, $"Exception while parsing registry key {gogKey}\\{subKeyName}");
         }
     }
 }

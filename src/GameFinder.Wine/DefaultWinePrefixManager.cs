@@ -27,40 +27,40 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
     }
 
     /// <inheritdoc/>
-    public IEnumerable<OneOf<WinePrefix, ErrorMessage>> FindPrefixes()
+    public IEnumerable<OneOf<WinePrefix, LogMessage>> FindPrefixes()
     {
         foreach (var defaultWinePrefixLocation in GetDefaultWinePrefixLocations(_fileSystem))
         {
             if (!_fileSystem.DirectoryExists(defaultWinePrefixLocation)) continue;
 
             var res = IsValidPrefix(_fileSystem, defaultWinePrefixLocation);
-            yield return res.Match<OneOf<WinePrefix, ErrorMessage>>(
+            yield return res.Match<OneOf<WinePrefix, LogMessage>>(
                 _ => new WinePrefix
                 {
                     ConfigurationDirectory = defaultWinePrefixLocation,
                 },
-                error => error);
+                message => message);
         }
     }
 
-    internal static OneOf<bool, ErrorMessage> IsValidPrefix(IFileSystem fileSystem, AbsolutePath directory)
+    internal static OneOf<bool, LogMessage> IsValidPrefix(IFileSystem fileSystem, AbsolutePath directory)
     {
         var virtualDrive = directory.CombineUnchecked("drive_c");
         if (!fileSystem.DirectoryExists(virtualDrive))
         {
-            return new ErrorMessage($"Virtual C: drive does not exist at {virtualDrive}");
+            return new LogMessage($"Virtual C: drive does not exist at {virtualDrive}");
         }
 
         var systemRegistryFile = directory.CombineUnchecked("system.reg");
         if (!fileSystem.FileExists(systemRegistryFile))
         {
-            return new ErrorMessage($"System registry file does not exist at {systemRegistryFile}");
+            return new LogMessage($"System registry file does not exist at {systemRegistryFile}");
         }
 
         var userRegistryFile = directory.CombineUnchecked("user.reg");
         if (!fileSystem.FileExists(userRegistryFile))
         {
-            return new ErrorMessage($"User registry file does not exist at {userRegistryFile}");
+            return new LogMessage($"User registry file does not exist at {userRegistryFile}");
         }
 
         return true;

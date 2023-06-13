@@ -17,7 +17,7 @@ public enum SchemaPolicy
 
     /// <summary>
     /// Creates a warning about the new schema version. Note that this is represented as
-    /// an error using <see cref="ErrorMessage"/>. This does not abort the
+    /// an error using <see cref="LogMessage"/>. This does not abort the
     /// parsing.
     /// </summary>
     Warn,

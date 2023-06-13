@@ -27,4 +27,7 @@ public class Options
 
     [Option("bottles", HelpText = "Search for wine prefixes managed with bottles")]
     public bool Bottles { get; set; } = true;
+
+    [Option("log", HelpText = $"Log level (0-6; 0=all messages, 6=none")]
+    public int LogLevel { get; set; } = -1;
 }

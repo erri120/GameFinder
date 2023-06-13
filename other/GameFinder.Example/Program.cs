@@ -31,6 +31,12 @@ namespace GameFinder.Example;
 
 public static class Program
 {
+#if DEBUG
+    public static readonly MessageLevel DefaultLogLevel = 0;
+#else
+    public static readonly MessageLevel DefaultLogLevel = 2;
+#endif
+    private static MessageLevel _logLevel = DefaultLogLevel;
     private static NLogLoggerProvider _provider = null!;
 
     public static void Main(string[] args)
@@ -50,10 +56,12 @@ public static class Program
                     CompileRegex = true,
                     ForegroundColor = ConsoleOutputColor.Gray,
                 },
+                new ConsoleWordHighlightingRule("TRACE", ConsoleOutputColor.DarkGray, ConsoleOutputColor.NoChange),
                 new ConsoleWordHighlightingRule("DEBUG", ConsoleOutputColor.Gray, ConsoleOutputColor.NoChange),
                 new ConsoleWordHighlightingRule("INFO", ConsoleOutputColor.Cyan, ConsoleOutputColor.NoChange),
+                new ConsoleWordHighlightingRule("WARN", ConsoleOutputColor.Yellow, ConsoleOutputColor.NoChange),
                 new ConsoleWordHighlightingRule("ERROR", ConsoleOutputColor.Red, ConsoleOutputColor.NoChange),
-                new ConsoleWordHighlightingRule("WARNING", ConsoleOutputColor.Yellow, ConsoleOutputColor.NoChange),
+                new ConsoleWordHighlightingRule("FATAL", ConsoleOutputColor.DarkRed, ConsoleOutputColor.NoChange),
             },
             Layout = "${longdate}|${level:uppercase=true}|${logger}|${message:withexception=true}",
         };
@@ -84,7 +92,10 @@ public static class Program
         var logFile = realFileSystem.GetKnownPath(KnownPath.CurrentDirectory).CombineUnchecked("log.log");
         if (realFileSystem.FileExists(logFile)) realFileSystem.DeleteFile(logFile);
 
-        logger.LogInformation("Operating System: {OSDescription}", RuntimeInformation.OSDescription);
+        _logLevel = (options.LogLevel >= (int)MessageLevel.Trace &&
+            options.LogLevel <= (int)MessageLevel.None) ? (MessageLevel)options.LogLevel : DefaultLogLevel;
+
+        Log(logger, MessageLevel.Info, "Operating System: {OSDescription}", RuntimeInformation.OSDescription);
 
         if (OperatingSystem.IsWindows())
         {
@@ -99,7 +110,7 @@ public static class Program
                 var hardwareInfoProvider = new HardwareInfoProvider();
                 var decryptionKey = Decryption.CreateDecryptionKey(new HardwareInfoProvider());
                 var sDecryptionKey = Convert.ToHexString(decryptionKey).ToLower(CultureInfo.InvariantCulture);
-                logger.LogDebug("EA Decryption Key: {DecryptionKey}", sDecryptionKey);
+                Log(logger, MessageLevel.Debug, "EA Decryption Key: {DecryptionKey}", sDecryptionKey);
 
                 RunEADesktopHandler(realFileSystem, hardwareInfoProvider);
             }
@@ -139,21 +150,21 @@ public static class Program
     {
         var logger = _provider.CreateLogger(nameof(GOGHandler));
         var handler = new GOGHandler(registry, fileSystem);
-        LogGamesAndErrors(handler.FindAllGames(), logger);
+        LogGamesAndMessages(handler.FindAllGames(), logger);
     }
 
     private static void RunEGSHandler(IRegistry registry, IFileSystem fileSystem)
     {
         var logger = _provider.CreateLogger(nameof(EGSHandler));
         var handler = new EGSHandler(registry, fileSystem);
-        LogGamesAndErrors(handler.FindAllGames(), logger);
+        LogGamesAndMessages(handler.FindAllGames(), logger);
     }
 
     private static void RunOriginHandler(IFileSystem fileSystem)
     {
         var logger = _provider.CreateLogger(nameof(OriginHandler));
         var handler = new OriginHandler(fileSystem);
-        LogGamesAndErrors(handler.FindAllGames(), logger);
+        LogGamesAndMessages(handler.FindAllGames(), logger);
     }
 
     private static void RunEADesktopHandler(
@@ -162,7 +173,7 @@ public static class Program
     {
         var logger = _provider.CreateLogger(nameof(EADesktopHandler));
         var handler = new EADesktopHandler(fileSystem, hardwareInfoProvider);
-        LogGamesAndErrors(handler.FindAllGames(), logger);
+        LogGamesAndMessages(handler.FindAllGames(), logger);
     }
 
     [UnconditionalSuppressMessage(
@@ -173,19 +184,19 @@ public static class Program
     {
         var logger = _provider.CreateLogger(nameof(XboxHandler));
         var handler = new XboxHandler(fileSystem);
-        LogGamesAndErrors(handler.FindAllGames(), logger);
+        LogGamesAndMessages(handler.FindAllGames(), logger);
     }
 
     private static void RunSteamHandler(IFileSystem fileSystem, IRegistry? registry)
     {
         var logger = _provider.CreateLogger(nameof(SteamHandler));
         var handler = new SteamHandler(fileSystem, registry);
-        LogGamesAndErrors(handler.FindAllGames(), logger, game =>
+        LogGamesAndMessages(handler.FindAllGames(), logger, game =>
         {
             if (!OperatingSystem.IsLinux()) return;
             var protonPrefix = game.GetProtonPrefix();
             if (!fileSystem.DirectoryExists(protonPrefix.ConfigurationDirectory)) return;
-            logger.LogInformation("Proton Directory for this game: {}", protonPrefix.ProtonDirectory.GetFullPath());
+            Log(logger, MessageLevel.Info, "Proton Directory for this game: {}", protonPrefix.ProtonDirectory.GetFullPath());
         });
     }
 
@@ -200,28 +211,34 @@ public static class Program
             {
                 logger.LogInformation("Found wine prefix at {PrefixConfigurationDirectory}", prefix.ConfigurationDirectory);
                 res.Add(prefix);
-            }, error =>
+            }, message =>
             {
-                logger.LogError("{Error}", error);
+                Log(logger, message.Level, "{Message}", message);
             });
         }
 
         return res;
     }
 
-    private static void LogGamesAndErrors<TGame>(IEnumerable<OneOf<TGame, ErrorMessage>> results, ILogger logger, Action<TGame>? action = null)
+    private static void LogGamesAndMessages<TGame>(IEnumerable<OneOf<TGame, LogMessage>> results, ILogger logger, Action<TGame>? action = null)
         where TGame : class
     {
         foreach (var result in results)
         {
             result.Switch(game =>
             {
-                logger.LogInformation("Found {Game}", game);
+                Log(logger, MessageLevel.Info, "Found {Game}", game);
                 action?.Invoke(game);
-            }, error =>
+            }, message =>
             {
-                logger.LogError("{Error}", error);
+                Log(logger, message.Level, "{Message}", message);
             });
         }
+    }
+
+    private static void Log(ILogger logger, MessageLevel msgLevel, string? message, params object?[] args)
+    {
+        if (_logLevel <= msgLevel)
+            logger.Log((Microsoft.Extensions.Logging.LogLevel)msgLevel, message, args);
     }
 }

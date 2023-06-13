@@ -71,26 +71,26 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
     public override Func<EADesktopGame, EADesktopGameId> IdSelector => game => game.EADesktopGameId;
 
     /// <inheritdoc/>
-    public override IEnumerable<OneOf<EADesktopGame, ErrorMessage>> FindAllGames()
+    public override IEnumerable<OneOf<EADesktopGame, LogMessage>> FindAllGames()
     {
         var dataFolder = GetDataFolder(_fileSystem);
         if (!_fileSystem.DirectoryExists(dataFolder))
         {
-            yield return new ErrorMessage($"Data folder {dataFolder} does not exist!");
+            yield return new LogMessage($"Data folder {dataFolder} does not exist!");
             yield break;
         }
 
         var installInfoFile = GetInstallInfoFile(dataFolder);
         if (!_fileSystem.FileExists(installInfoFile))
         {
-            yield return new ErrorMessage($"File does not exist: {installInfoFile.GetFullPath()}");
+            yield return new LogMessage($"File does not exist: {installInfoFile.GetFullPath()}");
             yield break;
         }
 
         var decryptionResult = DecryptInstallInfoFile(_fileSystem, installInfoFile, _hardwareInfoProvider);
-        if (decryptionResult.TryGetError(out var error))
+        if (decryptionResult.TryGetMessage(out var message))
         {
-            yield return error;
+            yield return message;
             yield break;
         }
 
@@ -115,7 +115,7 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
             .CombineUnchecked(InstallInfoFileName);
     }
 
-    internal static OneOf<string, ErrorMessage> DecryptInstallInfoFile(IFileSystem fileSystem, AbsolutePath installInfoFile, IHardwareInfoProvider hardwareInfoProvider)
+    internal static OneOf<string, LogMessage> DecryptInstallInfoFile(IFileSystem fileSystem, AbsolutePath installInfoFile, IHardwareInfoProvider hardwareInfoProvider)
     {
         try
         {
@@ -131,11 +131,11 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         }
         catch (Exception e)
         {
-            return new ErrorMessage(e, $"Exception while decrypting file {installInfoFile.GetFullPath()}");
+            return new LogMessage(e, $"Exception while decrypting file {installInfoFile.GetFullPath()}");
         }
     }
 
-    internal IEnumerable<OneOf<EADesktopGame, ErrorMessage>> ParseInstallInfoFile(string plaintext, AbsolutePath installInfoFile, SchemaPolicy schemaPolicy)
+    internal IEnumerable<OneOf<EADesktopGame, LogMessage>> ParseInstallInfoFile(string plaintext, AbsolutePath installInfoFile, SchemaPolicy schemaPolicy)
     {
         try
         {
@@ -143,9 +143,9 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         }
         catch (Exception e)
         {
-            return new OneOf<EADesktopGame, ErrorMessage>[]
+            return new OneOf<EADesktopGame, LogMessage>[]
             {
-                new ErrorMessage(e, $"Exception while parsing InstallInfoFile {installInfoFile.GetFullPath()}"),
+                new LogMessage(e, $"Exception while parsing InstallInfoFile {installInfoFile.GetFullPath()}"),
             };
         }
     }
@@ -155,35 +155,35 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         "Trimming",
         "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic access otherwise can break functionality when trimming application code",
         Justification = $"{nameof(JsonSerializerOptions)} uses {nameof(SourceGenerationContext)} for type information.")]
-    private IEnumerable<OneOf<EADesktopGame, ErrorMessage>> ParseInstallInfoFileInner(string plaintext, AbsolutePath installInfoFile, SchemaPolicy schemaPolicy)
+    private IEnumerable<OneOf<EADesktopGame, LogMessage>> ParseInstallInfoFileInner(string plaintext, AbsolutePath installInfoFile, SchemaPolicy schemaPolicy)
     {
         var installInfoFileContents = JsonSerializer.Deserialize<InstallInfoFile>(plaintext, JsonSerializerOptions);
 
         if (installInfoFileContents is null)
         {
-            yield return new ErrorMessage($"Unable to deserialize InstallInfoFile {installInfoFile.GetFullPath()}");
+            yield return new LogMessage($"Unable to deserialize InstallInfoFile {installInfoFile.GetFullPath()}");
             yield break;
         }
 
         var schemaVersionNullable = installInfoFileContents.Schema?.Version;
         if (!schemaVersionNullable.HasValue)
         {
-            yield return new ErrorMessage($"InstallInfoFile {installInfoFile.GetFullPath()} does not have a schema version!");
+            yield return new LogMessage($"InstallInfoFile {installInfoFile.GetFullPath()} does not have a schema version!");
             yield break;
         }
 
         var schemaVersion = schemaVersionNullable.Value;
-        var (schemaMessage, isSchemaError) = CreateSchemaVersionMessage(schemaPolicy, schemaVersion, installInfoFile);
+        var (schemaMessage, messageLevel) = CreateSchemaVersionMessage(schemaPolicy, schemaVersion, installInfoFile);
         if (schemaMessage is not null)
         {
-            yield return new ErrorMessage(schemaMessage);
-            if (isSchemaError) yield break;
+            yield return new LogMessage(schemaMessage, messageLevel);
+            if (messageLevel >= MessageLevel.Error) yield break;
         }
 
         var installInfos = installInfoFileContents.InstallInfos;
         if (installInfos is null || installInfos.Count == 0)
         {
-            yield return new ErrorMessage($"InstallInfoFile {installInfoFile.GetFullPath()} does not have any infos!");
+            yield return new LogMessage($"InstallInfoFile {installInfoFile.GetFullPath()} does not have any infos!");
             yield break;
         }
 
@@ -193,10 +193,10 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         }
     }
 
-    internal static (string? message, bool isError) CreateSchemaVersionMessage(
+    internal static (string? message, MessageLevel msgType) CreateSchemaVersionMessage(
         SchemaPolicy schemaPolicy, int schemaVersion, AbsolutePath installInfoFilePath)
     {
-        if (schemaVersion == SupportedSchemaVersion) return (null, false);
+        if (schemaVersion == SupportedSchemaVersion) return (null, MessageLevel.None);
 
         return schemaPolicy switch
         {
@@ -205,39 +205,39 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
                 $"{schemaVersion.ToString(CultureInfo.InvariantCulture)} but this library only supports schema version " +
                 $"{SupportedSchemaVersion.ToString(CultureInfo.InvariantCulture)}. " +
                 $"This message is a WARNING because the consumer of this library has set {nameof(SchemaPolicy)} to {nameof(SchemaPolicy.Warn)}",
-                false),
+                MessageLevel.Warn),
             SchemaPolicy.Error => (
                 $"InstallInfoFile {installInfoFilePath} has a schema version " +
                 $"{schemaVersion.ToString(CultureInfo.InvariantCulture)} but this library only supports schema version " +
                 $"{SupportedSchemaVersion.ToString(CultureInfo.InvariantCulture)}. " +
                 $"This is an ERROR because the consumer of this library has set {nameof(SchemaPolicy)} to {nameof(SchemaPolicy.Error)}",
-                true),
-            SchemaPolicy.Ignore => (null, false),
+                MessageLevel.Error),
+            SchemaPolicy.Ignore => (null, MessageLevel.None),
             _ => throw new ArgumentOutOfRangeException(nameof(schemaPolicy), schemaPolicy, message: null),
         };
     }
 
-    internal static OneOf<EADesktopGame, ErrorMessage> InstallInfoToGame(IFileSystem fileSystem, InstallInfo installInfo, int i, AbsolutePath installInfoFilePath)
+    internal static OneOf<EADesktopGame, LogMessage> InstallInfoToGame(IFileSystem fileSystem, InstallInfo installInfo, int i, AbsolutePath installInfoFilePath)
     {
         var num = i.ToString(CultureInfo.InvariantCulture);
 
         if (string.IsNullOrEmpty(installInfo.SoftwareId))
         {
-            return new ErrorMessage($"InstallInfo #{num} does not have the value \"softwareId\"");
+            return new LogMessage($"InstallInfo #{num} does not have the value \"softwareId\"");
         }
 
         var softwareId = installInfo.SoftwareId;
 
         if (string.IsNullOrEmpty(installInfo.BaseSlug))
         {
-            return new ErrorMessage($"InstallInfo #{num} for {softwareId} does not have the value \"baseSlug\"");
+            return new LogMessage($"InstallInfo #{num} for {softwareId} does not have the value \"baseSlug\"");
         }
 
         var baseSlug = installInfo.BaseSlug;
 
         if (string.IsNullOrEmpty(installInfo.BaseInstallPath))
         {
-            return new ErrorMessage($"InstallInfo #{num} for {softwareId} ({baseSlug}) does not have the value \"baseInstallPath\"");
+            return new LogMessage($"InstallInfo #{num} for {softwareId} ({baseSlug}) does not have the value \"baseInstallPath\"", MessageLevel.Debug);
         }
 
         var baseInstallPath = installInfo.BaseInstallPath;

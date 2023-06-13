@@ -13,9 +13,9 @@ public partial class WineTests
         var virtualDriveDirectory = prefixDirectory.CombineUnchecked("drive_c");
 
         prefixManager.FindPrefixes().Should()
-            .ContainSingle(result => result.IsError())
+            .ContainSingle(result => result.IsMessage())
             .Which
-            .AsError()
+            .AsMessage()
             .Should()
             .Be($"Virtual C: drive does not exist at {virtualDriveDirectory}");
     }
@@ -30,9 +30,9 @@ public partial class WineTests
         var systemRegistryFile = prefixDirectory.CombineUnchecked("system.reg");
 
         prefixManager.FindPrefixes().Should()
-            .ContainSingle(result => result.IsError())
+            .ContainSingle(result => result.IsMessage())
             .Which
-            .AsError()
+            .AsMessage()
             .Should()
             .Be($"System registry file does not exist at {systemRegistryFile}");
     }
@@ -50,9 +50,9 @@ public partial class WineTests
         var userRegistryFile = prefixDirectory.CombineUnchecked("user.reg");
 
         prefixManager.FindPrefixes().Should()
-            .ContainSingle(result => result.IsError())
+            .ContainSingle(result => result.IsMessage())
             .Which
-            .AsError()
+            .AsMessage()
             .Should()
             .Be($"User registry file does not exist at {userRegistryFile}");
     }

@@ -1,3 +1,4 @@
+using GameFinder.Common;
 using NexusMods.Paths;
 
 namespace GameFinder.StoreHandlers.EADesktop.Tests;
@@ -5,15 +6,15 @@ namespace GameFinder.StoreHandlers.EADesktop.Tests;
 public partial class EADesktopTests
 {
     [Theory]
-    [InlineData(SchemaPolicy.Error, EADesktopHandler.SupportedSchemaVersion, true, false)]
-    [InlineData(SchemaPolicy.Ignore, EADesktopHandler.SupportedSchemaVersion + 1, true, false)]
-    [InlineData(SchemaPolicy.Warn, EADesktopHandler.SupportedSchemaVersion + 1, false, false)]
-    [InlineData(SchemaPolicy.Error, EADesktopHandler.SupportedSchemaVersion + 1, false, true)]
+    [InlineData(SchemaPolicy.Error, EADesktopHandler.SupportedSchemaVersion, true, MessageLevel.Warn)]
+    [InlineData(SchemaPolicy.Ignore, EADesktopHandler.SupportedSchemaVersion + 1, true, MessageLevel.Warn)]
+    [InlineData(SchemaPolicy.Warn, EADesktopHandler.SupportedSchemaVersion + 1, false, MessageLevel.Warn)]
+    [InlineData(SchemaPolicy.Error, EADesktopHandler.SupportedSchemaVersion + 1, false, MessageLevel.Error)]
     public void Test_CreateSchemaVersionMessage(
         SchemaPolicy schemaPolicy, int schemaVersion, bool shouldMessageBeNull,
-        bool expectedIsErrorValue)
+        MessageLevel expectedMessageType)
     {
-        var (message, isError) = EADesktopHandler.CreateSchemaVersionMessage(
+        var (message, errType) = EADesktopHandler.CreateSchemaVersionMessage(
             schemaPolicy,
             schemaVersion,
             new InMemoryFileSystem().GetKnownPath(KnownPath.TempDirectory));
@@ -23,6 +24,6 @@ public partial class EADesktopTests
         else
             message.Should().NotBeNull();
 
-        isError.Should().Be(expectedIsErrorValue);
+        errType.Should().Be(expectedMessageType);
     }
 }

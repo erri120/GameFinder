@@ -20,7 +20,7 @@ public abstract class AHandler
     /// <seealso cref="AHandler{TGame,TId}.FindAllGames"/>
     [MustUseReturnValue]
     [System.Diagnostics.Contracts.Pure]
-    public abstract IEnumerable<OneOf<IGame, ErrorMessage>> FindAllInterfaceGames();
+    public abstract IEnumerable<OneOf<IGame, LogMessage>> FindAllInterfaceGames();
 }
 
 /// <summary>
@@ -49,7 +49,7 @@ public abstract class AHandler<TGame, TId> : AHandler
 
     /// <inheritdoc/>
     [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
-    public override IEnumerable<OneOf<IGame, ErrorMessage>> FindAllInterfaceGames()
+    public override IEnumerable<OneOf<IGame, LogMessage>> FindAllInterfaceGames()
     {
         foreach (var res in FindAllGames())
         {
@@ -63,20 +63,20 @@ public abstract class AHandler<TGame, TId> : AHandler
     /// <returns></returns>
     [MustUseReturnValue]
     [System.Diagnostics.Contracts.Pure]
-    public abstract IEnumerable<OneOf<TGame, ErrorMessage>> FindAllGames();
+    public abstract IEnumerable<OneOf<TGame, LogMessage>> FindAllGames();
 
     /// <summary>
     /// Calls <see cref="FindAllGames"/> and converts the result into a dictionary where
     /// the key is the id of the game.
     /// </summary>
-    /// <param name="errors"></param>
+    /// <param name="messages"></param>
     /// <returns></returns>
     [MustUseReturnValue]
     [System.Diagnostics.Contracts.Pure]
-    public IReadOnlyDictionary<TId, TGame> FindAllGamesById(out ErrorMessage[] errors)
+    public IReadOnlyDictionary<TId, TGame> FindAllGamesById(out LogMessage[] messages)
     {
-        var (games, allErrors) = FindAllGames().SplitResults();
-        errors = allErrors;
+        var (games, allMessages) = FindAllGames().SplitResults();
+        messages = allMessages;
 
         return games.CustomToDictionary(IdSelector, game => game, IdEqualityComparer ?? EqualityComparer<TId>.Default);
     }
@@ -85,13 +85,13 @@ public abstract class AHandler<TGame, TId> : AHandler
     /// Wrapper around <see cref="FindAllGamesById"/> if you just need to find one game.
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="errors"></param>
+    /// <param name="messages"></param>
     /// <returns></returns>
     [MustUseReturnValue]
     [System.Diagnostics.Contracts.Pure]
-    public TGame? FindOneGameById(TId id, out ErrorMessage[] errors)
+    public TGame? FindOneGameById(TId id, out LogMessage[] messages)
     {
-        var allGames = FindAllGamesById(out errors);
+        var allGames = FindAllGamesById(out messages);
         return allGames.TryGetValue(id, out var game) ? game : null;
     }
 

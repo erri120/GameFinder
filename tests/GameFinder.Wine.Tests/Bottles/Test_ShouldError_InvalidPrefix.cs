@@ -18,9 +18,9 @@ public partial class BottlesTests
         var bottlesConfigFile = prefixDirectory.CombineUnchecked("bottle.yml");
 
         prefixManager.FindPrefixes().Should()
-            .ContainSingle(result => result.IsError())
+            .ContainSingle(result => result.IsMessage())
             .Which
-            .AsError()
+            .AsMessage()
             .Should()
             .Be($"Bottles configuration file is missing at {bottlesConfigFile}");
     }
