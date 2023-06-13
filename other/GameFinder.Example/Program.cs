@@ -101,7 +101,7 @@ public static class Program
                 var sDecryptionKey = Convert.ToHexString(decryptionKey).ToLower(CultureInfo.InvariantCulture);
                 logger.LogDebug("EA Decryption Key: {DecryptionKey}", sDecryptionKey);
 
-                RunEADesktopHandler(realFileSystem, hardwareInfoProvider);
+                RunEADesktopHandler(windowsRegistry, realFileSystem, hardwareInfoProvider);
             }
         }
 
@@ -157,11 +157,12 @@ public static class Program
     }
 
     private static void RunEADesktopHandler(
+        IRegistry registry,
         IFileSystem fileSystem,
         IHardwareInfoProvider hardwareInfoProvider)
     {
         var logger = _provider.CreateLogger(nameof(EADesktopHandler));
-        var handler = new EADesktopHandler(fileSystem, hardwareInfoProvider);
+        var handler = new EADesktopHandler(registry, fileSystem, hardwareInfoProvider);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 

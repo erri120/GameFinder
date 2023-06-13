@@ -129,7 +129,7 @@ public sealed class InMemoryRegistryKey : IRegistryKey
             return names.Length == 1 ? child : child.OpenSubKey(names.Skip(1).Aggregate((a, b) => $"{a}\\{b}"));
         }
 
-        // TODO: this is only a stop-gag measure
+        // TODO: this is only a stop-gap measure
         if (string.Equals(_key, "Software", StringComparison.OrdinalIgnoreCase))
         {
             if (_children.TryGetValue("Wow6432Node", out var wowNode))
