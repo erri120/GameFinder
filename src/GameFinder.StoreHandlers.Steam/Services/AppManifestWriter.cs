@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using FluentResults;
 using GameFinder.StoreHandlers.Steam.Models;
@@ -107,6 +108,7 @@ public static class AppManifestWriter
         list.Add(new KVObject(name, children));
     }
 
+    [ExcludeFromCodeCoverage]
     private class StringValue : KVValue
     {
         private readonly string _value;

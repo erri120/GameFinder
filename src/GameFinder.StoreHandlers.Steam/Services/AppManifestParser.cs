@@ -392,8 +392,8 @@ public static class AppManifestParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static BuildId ParseBuildId(KVValue value) => BuildId.From(ParseUInt32(value));
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static DepotId ParseDepotId(KVValue value) => DepotId.From(ParseUInt32(value));
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // private static DepotId ParseDepotId(KVValue value) => DepotId.From(ParseUInt32(value));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ManifestId ParseManifestId(KVValue value) => ManifestId.From(ParseString(value));
