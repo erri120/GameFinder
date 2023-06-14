@@ -26,7 +26,7 @@ public record InstalledDepot
     /// <summary>
     /// Gets the size of the depot on disk.
     /// </summary>
-    public Size SizeOnDisk { get; init; } = Size.Zero;
+    public required Size SizeOnDisk { get; init; } = Size.Zero;
 
     /// <summary>
     /// Gets the optionally unique identifier of the DLC that is associated with this depot.

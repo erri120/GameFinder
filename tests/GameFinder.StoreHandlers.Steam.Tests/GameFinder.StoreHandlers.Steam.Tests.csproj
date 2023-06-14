@@ -9,4 +9,8 @@
             <Link>Usings.cs</Link>
         </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FluentResults.Extensions.FluentAssertions" Version="2.1.1" />
+    </ItemGroup>
 </Project>

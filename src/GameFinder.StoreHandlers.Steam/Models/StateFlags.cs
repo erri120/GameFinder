@@ -12,8 +12,7 @@ namespace GameFinder.StoreHandlers.Steam.Models;
 /// </remarks>
 [PublicAPI]
 [Flags]
-[SuppressMessage("ReSharper", "EnumUnderlyingTypeIsInt")]
-public enum StateFlags : int
+public enum StateFlags : uint
 {
     /// <summary>
     /// Invalid.

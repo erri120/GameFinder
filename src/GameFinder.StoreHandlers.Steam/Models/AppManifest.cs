@@ -21,7 +21,7 @@ namespace GameFinder.StoreHandlers.Steam.Models;
 public record AppManifest
 {
     /// <summary>
-    /// Gets the <see cref="AbsolutePath"/> to the <c>*.acf</c> file
+    /// Gets the <see cref="AbsolutePath"/> to the <c>appmanifest_*.acf</c> file
     /// that was parsed to produce this <see cref="AppManifest"/>.
     /// </summary>
     /// <example><c>E:\SteamLibrary\steamapps\appmanifest_262060.acf</c></example>
@@ -30,7 +30,7 @@ public record AppManifest
     [SuppressMessage("ReSharper", "CommentTypo")]
     public required AbsolutePath ManifestPath { get; init; }
 
-    #region Values
+    #region Parsed Values
 
     /// <summary>
     /// Gets the unique identifier of the app.
@@ -120,7 +120,7 @@ public record AppManifest
     /// <remarks>
     /// The meaning of this value is unknown.
     /// </remarks>
-    public int UpdateResult { get; init; }
+    public uint UpdateResult { get; init; }
 
     /// <summary>
     /// Gets the amount of bytes to download.
@@ -180,9 +180,19 @@ public record AppManifest
     public DateTimeOffset ScheduledAutoUpdate { get; init; } = DateTimeOffset.UnixEpoch;
 
     /// <summary>
+    /// Whether Steam will do a full validation after the next update.
+    /// </summary>
+    public bool FullValidateAfterNextUpdate { get; init; }
+
+    /// <summary>
     /// Gets all locally installed depots.
     /// </summary>
     public IReadOnlyDictionary<DepotId, InstalledDepot> InstalledDepots { get; init; } = ImmutableDictionary<DepotId, InstalledDepot>.Empty;
+
+    /// <summary>
+    /// Gets all scripts that run after installation.
+    /// </summary>
+    public IReadOnlyDictionary<DepotId, RelativePath> InstallScripts { get; init; } = ImmutableDictionary<DepotId, RelativePath>.Empty;
 
     /// <summary>
     /// Gets all locally installed shared depots.
@@ -190,18 +200,13 @@ public record AppManifest
     /// <remarks>
     /// Shared depots are depots from another app and are commonly used for the Steamworks Common Redistributables.
     /// </remarks>
-    public IReadOnlyList<KeyValuePair<DepotId, AppId>> SharedDepots { get; init; } = ImmutableList<KeyValuePair<DepotId, AppId>>.Empty;
+    public IReadOnlyDictionary<DepotId, AppId> SharedDepots { get; init; } = ImmutableDictionary<DepotId, AppId>.Empty;
 
     /// <summary>
     /// Gets the local user config.
     /// </summary>
     /// <remarks>
-    /// This can contains keys like <c>language</c> or <c>BetaKey</c>. It should be noted
-    /// that the existence of a key shouldn't be used to infer a config value. As an example:
-    /// If the user opts into a beta, the <c>BetaKey</c> value will be set to the beta they
-    /// want to participate in. However, once they opt out of the beta, the key <c>BetaKey</c>
-    /// will still exist but the value will be an empty string. As such, you shouldn't make
-    /// assumption using the existence of a key alone.
+    /// This can contains keys like <c>language</c> or <c>BetaKey</c>.
     /// </remarks>
     /// <seealso cref="MountedConfig"/>
     public IReadOnlyDictionary<string, string> UserConfig { get; init; } = ImmutableDictionary<string, string>.Empty;
@@ -266,6 +271,75 @@ public record AppManifest
         return steamUserDataDirectory
             .CombineUnchecked(LastOwner.AccountId.ToString(CultureInfo.InvariantCulture))
             .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
+    }
+
+    #endregion
+
+    #region Overwrites
+
+    /// <inheritdoc/>
+    public virtual bool Equals(AppManifest? other)
+    {
+        if (other is null) return false;
+        if (AppId != other.AppId) return false;
+        if (Universe != other.Universe) return false;
+        if (!string.Equals(Name, other.Name, StringComparison.Ordinal)) return false;
+        if (StateFlags != other.StateFlags) return false;
+        if (InstallationDirectoryName != other.InstallationDirectoryName) return false;
+        if (LastUpdated != other.LastUpdated) return false;
+        if (SizeOnDisk != other.SizeOnDisk) return false;
+        if (StagingSize != other.StagingSize) return false;
+        if (BuildId != other.BuildId) return false;
+        if (LastOwner != other.LastOwner) return false;
+        if (UpdateResult != other.UpdateResult) return false;
+        if (BytesToDownload != other.BytesToDownload) return false;
+        if (BytesDownloaded != other.BytesDownloaded) return false;
+        if (BytesToStage != other.BytesToStage) return false;
+        if (BytesStaged != other.BytesStaged) return false;
+        if (TargetBuildId != other.TargetBuildId) return false;
+        if (AutoUpdateBehavior != other.AutoUpdateBehavior) return false;
+        if (BackgroundDownloadBehavior != other.BackgroundDownloadBehavior) return false;
+        if (ScheduledAutoUpdate != other.ScheduledAutoUpdate) return false;
+        if (FullValidateAfterNextUpdate != other.FullValidateAfterNextUpdate) return false;
+        if (!InstalledDepots.SequenceEqual(other.InstalledDepots)) return false;
+        if (!InstallScripts.SequenceEqual(other.InstallScripts)) return false;
+        if (!SharedDepots.SequenceEqual(other.SharedDepots)) return false;
+        if (!UserConfig.SequenceEqual(other.UserConfig)) return false;
+        if (!MountedConfig.SequenceEqual(other.MountedConfig)) return false;
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(ManifestPath);
+        hashCode.Add(AppId);
+        hashCode.Add((int)Universe);
+        hashCode.Add(Name);
+        hashCode.Add((int)StateFlags);
+        hashCode.Add(InstallationDirectoryName);
+        hashCode.Add(LastUpdated);
+        hashCode.Add(SizeOnDisk);
+        hashCode.Add(StagingSize);
+        hashCode.Add(BuildId);
+        hashCode.Add(LastOwner);
+        hashCode.Add(UpdateResult);
+        hashCode.Add(BytesToDownload);
+        hashCode.Add(BytesDownloaded);
+        hashCode.Add(BytesToStage);
+        hashCode.Add(BytesStaged);
+        hashCode.Add(TargetBuildId);
+        hashCode.Add((int)AutoUpdateBehavior);
+        hashCode.Add((int)BackgroundDownloadBehavior);
+        hashCode.Add(ScheduledAutoUpdate);
+        hashCode.Add(FullValidateAfterNextUpdate);
+        hashCode.Add(InstalledDepots);
+        hashCode.Add(InstallScripts);
+        hashCode.Add(SharedDepots);
+        hashCode.Add(UserConfig);
+        hashCode.Add(MountedConfig);
+        return hashCode.ToHashCode();
     }
 
     #endregion

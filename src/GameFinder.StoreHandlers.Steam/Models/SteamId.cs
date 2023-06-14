@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using JetBrains.Annotations;
 
@@ -10,7 +11,7 @@ namespace GameFinder.StoreHandlers.Steam.Models;
 /// See https://developer.valvesoftware.com/wiki/SteamID for more information.
 /// </remarks>
 [PublicAPI]
-public readonly struct SteamId
+public readonly struct SteamId : IEquatable<SteamId>, IComparable<SteamId>
 {
     /// <summary>
     /// Represents an empty ID of an invalid user.
@@ -31,6 +32,13 @@ public readonly struct SteamId
     {
         RawId = rawId;
     }
+
+    /// <summary>
+    /// Factory method for consistency.
+    /// </summary>
+    /// <param name="rawId"></param>
+    /// <returns></returns>
+    public static SteamId From(ulong rawId) => new(rawId);
 
     /// <summary>
     /// Gets the universe of the account.
@@ -89,4 +97,29 @@ public readonly struct SteamId
 
     /// <inheritdoc/>
     public override string ToString() => Steam3Id;
+
+    /// <inheritdoc/>
+    public bool Equals(SteamId other) => RawId == other.RawId;
+
+    /// <inheritdoc/>
+    public int CompareTo(SteamId other) => RawId.CompareTo(other.RawId);
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj)
+    {
+        return obj is SteamId other && Equals(other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => RawId.GetHashCode();
+
+    /// <summary>
+    /// Equality operator.
+    /// </summary>
+    public static bool operator ==(SteamId a, SteamId b) => a.Equals(b);
+
+    /// <summary>
+    /// Inequality operator.
+    /// </summary>
+    public static bool operator !=(SteamId a, SteamId b) => !a.Equals(b);
 }
