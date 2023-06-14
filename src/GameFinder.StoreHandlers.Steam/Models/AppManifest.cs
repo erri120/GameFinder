@@ -7,6 +7,7 @@ using System.Linq;
 using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 using JetBrains.Annotations;
 using NexusMods.Paths;
+using NexusMods.Paths.Extensions;
 
 namespace GameFinder.StoreHandlers.Steam.Models;
 
@@ -18,7 +19,7 @@ namespace GameFinder.StoreHandlers.Steam.Models;
 /// KeyValue format.
 /// </remarks>
 [PublicAPI]
-public record AppManifest
+public sealed record AppManifest
 {
     /// <summary>
     /// Gets the <see cref="AbsolutePath"/> to the <c>appmanifest_*.acf</c> file
@@ -225,23 +226,35 @@ public record AppManifest
 
     #region Helpers
 
+    private static readonly RelativePath CommonDirectory = "common".ToRelativePath();
+    private static readonly RelativePath ShaderCacheDirectory = "shadercache".ToRelativePath();
+    private static readonly RelativePath WorkshopDirectory = "workshop".ToRelativePath();
+
     /// <summary>
     /// Gets the <see cref="AbsolutePath"/> to the installation directory of the app.
     /// </summary>
     /// <remarks>This uses <see cref="ManifestPath"/> to get to the installation directory.</remarks>
-    /// <example><c>E:\SteamLibrary\steamapps\common\DarkestDungeon</c></example>
+    /// <example><c>E:/SteamLibrary/steamapps/common/DarkestDungeon</c></example>
     /// <seealso cref="InstallationDirectoryName"/>
     [SuppressMessage("ReSharper", "CommentTypo")]
     public AbsolutePath InstallationDirectory => ManifestPath.Parent
-        .CombineUnchecked("common")
+        .CombineUnchecked(CommonDirectory)
         .CombineUnchecked(InstallationDirectoryName);
+
+    /// <summary>
+    /// Gets the path to the <c>appworkshop_*.acf</c> file.
+    /// </summary>
+    /// <example><c>E:/SteamLibrary/steamapps/workshop/appworkshop_262060.acf</c></example>
+    public AbsolutePath WorkshopManifestFilePath => ManifestPath.Parent
+        .CombineUnchecked(WorkshopDirectory)
+        .CombineUnchecked($"appworkshop_{AppId.Value.ToString(CultureInfo.InvariantCulture)}.acf");
 
     /// <summary>
     /// Gets all locally installed DLCs.
     /// </summary>
-    public IEnumerable<KeyValuePair<AppId, InstalledDepot>> InstalledDLCs => InstalledDepots
+    public IReadOnlyDictionary<AppId, InstalledDepot> InstalledDLCs => InstalledDepots
         .Where(kv => kv.Value.DLCAppId != AppId.Empty)
-        .Select(kv => new KeyValuePair<AppId, InstalledDepot>(kv.Value.DLCAppId, kv.Value));
+        .ToDictionary(kv => kv.Value.DLCAppId, kv => kv.Value);
 
     /// <summary>
     /// Gets the URL to the Update Notes for the current <see cref="BuildId"/> on SteamDB.
@@ -262,9 +275,9 @@ public record AppManifest
     /// </summary>
     /// <param name="steamUserDataDirectory">
     /// Path to the <c>userdata</c> directory in the Steam installation. Example:
-    /// <c>C:\Program Files\Steam\userdata</c>
+    /// <c>C:/Program Files/Steam/userdata</c>
     /// </param>
-    /// <example><c>C:\Program Files\Steam\userdata\149956546\262060</c></example>
+    /// <example><c>C:/Program Files/Steam/userdata/149956546\262060</c></example>
     /// <returns></returns>
     public AbsolutePath GetUserDataPath(AbsolutePath steamUserDataDirectory)
     {
@@ -273,12 +286,20 @@ public record AppManifest
             .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
     }
 
+    /// <summary>
+    /// Gets the path to the shader-cache directory.
+    /// </summary>
+    /// <example><c>E:/SteamLibrary/common/steamapps/shadercache/262060</c></example>
+    public AbsolutePath GetShaderCacheDirectory => ManifestPath.Parent
+        .CombineUnchecked(ShaderCacheDirectory)
+        .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
+
     #endregion
 
     #region Overwrites
 
     /// <inheritdoc/>
-    public virtual bool Equals(AppManifest? other)
+    public bool Equals(AppManifest? other)
     {
         if (other is null) return false;
         if (AppId != other.AppId) return false;
