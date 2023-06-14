@@ -27,6 +27,7 @@ using FileSystem = NexusMods.Paths.FileSystem;
 using IFileSystem = NexusMods.Paths.IFileSystem;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
+[assembly:ExcludeFromCodeCoverage]
 namespace GameFinder.Example;
 
 public static class Program

@@ -45,8 +45,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9C6671E1
 	ProjectSection(SolutionItems) = preProject
 		tests\Directory.Build.props = tests\Directory.Build.props
 		tests\Directory.Build.targets = tests\Directory.Build.targets
-		tests\Usings.cs = tests\Usings.cs
 		tests\NexusMods.Paths.TestingHelpers.props = tests\NexusMods.Paths.TestingHelpers.props
+		tests\SharedUsings.cs = tests\SharedUsings.cs
+		tests\SharedAssemblyAttributes.cs = tests\SharedAssemblyAttributes.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "other", "other", "{7EA29B58-0E2E-4714-81AC-1F86FE253664}"

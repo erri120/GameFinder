@@ -5,12 +5,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\Usings.cs">
-            <Link>Usings.cs</Link>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="FluentResults.Extensions.FluentAssertions" Version="2.1.1" />
+        <PackageReference Include="FluentResults.Extensions.FluentAssertions" Version="2.1.1" />
     </ItemGroup>
 </Project>

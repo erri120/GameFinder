@@ -2,10 +2,4 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\GameFinder.Common\GameFinder.Common.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Compile Include="..\Usings.cs">
-            <Link>Usings.cs</Link>
-        </Compile>
-    </ItemGroup>
 </Project>
