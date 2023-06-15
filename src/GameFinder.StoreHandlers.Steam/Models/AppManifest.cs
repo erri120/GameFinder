@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using FluentResults;
@@ -237,7 +236,7 @@ public sealed record AppManifest
     /// Parses the file at <see cref="ManifestPath"/> again and returns a new
     /// instance of <see cref="AppManifest"/>.
     /// </summary>
-    [JetBrains.Annotations.Pure]
+    [Pure]
     [System.Diagnostics.Contracts.Pure]
     [MustUseReturnValue]
     public Result<AppManifest> Reload()

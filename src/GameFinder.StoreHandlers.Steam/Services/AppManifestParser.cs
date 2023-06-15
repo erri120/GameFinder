@@ -72,7 +72,7 @@ public static class AppManifestParser
             var nameResult = ParseRequiredChildObject(appState, "name", ParseString);
             var stateFlagsResult = ParseRequiredChildObject(appState, "StateFlags", ParseByte).Map(x => (StateFlags)x);
             var installationDirectoryNameResult = ParseRequiredChildObject(appState, "installdir", ParseRelativePath);
-            var lastUpdatedResult = ParseOptionalChildObject(appState, "LastUpdated", ParseDateTimeOffset);
+            var lastUpdatedResult = ParseOptionalChildObject(appState, "LastUpdated", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
             var sizeOnDiskResult = ParseOptionalChildObject(appState, "SizeOnDisk", ParseSize, Size.Zero);
             var stagingSizeResult = ParseOptionalChildObject(appState, "StagingSize", ParseSize, Size.Zero);
             var buildIdResult = ParseOptionalChildObject(appState, "buildid", ParseBuildId, BuildId.Empty);
@@ -85,7 +85,7 @@ public static class AppManifestParser
             var targetBuildIdResult = ParseOptionalChildObject(appState, "TargetBuildID", ParseBuildId, BuildId.Empty);
             var autoUpdateBehaviorResult = ParseOptionalChildObject(appState, "AutoUpdateBehavior", ParseByte).Map(x => (AutoUpdateBehavior)x);
             var backgroundDownloadBehaviorResult= ParseOptionalChildObject(appState, "AllowOtherDownloadsWhileRunning", ParseByte).Map(x => (BackgroundDownloadBehavior)x);
-            var scheduledAutoUpdateResult = ParseOptionalChildObject(appState, "ScheduledAutoUpdate", ParseDateTimeOffset);
+            var scheduledAutoUpdateResult = ParseOptionalChildObject(appState, "ScheduledAutoUpdate", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
             var fullValidateAfterNextUpdateResult = ParseOptionalChildObject(appState, "FullValidateAfterNextUpdate", ParseBool);
 
             var installedDepotsResult = ParseInstalledDepots(appState);
