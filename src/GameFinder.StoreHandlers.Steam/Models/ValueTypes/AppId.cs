@@ -3,7 +3,7 @@ using System.Web;
 using JetBrains.Annotations;
 using Vogen;
 
-[assembly:VogenDefaults(debuggerAttributes: DebuggerAttributeGeneration.Basic)]
+[assembly: VogenDefaults(debuggerAttributes: DebuggerAttributeGeneration.Basic)]
 
 namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 

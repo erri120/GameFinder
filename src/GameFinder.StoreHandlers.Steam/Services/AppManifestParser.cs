@@ -84,7 +84,7 @@ public static class AppManifestParser
             var bytesStagedResult = ParseOptionalChildObject(appState, "BytesStaged", ParseSize, Size.Zero);
             var targetBuildIdResult = ParseOptionalChildObject(appState, "TargetBuildID", ParseBuildId, BuildId.Empty);
             var autoUpdateBehaviorResult = ParseOptionalChildObject(appState, "AutoUpdateBehavior", ParseByte).Map(x => (AutoUpdateBehavior)x);
-            var backgroundDownloadBehaviorResult= ParseOptionalChildObject(appState, "AllowOtherDownloadsWhileRunning", ParseByte).Map(x => (BackgroundDownloadBehavior)x);
+            var backgroundDownloadBehaviorResult = ParseOptionalChildObject(appState, "AllowOtherDownloadsWhileRunning", ParseByte).Map(x => (BackgroundDownloadBehavior)x);
             var scheduledAutoUpdateResult = ParseOptionalChildObject(appState, "ScheduledAutoUpdate", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
             var fullValidateAfterNextUpdateResult = ParseOptionalChildObject(appState, "FullValidateAfterNextUpdate", ParseBool);
 

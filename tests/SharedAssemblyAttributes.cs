@@ -1,1 +1,1 @@
-[assembly:global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+[assembly: global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
