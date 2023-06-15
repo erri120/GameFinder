@@ -6,8 +6,8 @@ namespace GameFinder.StoreHandlers.EADesktop.Tests;
 public partial class EADesktopTests
 {
     [Theory]
-    [InlineData(SchemaPolicy.Error, EADesktopHandler.SupportedSchemaVersion, true, MessageLevel.Warn)]
-    [InlineData(SchemaPolicy.Ignore, EADesktopHandler.SupportedSchemaVersion + 1, true, MessageLevel.Warn)]
+    [InlineData(SchemaPolicy.Error, EADesktopHandler.SupportedSchemaVersion, true, MessageLevel.None)]
+    [InlineData(SchemaPolicy.Ignore, EADesktopHandler.SupportedSchemaVersion + 1, true, MessageLevel.None)]
     [InlineData(SchemaPolicy.Warn, EADesktopHandler.SupportedSchemaVersion + 1, false, MessageLevel.Warn)]
     [InlineData(SchemaPolicy.Error, EADesktopHandler.SupportedSchemaVersion + 1, false, MessageLevel.Error)]
     public void Test_CreateSchemaVersionMessage(
