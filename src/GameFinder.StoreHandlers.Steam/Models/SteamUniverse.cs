@@ -10,7 +10,7 @@ namespace GameFinder.StoreHandlers.Steam.Models;
 /// and https://developer.valvesoftware.com/wiki/SteamID#Universes_Available_for_Steam_Accounts.
 /// </remarks>
 [PublicAPI]
-public enum SteamUniverse
+public enum SteamUniverse : uint
 {
     /// <summary>
     /// Invalid.

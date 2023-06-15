@@ -9,7 +9,7 @@ namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 /// </summary>
 /// <example><c>9545898</c></example>
 [PublicAPI]
-[ValueObject<uint>(conversions: Conversions.None)]
+[ValueObject<uint>]
 public readonly partial struct BuildId
 {
     /// <summary>

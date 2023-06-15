@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using FluentResults;
 using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
+using GameFinder.StoreHandlers.Steam.Services;
 using JetBrains.Annotations;
 using NexusMods.Paths;
 using NexusMods.Paths.Extensions;
@@ -12,10 +15,10 @@ using NexusMods.Paths.Extensions;
 namespace GameFinder.StoreHandlers.Steam.Models;
 
 /// <summary>
-/// Represents a parse app manifest.
+/// Represents a parsed app manifest file.
 /// </summary>
 /// <remarks>
-/// Manifest files <c>appmanifest_*.acf</c> are stored in Valve's custom
+/// Manifest files <c>appmanifest_*.acf</c> use Valve's custom
 /// KeyValue format.
 /// </remarks>
 [PublicAPI]
@@ -25,7 +28,7 @@ public sealed record AppManifest
     /// Gets the <see cref="AbsolutePath"/> to the <c>appmanifest_*.acf</c> file
     /// that was parsed to produce this <see cref="AppManifest"/>.
     /// </summary>
-    /// <example><c>E:\SteamLibrary\steamapps\appmanifest_262060.acf</c></example>
+    /// <example><c>E:/SteamLibrary/steamapps/appmanifest_262060.acf</c></example>
     /// <seealso cref="InstallationDirectoryName"/>
     /// <seealso cref="InstallationDirectory"/>
     [SuppressMessage("ReSharper", "CommentTypo")]
@@ -229,6 +232,18 @@ public sealed record AppManifest
     private static readonly RelativePath CommonDirectory = "common".ToRelativePath();
     private static readonly RelativePath ShaderCacheDirectory = "shadercache".ToRelativePath();
     private static readonly RelativePath WorkshopDirectory = "workshop".ToRelativePath();
+
+    /// <summary>
+    /// Parses the file at <see cref="ManifestPath"/> again and returns a new
+    /// instance of <see cref="AppManifest"/>.
+    /// </summary>
+    [JetBrains.Annotations.Pure]
+    [System.Diagnostics.Contracts.Pure]
+    [MustUseReturnValue]
+    public Result<AppManifest> Reload()
+    {
+        return AppManifestParser.ParseManifestFile(ManifestPath);
+    }
 
     /// <summary>
     /// Gets the <see cref="AbsolutePath"/> to the installation directory of the app.

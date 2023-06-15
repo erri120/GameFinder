@@ -35,7 +35,7 @@ public static class ArrangeHelper
         fixture.Customize<SteamId>(composer => composer.FromFactory<ulong>(SteamId.From));
         fixture.Customize<DepotId>(composer => composer.FromFactory<uint>(DepotId.From));
         fixture.Customize<AppId>(composer => composer.FromFactory<uint>(AppId.From));
-        fixture.Customize<ManifestId>(composer => composer.FromFactory<ulong>(value => ManifestId.From(value.ToString())));
+        fixture.Customize<ManifestId>(composer => composer.FromFactory<ulong>(ManifestId.From));
         fixture.Customize<DateTimeOffset>(composer => composer.FromFactory(() => DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds())));
 
         return new AppManifest
@@ -86,6 +86,39 @@ public static class ArrangeHelper
                 .CreateMany<string>()
                 .Select(key => (key, fixture.Create<string>()))
                 .ToDictionary(kv => kv.Item1, kv => kv.Item2, StringComparer.OrdinalIgnoreCase),
+        };
+    }
+
+    public static WorkshopManifest CreateWorkshopManifest(AbsolutePath manifestPath)
+    {
+        var fixture = new Fixture();
+        fixture.Customize<Size>(composer => composer.FromFactory<ulong>(Size.From));
+        fixture.Customize<AppId>(composer => composer.FromFactory<uint>(AppId.From));
+        fixture.Customize<WorkshopItemId>(composer => composer.FromFactory<ulong>(WorkshopItemId.From));
+        fixture.Customize<WorkshopManifestId>(composer => composer.FromFactory<ulong>(WorkshopManifestId.From));
+        fixture.Customize<DateTimeOffset>(composer => composer.FromFactory(() => DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds())));
+
+        return new WorkshopManifest
+        {
+            ManifestPath = manifestPath,
+            AppId = fixture.Create<AppId>(),
+            SizeOnDisk = fixture.Create<Size>(),
+            NeedsUpdate = fixture.Create<bool>(),
+            NeedsDownload = fixture.Create<bool>(),
+            LastUpdated = fixture.Create<DateTimeOffset>(),
+            LastAppStart = fixture.Create<DateTimeOffset>(),
+            InstalledWorkshopItems = fixture
+                .CreateMany<WorkshopItemId>()
+                .Select(x => new WorkshopItemDetails
+                {
+                    ItemId = x,
+                    SizeOnDisk = fixture.Create<Size>(),
+                    ManifestId = fixture.Create<WorkshopManifestId>(),
+                    LastUpdated = fixture.Create<DateTimeOffset>(),
+                    LastTouched = fixture.Create<DateTimeOffset>(),
+                    SubscribedBy = SteamId.FromAccountId(fixture.Create<uint>()),
+                })
+                .ToDictionary(x => x.ItemId, x => x),
         };
     }
 }

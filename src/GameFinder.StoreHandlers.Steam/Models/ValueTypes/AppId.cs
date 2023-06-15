@@ -8,11 +8,11 @@ using Vogen;
 namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 
 /// <summary>
-/// Represents a 32-bit unsigned integer unique identifier for an app.
+/// Represents a 32-bit unsigned integer unique identifier of an app.
 /// </summary>
 /// <example><c>262060</c></example>
 [PublicAPI]
-[ValueObject<uint>(conversions: Conversions.None)]
+[ValueObject<uint>]
 public readonly partial struct AppId
 {
     /// <summary>

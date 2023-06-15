@@ -41,6 +41,25 @@ public readonly struct SteamId : IEquatable<SteamId>, IComparable<SteamId>
     public static SteamId From(ulong rawId) => new(rawId);
 
     /// <summary>
+    /// Creates a new <see cref="SteamId"/> using an account Id.
+    /// </summary>
+    public static SteamId FromAccountId(
+        uint accountId,
+        SteamUniverse universe = SteamUniverse.Public,
+        SteamAccountType accountType = SteamAccountType.Individual)
+    {
+        var rawId = (ulong)accountId;
+
+        var universeMask = (ulong)universe << 56;
+        var accountTypeMask = (ulong)accountType << 52;
+
+        rawId |= universeMask;
+        rawId |= accountTypeMask;
+
+        return From(rawId);
+    }
+
+    /// <summary>
     /// Gets the universe of the account.
     /// </summary>
     public SteamUniverse Universe => (SteamUniverse)(int)(RawId >> 56);
@@ -58,7 +77,7 @@ public readonly struct SteamId : IEquatable<SteamId>, IComparable<SteamId>
     /// It's also used by <see cref="Steam3Id"/>.
     /// </remarks>
     /// <example>149956546</example>
-    public int AccountId => (int)(RawId << 32 >> 32);
+    public uint AccountId => (uint)(RawId << 32 >> 32);
 
     /// <summary>
     /// Gets the account number.
@@ -67,14 +86,14 @@ public readonly struct SteamId : IEquatable<SteamId>, IComparable<SteamId>
     /// This is only useful for <see cref="Steam2Id"/>.
     /// </remarks>
     /// <example>74978273</example>
-    public int AccountNumber => (int)(RawId << 32 >> 33);
+    public uint AccountNumber => (uint)(RawId << 32 >> 33);
 
     /// <summary>
     /// Gets the textually representation in the Steam2 ID format.
     /// </summary>
     /// <example>STEAM_1:0:74978273</example>
     /// <seealso cref="Steam3Id"/>
-    public string Steam2Id => $"STEAM_{((int)Universe).ToString(CultureInfo.InvariantCulture)}:{((int)(RawId << 63 >> 63)).ToString(CultureInfo.InvariantCulture)}:{AccountNumber.ToString(CultureInfo.InvariantCulture)}";
+    public string Steam2Id => $"STEAM_{((byte)Universe).ToString(CultureInfo.InvariantCulture)}:{((byte)(RawId << 63 >> 63)).ToString(CultureInfo.InvariantCulture)}:{AccountNumber.ToString(CultureInfo.InvariantCulture)}";
 
     /// <summary>
     /// Gets the textually representation in the Steam3 ID format.
