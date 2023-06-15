@@ -29,7 +29,7 @@ public sealed record AppManifest
     /// </summary>
     /// <example><c>E:/SteamLibrary/steamapps/appmanifest_262060.acf</c></example>
     /// <seealso cref="InstallationDirectoryName"/>
-    /// <seealso cref="InstallationDirectory"/>
+    /// <seealso cref="GetInstallationDirectoryPath"/>
     [SuppressMessage("ReSharper", "CommentTypo")]
     public required AbsolutePath ManifestPath { get; init; }
 
@@ -60,10 +60,10 @@ public sealed record AppManifest
     /// </summary>
     /// <remarks>
     /// This is the relative path to the installation directory.
-    /// Use <see cref="InstallationDirectory"/> get the absolute path.
+    /// Use <see cref="GetInstallationDirectoryPath"/> get the absolute path.
     /// </remarks>
     /// <example><c>DarkestDungeon</c></example>
-    /// <seealso cref="InstallationDirectory"/>
+    /// <seealso cref="GetInstallationDirectoryPath"/>
     public required RelativePath InstallationDirectoryName { get; init; }
 
     /// <summary>
@@ -104,7 +104,7 @@ public sealed record AppManifest
     /// a global identifier that can be used to retrieve the current
     /// update notes using SteamDB.
     /// </remarks>
-    /// <seealso cref="CurrentUpdateNotesUrl"/>
+    /// <seealso cref="GetCurrentUpdateNotesUrl"/>
     /// <seealso cref="TargetBuildId"/>
     public BuildId BuildId { get; init; } = BuildId.Empty;
 
@@ -159,7 +159,7 @@ public sealed record AppManifest
     /// <remarks>
     /// This value will be <c>0</c>, if there is no update available.
     /// </remarks>
-    /// <seealso cref="NextUpdateNotesUrl"/>
+    /// <seealso cref="GetNextUpdateNotesUrl"/>
     /// <seealso cref="BuildId"/>
     public BuildId TargetBuildId { get; init; } = BuildId.Empty;
 
@@ -228,9 +228,9 @@ public sealed record AppManifest
 
     #region Helpers
 
-    private static readonly RelativePath CommonDirectory = "common".ToRelativePath();
-    private static readonly RelativePath ShaderCacheDirectory = "shadercache".ToRelativePath();
-    private static readonly RelativePath WorkshopDirectory = "workshop".ToRelativePath();
+    private static readonly RelativePath CommonDirectoryName = "common".ToRelativePath();
+    private static readonly RelativePath ShaderCacheDirectoryName = "shadercache".ToRelativePath();
+    private static readonly RelativePath WorkshopDirectoryName = "workshop".ToRelativePath();
 
     /// <summary>
     /// Parses the file at <see cref="ManifestPath"/> again and returns a new
@@ -251,29 +251,29 @@ public sealed record AppManifest
     /// <example><c>E:/SteamLibrary/steamapps/common/DarkestDungeon</c></example>
     /// <seealso cref="InstallationDirectoryName"/>
     [SuppressMessage("ReSharper", "CommentTypo")]
-    public AbsolutePath InstallationDirectory => ManifestPath.Parent
-        .CombineUnchecked(CommonDirectory)
+    public AbsolutePath GetInstallationDirectoryPath() => ManifestPath.Parent
+        .CombineUnchecked(CommonDirectoryName)
         .CombineUnchecked(InstallationDirectoryName);
 
     /// <summary>
     /// Gets the path to the <c>appworkshop_*.acf</c> file.
     /// </summary>
     /// <example><c>E:/SteamLibrary/steamapps/workshop/appworkshop_262060.acf</c></example>
-    public AbsolutePath WorkshopManifestFilePath => ManifestPath.Parent
-        .CombineUnchecked(WorkshopDirectory)
+    public AbsolutePath GetWorkshopManifestFilePath() => ManifestPath.Parent
+        .CombineUnchecked(WorkshopDirectoryName)
         .CombineUnchecked($"appworkshop_{AppId.Value.ToString(CultureInfo.InvariantCulture)}.acf");
 
     /// <summary>
     /// Gets all locally installed DLCs.
     /// </summary>
-    public IReadOnlyDictionary<AppId, InstalledDepot> InstalledDLCs => InstalledDepots
+    public IReadOnlyDictionary<AppId, InstalledDepot> GetInstalledDLCs() => InstalledDepots
         .Where(kv => kv.Value.DLCAppId != AppId.Empty)
         .ToDictionary(kv => kv.Value.DLCAppId, kv => kv.Value);
 
     /// <summary>
     /// Gets the URL to the Update Notes for the current <see cref="BuildId"/> on SteamDB.
     /// </summary>
-    public string CurrentUpdateNotesUrl => BuildId.SteamDbUpdateNotesUrl;
+    public string GetCurrentUpdateNotesUrl() => BuildId.GetSteamDbUpdateNotesUrl();
 
     /// <summary>
     /// Gets the URL to the Update Notes for the next update using <see cref="TargetBuildId"/> on SteamDB.
@@ -281,7 +281,7 @@ public sealed record AppManifest
     /// <remarks>
     /// This value will be <c>null</c>, if <see cref="TargetBuildId"/> is <see cref="ValueTypes.BuildId.Empty"/>.
     /// </remarks>
-    public string? NextUpdateNotesUrl => TargetBuildId == BuildId.Empty ? null : TargetBuildId.SteamDbUpdateNotesUrl;
+    public string? GetNextUpdateNotesUrl() => TargetBuildId == BuildId.Empty ? null : TargetBuildId.GetSteamDbUpdateNotesUrl();
 
     /// <summary>
     /// Gets the user-data path for the current app using <see cref="LastOwner"/> and
@@ -293,7 +293,7 @@ public sealed record AppManifest
     /// </param>
     /// <example><c>C:/Program Files/Steam/userdata/149956546\262060</c></example>
     /// <returns></returns>
-    public AbsolutePath GetUserDataPath(AbsolutePath steamUserDataDirectory)
+    public AbsolutePath GetUserDataDirectoryPath(AbsolutePath steamUserDataDirectory)
     {
         return steamUserDataDirectory
             .CombineUnchecked(LastOwner.AccountId.ToString(CultureInfo.InvariantCulture))
@@ -304,8 +304,8 @@ public sealed record AppManifest
     /// Gets the path to the shader-cache directory.
     /// </summary>
     /// <example><c>E:/SteamLibrary/common/steamapps/shadercache/262060</c></example>
-    public AbsolutePath GetShaderCacheDirectory => ManifestPath.Parent
-        .CombineUnchecked(ShaderCacheDirectory)
+    public AbsolutePath GetShaderCacheDirectoryPath() => ManifestPath.Parent
+        .CombineUnchecked(ShaderCacheDirectoryName)
         .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
 
     #endregion

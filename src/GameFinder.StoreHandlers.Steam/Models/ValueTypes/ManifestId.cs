@@ -33,6 +33,6 @@ public readonly partial struct ManifestId
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public string GetSteamDbChangesetUrl(DepotId depotId)
     {
-        return $"{depotId.SteamDbUrl}/history/?changeid=M:{Value}";
+        return $"{depotId.GetSteamDbUrl()}/history/?changeid=M:{Value}";
     }
 }

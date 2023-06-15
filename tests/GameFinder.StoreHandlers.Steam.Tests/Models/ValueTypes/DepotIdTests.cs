@@ -12,6 +12,6 @@ public class DepotIdTests
     public void Test_SteamDbUpdateNotesUrl(uint input, string expectedUrl)
     {
         var depotId = DepotId.From(input);
-        depotId.SteamDbUrl.Should().Be(expectedUrl);
+        depotId.GetSteamDbUrl().Should().Be(expectedUrl);
     }
 }

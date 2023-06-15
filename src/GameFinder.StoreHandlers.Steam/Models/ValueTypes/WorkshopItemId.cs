@@ -28,5 +28,5 @@ public readonly partial struct WorkshopItemId
     /// </summary>
     /// <example><c>https://steamcommunity.com/sharedfiles/filedetails/?id=942405260</c></example>
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public string SteamWorkshopUrl => $"{Constants.SteamCommunityBaseUrl}/sharedfiles/filedetails/?id={Value.ToString(CultureInfo.InvariantCulture)}";
+    public string GetSteamWorkshopUrl() => $"{Constants.SteamCommunityBaseUrl}/sharedfiles/filedetails/?id={Value.ToString(CultureInfo.InvariantCulture)}";
 }

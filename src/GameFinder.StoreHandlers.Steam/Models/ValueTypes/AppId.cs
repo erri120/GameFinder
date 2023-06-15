@@ -21,17 +21,10 @@ public readonly partial struct AppId
     public static readonly AppId Empty = From(0);
 
     /// <summary>
-    /// Gets the URL to the Steam Store page of the app associated with this id.
-    /// </summary>
-    /// <example><c>https://store.steampowered.com/app/262060</c></example>
-    /// <seealso cref="GetSteamStoreUrlWithTracking"/>
-    public string SteamStoreUrl => $"{Constants.SteamStoreBaseUrl}/app/{Value.ToString(CultureInfo.InvariantCulture)}";
-
-    /// <summary>
     /// Gets the URL to the SteamDB page of the app associated with this id.
     /// </summary>
     /// <example><c>https://steamdb.info/app/262060</c></example>
-    public string SteamDbUrl => $"{Constants.SteamDbBaseUrl}/app/{Value.ToString(CultureInfo.InvariantCulture)}";
+    public string GetSteamDbUrl() => $"{Constants.SteamDbBaseUrl}/app/{Value.ToString(CultureInfo.InvariantCulture)}";
 
     /// <summary>
     /// Gets the URL to the Steam Store page of the app associated with this id and with additional UTM parameters.
@@ -42,10 +35,13 @@ public readonly partial struct AppId
     /// </remarks>
     /// <param name="source">The current source. This should be the name of your app.</param>
     /// <returns></returns>
-    /// <example><c>https://store.steampowered.com/app/262060/?utm_source=MyApp</c></example>
-    /// <seealso cref="SteamStoreUrl"/>
-    public string GetSteamStoreUrlWithTracking(string source)
+    /// <example>
+    /// <c>https://store.steampowered.com/app/262060</c> or
+    /// <c>https://store.steampowered.com/app/262060/?utm_source=MyApp</c>
+    /// </example>
+    public string GetSteamStoreUrl(string? source = null)
     {
-        return $"{SteamStoreUrl}/?utm_source={HttpUtility.UrlEncode(source)}";
+        var url = $"{Constants.SteamStoreBaseUrl}/app/{Value.ToString(CultureInfo.InvariantCulture)}";
+        return source is null ? url : $"{url}/?utm_source={HttpUtility.UrlEncode(source)}";
     }
 }

@@ -39,10 +39,10 @@ public record InstalledDepot
     /// <summary>
     /// Gets the URL to the SteamDB page for the depot.
     /// </summary>
-    public string SteamDbUrl => $"{Constants.SteamDbBaseUrl}/depot/{DepotId.Value.ToString(CultureInfo.InvariantCulture)}";
+    public string GetSteamDbUrl() => $"{Constants.SteamDbBaseUrl}/depot/{DepotId.Value.ToString(CultureInfo.InvariantCulture)}";
 
     /// <summary>
     /// Gets the URL to the SteamDB page for the Changeset of the current version of this depot, based on the <see cref="ManifestId"/>.
     /// </summary>
-    public string SteamDbChangeSetUrl => ManifestId.GetSteamDbChangesetUrl(DepotId);
+    public string GetSteamDbChangeSetUrl() => ManifestId.GetSteamDbChangesetUrl(DepotId);
 }

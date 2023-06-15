@@ -12,7 +12,7 @@ public class AppIdTests
     public void Test_SteamStoreUrl(uint input, string expectedUrl)
     {
         var appId = AppId.From(input);
-        appId.SteamStoreUrl.Should().Be(expectedUrl);
+        appId.GetSteamStoreUrl().Should().Be(expectedUrl);
     }
 
     [Theory]
@@ -20,7 +20,7 @@ public class AppIdTests
     public void Test_SteamDbUrl(uint input, string expectedUrl)
     {
         var appId = AppId.From(input);
-        appId.SteamDbUrl.Should().Be(expectedUrl);
+        appId.GetSteamDbUrl().Should().Be(expectedUrl);
     }
 
     [Theory]
@@ -28,6 +28,6 @@ public class AppIdTests
     public void Test_GetSteamStoreUrlWithTracking(uint input, string source, string expectedUrl)
     {
         var appId = AppId.From(input);
-        appId.GetSteamStoreUrlWithTracking(source).Should().Be(expectedUrl);
+        appId.GetSteamStoreUrl(source).Should().Be(expectedUrl);
     }
 }

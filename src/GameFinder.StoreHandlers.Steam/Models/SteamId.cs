@@ -106,13 +106,13 @@ public readonly struct SteamId : IEquatable<SteamId>, IComparable<SteamId>
     /// Gets the URL to the community profile page of the account using <see cref="RawId"/>.
     /// </summary>
     /// <example>https://steamcommunity.com/profiles/76561198110222274</example>
-    public string ProfileUrl => $"{Constants.SteamCommunityBaseUrl}/profiles/{RawId}";
+    public string GetProfileUrl() => $"{Constants.SteamCommunityBaseUrl}/profiles/{RawId}";
 
     /// <summary>
     /// Gets the URL to the community profile page of the account using the <see cref="Steam3Id"/>.
     /// </summary>
     /// <example>https://steamcommunity.com/profiles/[U:1:149956546]</example>
-    public string Steam3IdProfileUrl => $"{Constants.SteamCommunityBaseUrl}/profiles/{Steam3Id}";
+    public string GetSteam3IdProfileUrl() => $"{Constants.SteamCommunityBaseUrl}/profiles/{Steam3Id}";
 
     /// <inheritdoc/>
     public override string ToString() => Steam3Id;

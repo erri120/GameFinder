@@ -39,8 +39,8 @@ public class SteamIdTests
         steamId.Steam2Id.Should().Be(expectedSteam2Id);
         steamId.Steam3Id.Should().Be(expectedSteam3Id);
 
-        steamId.ProfileUrl.Should().EndWith($"/{input}");
-        steamId.Steam3IdProfileUrl.Should().EndWith($"/{expectedSteam3Id}");
+        steamId.GetProfileUrl().Should().EndWith($"/{input}");
+        steamId.GetSteam3IdProfileUrl().Should().EndWith($"/{expectedSteam3Id}");
 
         steamId.ToString().Should().Be(expectedSteam3Id);
     }

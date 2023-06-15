@@ -21,5 +21,5 @@ public readonly partial struct DepotId
     /// Gets the URL to the SteamDB page of this depot.
     /// </summary>
     /// <example><c>https://steamdb.info/depot/262061</c></example>
-    public string SteamDbUrl => $"{Constants.SteamDbBaseUrl}/depot/{Value.ToString(CultureInfo.InvariantCulture)}";
+    public string GetSteamDbUrl() => $"{Constants.SteamDbBaseUrl}/depot/{Value.ToString(CultureInfo.InvariantCulture)}";
 }

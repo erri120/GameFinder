@@ -12,6 +12,6 @@ public class BuildIdTests
     public void Test_SteamDbUpdateNotesUrl(uint input, string expectedUrl)
     {
         var buildId = BuildId.From(input);
-        buildId.SteamDbUpdateNotesUrl.Should().Be(expectedUrl);
+        buildId.GetSteamDbUpdateNotesUrl().Should().Be(expectedUrl);
     }
 }

@@ -21,5 +21,5 @@ public readonly partial struct BuildId
     /// Gets the URL to the SteamDB Update Notes for the build associated with this id.
     /// </summary>
     /// <example><c>https://steamdb.info/patchnotes/9545898</c></example>
-    public string SteamDbUpdateNotesUrl => $"{Constants.SteamDbBaseUrl}/patchnotes/{Value.ToString(CultureInfo.InvariantCulture)}";
+    public string GetSteamDbUpdateNotesUrl() => $"{Constants.SteamDbBaseUrl}/patchnotes/{Value.ToString(CultureInfo.InvariantCulture)}";
 }

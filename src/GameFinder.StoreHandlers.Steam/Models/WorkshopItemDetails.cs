@@ -64,5 +64,5 @@ public sealed record WorkshopItemDetails
     /// </summary>
     /// <example><c>https://steamcommunity.com/sharedfiles/filedetails/?id=942405260</c></example>
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public string SteamWorkshopUrl => ItemId.SteamWorkshopUrl;
+    public string SteamWorkshopUrl => ItemId.GetSteamWorkshopUrl();
 }

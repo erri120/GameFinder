@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using FluentResults;
 using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
@@ -85,6 +86,25 @@ public sealed record WorkshopManifest
     {
         return WorkshopManifestParser.ParseManifestFile(ManifestPath);
     }
+
+    private static readonly RelativePath ContentDirectoryName = "content";
+    private static readonly RelativePath DownloadsDirectoryName = "downloads";
+
+    /// <summary>
+    /// Gets the absolute path to the content directory.
+    /// </summary>
+    /// <example><c>E:/SteamLibrary/steamapps/workshop/content/262060</c></example>
+    public AbsolutePath GetContentDirectoryPath() => ManifestPath.Parent
+        .CombineUnchecked(ContentDirectoryName)
+        .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
+
+    /// <summary>
+    /// Gets the absolute path to the downloads directory.
+    /// </summary>
+    /// <example><c>E:/SteamLibrary/steamapps/workshop/downloads/262060</c></example>
+    public AbsolutePath GetDownloadsDirectoryPath() => ManifestPath.Parent
+        .CombineUnchecked(DownloadsDirectoryName)
+        .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
 
     #endregion
 
