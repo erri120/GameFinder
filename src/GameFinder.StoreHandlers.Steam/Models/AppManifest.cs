@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using FluentResults;
@@ -30,7 +29,6 @@ public sealed record AppManifest
     /// <example><c>E:/SteamLibrary/steamapps/appmanifest_262060.acf</c></example>
     /// <seealso cref="InstallationDirectoryName"/>
     /// <seealso cref="GetInstallationDirectoryPath"/>
-    [SuppressMessage("ReSharper", "CommentTypo")]
     public required AbsolutePath ManifestPath { get; init; }
 
     #region Parsed Values
@@ -250,7 +248,6 @@ public sealed record AppManifest
     /// <remarks>This uses <see cref="ManifestPath"/> to get to the installation directory.</remarks>
     /// <example><c>E:/SteamLibrary/steamapps/common/DarkestDungeon</c></example>
     /// <seealso cref="InstallationDirectoryName"/>
-    [SuppressMessage("ReSharper", "CommentTypo")]
     public AbsolutePath GetInstallationDirectoryPath() => ManifestPath.Parent
         .CombineUnchecked(CommonDirectoryName)
         .CombineUnchecked(InstallationDirectoryName);
