@@ -1,6 +1,7 @@
 using System.Globalization;
 using GameFinder.StoreHandlers.Steam.Models;
 using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
+using GameFinder.StoreHandlers.Steam.Services;
 using NexusMods.Paths;
 using NexusMods.Paths.Extensions;
 
@@ -119,6 +120,34 @@ public static class ArrangeHelper
                     SubscribedBy = SteamId.FromAccountId(fixture.Create<uint>()),
                 })
                 .ToDictionary(x => x.ItemId, x => x),
+        };
+    }
+
+    public static LibraryFoldersManifest CreateLibraryFoldersManifest(AbsolutePath manifestPath)
+    {
+        var fixture = new Fixture();
+        fixture.Customize<Size>(composer => composer.FromFactory<ulong>(Size.From));
+        fixture.Customize<AppId>(composer => composer.FromFactory<uint>(AppId.From));
+
+        return new LibraryFoldersManifest
+        {
+            ManifestPath = manifestPath,
+            LibraryFolders = fixture.CreateMany<string>()
+                .Select(folderNames =>
+                {
+                    return new LibraryFolder
+                    {
+                        Path = manifestPath.FileSystem
+                            .GetKnownPath(KnownPath.TempDirectory)
+                            .CombineUnchecked(folderNames),
+                        Label = fixture.Create<string>(),
+                        TotalSize = fixture.Create<Size>(),
+                        AppSizes = fixture.CreateMany<AppId>()
+                            .Select(id => (id, fixture.Create<Size>()))
+                            .ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2),
+                    };
+                })
+                .ToList(),
         };
     }
 }

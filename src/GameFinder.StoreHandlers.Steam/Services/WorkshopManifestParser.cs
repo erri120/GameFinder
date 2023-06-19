@@ -59,8 +59,8 @@ public static class WorkshopManifestParser
 
             var appIdResult = ParseRequiredChildObject(appWorkshop, "appid", ParseAppId);
             var sizeOnDiskResult = ParseOptionalChildObject(appWorkshop, "SizeOnDisk", ParseSize, Size.Zero);
-            var needsUpdateResult = ParseOptionalChildObject(appWorkshop, "NeedsUpdate", ParseBool);
-            var needsDownloadResult = ParseOptionalChildObject(appWorkshop, "NeedsDownload", ParseBool);
+            var needsUpdateResult = ParseOptionalChildObject(appWorkshop, "NeedsUpdate", ParseBool, default);
+            var needsDownloadResult = ParseOptionalChildObject(appWorkshop, "NeedsDownload", ParseBool, default);
             var lastUpdatedResult = ParseOptionalChildObject(appWorkshop, "TimeLastUpdated", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
             var lastAppStartResult = ParseOptionalChildObject(appWorkshop, "TimeLastAppRan", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
 
@@ -191,7 +191,7 @@ public static class WorkshopManifestParser
         var manifestResult = ParseRequiredChildObject(workshopItemDetailObject, "manifest", ParseWorkshopManifestId);
         var lastUpdatedResult = ParseOptionalChildObject(workshopItemDetailObject, "timeupdated", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
         var lastTouchedResult = ParseOptionalChildObject(workshopItemDetailObject, "timetouched", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
-        var subscribedByResult = ParseOptionalChildObject(workshopItemDetailObject, "subscribedby", ParseUInt32).Map(x => SteamId.FromAccountId(x));
+        var subscribedByResult = ParseOptionalChildObject(workshopItemDetailObject, "subscribedby", ParseUInt32, default).Map(x => SteamId.FromAccountId(x));
 
         var mergedResults = Result.Merge(
             manifestResult,

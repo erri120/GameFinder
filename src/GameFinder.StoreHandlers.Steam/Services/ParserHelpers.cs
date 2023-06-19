@@ -94,8 +94,7 @@ internal static class ParserHelpers
         KVObject parentObject,
         string childObjectName,
         Func<KVValue, T> parser,
-        T defaultValue = default)
-        where T : struct
+        T defaultValue)
     {
         var childObject = FindOptionalChildObject(parentObject, childObjectName);
         return childObject is null
@@ -179,6 +178,10 @@ internal static class ParserHelpers
     // TODO: sanitize the path (requires https://github.com/Nexus-Mods/NexusMods.App/pull/345)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static RelativePath ParseRelativePath(KVValue value) => new(ParseString(value));
+
+    // TODO: sanitize the path (requires https://github.com/Nexus-Mods/NexusMods.App/pull/345)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static AbsolutePath ParseAbsolutePath(KVValue value, IFileSystem fileSystem) => fileSystem.FromFullPath(ParseString(value));
 
     #endregion
 }

@@ -68,7 +68,7 @@ public static class AppManifestParser
             // Until those issues are resolved or I find another library, parsing is going to be broken.
 
             var appIdResult = ParseRequiredChildObject(appState, "appid", ParseAppId);
-            var universeResult = ParseOptionalChildObject(appState, "Universe", ParseUInt32).Map(x => (SteamUniverse)x);
+            var universeResult = ParseOptionalChildObject(appState, "Universe", ParseUInt32, default).Map(x => (SteamUniverse)x);
             var nameResult = ParseRequiredChildObject(appState, "name", ParseString);
             var stateFlagsResult = ParseRequiredChildObject(appState, "StateFlags", ParseByte).Map(x => (StateFlags)x);
             var installationDirectoryNameResult = ParseRequiredChildObject(appState, "installdir", ParseRelativePath);
@@ -77,16 +77,16 @@ public static class AppManifestParser
             var stagingSizeResult = ParseOptionalChildObject(appState, "StagingSize", ParseSize, Size.Zero);
             var buildIdResult = ParseOptionalChildObject(appState, "buildid", ParseBuildId, BuildId.Empty);
             var lastOwnerResult = ParseOptionalChildObject(appState, "LastOwner", ParseSteamId, SteamId.Empty);
-            var updateResult = ParseOptionalChildObject(appState, "UpdateResult", ParseUInt32);
+            var updateResult = ParseOptionalChildObject(appState, "UpdateResult", ParseUInt32, default);
             var bytesToDownloadResult = ParseOptionalChildObject(appState, "BytesToDownload", ParseSize, Size.Zero);
             var bytesDownloadedResult = ParseOptionalChildObject(appState, "BytesDownloaded", ParseSize, Size.Zero);
             var bytesToStageResult = ParseOptionalChildObject(appState, "BytesToStage", ParseSize, Size.Zero);
             var bytesStagedResult = ParseOptionalChildObject(appState, "BytesStaged", ParseSize, Size.Zero);
             var targetBuildIdResult = ParseOptionalChildObject(appState, "TargetBuildID", ParseBuildId, BuildId.Empty);
-            var autoUpdateBehaviorResult = ParseOptionalChildObject(appState, "AutoUpdateBehavior", ParseByte).Map(x => (AutoUpdateBehavior)x);
-            var backgroundDownloadBehaviorResult = ParseOptionalChildObject(appState, "AllowOtherDownloadsWhileRunning", ParseByte).Map(x => (BackgroundDownloadBehavior)x);
+            var autoUpdateBehaviorResult = ParseOptionalChildObject(appState, "AutoUpdateBehavior", ParseByte, default).Map(x => (AutoUpdateBehavior)x);
+            var backgroundDownloadBehaviorResult = ParseOptionalChildObject(appState, "AllowOtherDownloadsWhileRunning", ParseByte, default).Map(x => (BackgroundDownloadBehavior)x);
             var scheduledAutoUpdateResult = ParseOptionalChildObject(appState, "ScheduledAutoUpdate", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
-            var fullValidateAfterNextUpdateResult = ParseOptionalChildObject(appState, "FullValidateAfterNextUpdate", ParseBool);
+            var fullValidateAfterNextUpdateResult = ParseOptionalChildObject(appState, "FullValidateAfterNextUpdate", ParseBool, default);
 
             var installedDepotsResult = ParseInstalledDepots(appState);
             var installScriptsResult = ParseBasicDictionary(
