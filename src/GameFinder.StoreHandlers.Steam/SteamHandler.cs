@@ -128,6 +128,6 @@ public class SteamHandler : AHandler<SteamGame, AppId>
     private static ErrorMessage ConvertResultToErrorMessage<T>(Result<T> result)
     {
         // TODO: for compatability, remove this mapping once FindAllGames uses FluentResults
-        return new ErrorMessage(result.Errors.Select(x => x.Message).Aggregate((a,b) => $"{a}\n{b}"));
+        return new ErrorMessage(result.Errors.Select(x => x.Message).Aggregate((a, b) => $"{a}\n{b}"));
     }
 }
