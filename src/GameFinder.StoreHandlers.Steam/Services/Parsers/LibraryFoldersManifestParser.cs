@@ -109,7 +109,7 @@ public static class LibraryFoldersManifestParser
             {
                 Path = pathResult.Value,
                 Label = labelResult.Value,
-                TotalSize = totalSizeResult.Value,
+                TotalDiskSize = totalSizeResult.Value,
                 AppSizes = appSizesResult.Value,
             }
         );

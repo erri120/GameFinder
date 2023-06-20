@@ -32,7 +32,7 @@ public static class LibraryFoldersManifestWriter
             var children = new List<KVObject>();
             children.AddValue("path", libraryFolder.Path.ToString(), string.Empty);
             children.AddValue("label", libraryFolder.Label, string.Empty);
-            children.AddValue("totalsize", libraryFolder.TotalSize.Value, default);
+            children.AddValue("totalsize", libraryFolder.TotalDiskSize.Value, default);
             children.AddDictionary("apps", libraryFolder.AppSizes
                 .Select(kv => new KeyValuePair<AppId, ulong>(kv.Key, kv.Value.Value))
                 .ToDictionary(kv => kv.Key, kv => kv.Value),

@@ -9,24 +9,38 @@ namespace GameFinder.StoreHandlers.Steam.Tests;
 
 public static class ArrangeHelper
 {
-    private static readonly RelativePath SteamAppsDirectoryName = "steamapps".ToRelativePath();
-
-    public static AbsolutePath GetSteamLibraryPath(IFileSystem fileSystem)
+    private static AbsolutePath CreateOrReturnPath(IFileSystem fileSystem, AbsolutePath path, bool createDirectory)
     {
-        var path = fileSystem
-            .GetKnownPath(KnownPath.TempDirectory)
-            .CombineUnchecked("SteamLibrary-" + Guid.NewGuid().ToString("N"));
-
+        if (!createDirectory) return path;
         fileSystem.CreateDirectory(path);
         return path;
     }
 
-    public static AbsolutePath GetAppManifestFilePath(AbsolutePath steamLibraryPath, AppId appId)
+    public static AbsolutePath CreateSteamPath(IFileSystem fileSystem, bool createDirectory = false)
     {
-        return steamLibraryPath
-            .CombineUnchecked(SteamAppsDirectoryName)
-            .CombineUnchecked($"appmanifest_{appId.Value.ToString(CultureInfo.InvariantCulture)}.acf");
+        var steamPath = fileSystem
+            .GetKnownPath(KnownPath.TempDirectory)
+            .CombineUnchecked($"Steam-{Guid.NewGuid():N}");
+
+        return CreateOrReturnPath(fileSystem, steamPath, createDirectory);
     }
+
+    public static AbsolutePath CreateSteamLibraryPath(IFileSystem fileSystem, bool createDirectory = false)
+    {
+        var libraryPath = fileSystem
+            .GetKnownPath(KnownPath.TempDirectory)
+            .CombineUnchecked($"SteamLibrary-{Guid.NewGuid():N}");
+
+        return CreateOrReturnPath(fileSystem, libraryPath, createDirectory);
+    }
+
+    public static AbsolutePath CreateAppManifestPath(IFileSystem fileSystem, AbsolutePath libraryPath = default)
+    {
+        if (libraryPath == default) libraryPath = CreateSteamLibraryPath(fileSystem);
+        return libraryPath.CombineUnchecked("steamapps").CombineUnchecked($"appmanifest_{Guid.NewGuid():N}.acf");
+    }
+
+    public static SteamId CreateSteamId() => SteamId.From(76561198110222274);
 
     public static AppManifest CreateAppManifest(AbsolutePath manifestPath)
     {
@@ -141,7 +155,7 @@ public static class ArrangeHelper
                             .GetKnownPath(KnownPath.TempDirectory)
                             .CombineUnchecked(folderNames),
                         Label = fixture.Create<string>(),
-                        TotalSize = fixture.Create<Size>(),
+                        TotalDiskSize = fixture.Create<Size>(),
                         AppSizes = fixture.CreateMany<AppId>()
                             .Select(id => (id, fixture.Create<Size>()))
                             .ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2),

@@ -5,6 +5,7 @@ using System.Linq;
 using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 using JetBrains.Annotations;
 using NexusMods.Paths;
+using NexusMods.Paths.Extensions;
 
 namespace GameFinder.StoreHandlers.Steam.Models;
 
@@ -26,14 +27,47 @@ public sealed record LibraryFolder
     public string Label { get; init; } = string.Empty;
 
     /// <summary>
-    /// Gets the combined size of all installed apps inside the library folder.
+    /// Gets the total size of the disk that contains this library.
     /// </summary>
-    public Size TotalSize { get; init; } = Size.Zero;
+    /// <remarks>
+    /// Since you usually only have one library per disk (eg: <c>C:/SteamLibrary</c>,
+    /// <c>E:/SteamLibrary</c> and <c>M:/SteamLibrary</c>), this value can give you
+    /// an idea of how big the drive is. Do note that this value can also be
+    /// <see cref="Size.Zero"/> in some situations, for example, on Linux
+    /// if Steam doesn't fully understand the file system.
+    /// </remarks>
+    public Size TotalDiskSize { get; init; } = Size.Zero;
 
     /// <summary>
     /// Gets all installed apps inside the library folders and their sizes.
     /// </summary>
+    /// <seealso cref="GetTotalSizeOfInstalledApps"/>
     public IReadOnlyDictionary<AppId, Size> AppSizes { get; init; } = ImmutableDictionary<AppId, Size>.Empty;
+
+    #region Helpers
+
+    /// <summary>
+    /// Calculates the total size of all installed apps.
+    /// </summary>
+    /// <seealso cref="AppSizes"/>
+    public Size GetTotalSizeOfInstalledApps() => AppSizes.Values.Sum();
+
+    /// <summary>
+    /// Calculates a free space estimate on the disk using <see cref="TotalDiskSize"/> and <see cref="GetTotalSizeOfInstalledApps"/>.
+    /// </summary>
+    public Size GetFreeSpaceEstimate() => TotalDiskSize - GetTotalSizeOfInstalledApps();
+
+    private static readonly RelativePath SteamAppsDirectoryName = "steamapps".ToRelativePath();
+
+    /// <summary>
+    /// Returns an enumerable for every <c>appmanifest_*.acf</c> file path in the current library.
+    /// </summary>
+    public IEnumerable<AbsolutePath> EnumerateAppManifestFilePaths()
+    {
+        return Path.CombineUnchecked(SteamAppsDirectoryName).EnumerateFiles("*.acf", recursive: false);
+    }
+
+    #endregion
 
     #region Overrides
 
@@ -43,7 +77,7 @@ public sealed record LibraryFolder
         if (other is null) return false;
         if (!Path.Equals(other.Path)) return false;
         if (!Label.Equals(other.Label, StringComparison.Ordinal)) return false;
-        if (!TotalSize.Equals(other.TotalSize)) return false;
+        if (!TotalDiskSize.Equals(other.TotalDiskSize)) return false;
         if (!AppSizes.SequenceEqual(other.AppSizes)) return false;
         return true;
     }
@@ -54,7 +88,7 @@ public sealed record LibraryFolder
         var hashCode = new HashCode();
         hashCode.Add(Path);
         hashCode.Add(Label);
-        hashCode.Add(TotalSize);
+        hashCode.Add(TotalDiskSize);
         hashCode.Add(AppSizes);
         return hashCode.ToHashCode();
     }

@@ -77,7 +77,6 @@ public static class Program
             .WithParsed(x => Run(x, logger));
     }
 
-    [SuppressMessage("Design", "MA0051:Method is too long")]
     private static void Run(Options options, ILogger logger)
     {
         var realFileSystem = FileSystem.Shared;
@@ -185,7 +184,7 @@ public static class Program
         {
             if (!OperatingSystem.IsLinux()) return;
             var protonPrefix = game.GetProtonPrefix();
-            if (!fileSystem.DirectoryExists(protonPrefix.ConfigurationDirectory)) return;
+            if (protonPrefix is null) return;
             logger.LogInformation("Proton Directory for this game: {}", protonPrefix.ProtonDirectory.GetFullPath());
         });
     }

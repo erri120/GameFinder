@@ -1,5 +1,8 @@
-using System.Globalization;
+using FluentResults;
 using GameFinder.Common;
+using GameFinder.StoreHandlers.Steam.Models;
+using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
+using GameFinder.StoreHandlers.Steam.Services;
 using JetBrains.Annotations;
 using NexusMods.Paths;
 
@@ -8,34 +11,49 @@ namespace GameFinder.StoreHandlers.Steam;
 /// <summary>
 /// Represents a game installed with Steam.
 /// </summary>
-/// <param name="AppId">ID of the game.</param>
-/// <param name="Name">Name of the game.</param>
-/// <param name="Path">Absolute path to the game installation directory.</param>
-/// <param name="CloudSavesDirectory">Absolute path to the cloud saves directory.</param>
 [PublicAPI]
-public record SteamGame(SteamGameId AppId, string Name, AbsolutePath Path, AbsolutePath? CloudSavesDirectory) : IGame
+public sealed record SteamGame : IGame
 {
     /// <summary>
-    /// Returns the absolute path of the manifest for this game.
+    /// Gets the parsed <see cref="AppManifest"/> of this game.
     /// </summary>
-    /// <returns></returns>
-    public AbsolutePath GetManifestPath()
-    {
-        var manifestName = $"{AppId.Value.ToString(CultureInfo.InvariantCulture)}.acf";
-        return Path.Parent.Parent.CombineUnchecked(manifestName);
-    }
+    public required AppManifest AppManifest { get; init; }
 
     /// <summary>
-    /// Returns the absolute path to the Wine prefix directory, managed by Proton.
+    /// Gets the library folder that contains this game.
     /// </summary>
-    /// <returns></returns>
-    public ProtonWinePrefix GetProtonPrefix()
+    public required LibraryFolder LibraryFolder { get; init; }
+
+    /// <summary>
+    /// Gets the path to the global Steam installation.
+    /// </summary>
+    public required AbsolutePath SteamPath { get; init; }
+
+    #region Helpers
+
+    /// <inheritdoc cref="Models.AppManifest.AppId"/>
+    public AppId AppId => AppManifest.AppId;
+
+    /// <inheritdoc cref="Models.AppManifest.Name"/>
+    public string Name => AppManifest.Name;
+
+    /// <summary>
+    /// Gets the absolute path to the game's installation directory.
+    /// </summary>
+    public AbsolutePath Path => AppManifest.GetInstallationDirectoryPath();
+
+    /// <summary>
+    /// Gets the absolute path to the cloud saves directory.
+    /// </summary>
+    public AbsolutePath GetCloudSavesDirectoryPath() => AppManifest.GetUserDataDirectoryPath(SteamPath);
+
+    /// <summary>
+    /// Gets the Wine prefix managed by Proton for this game, if it exists.
+    /// </summary>
+    public ProtonWinePrefix? GetProtonPrefix()
     {
-        var protonDirectory = Path
-            .Parent
-            .Parent
-            .CombineUnchecked("compatdata")
-            .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
+        var protonDirectory = AppManifest.GetCompatabilityDataDirectoryPath();
+        if (!protonDirectory.DirectoryExists()) return null;
 
         var configurationDirectory = protonDirectory.CombineUnchecked("pfx");
         return new ProtonWinePrefix
@@ -44,4 +62,32 @@ public record SteamGame(SteamGameId AppId, string Name, AbsolutePath Path, Absol
             ProtonDirectory = protonDirectory,
         };
     }
+
+    /// <summary>
+    /// Uses <see cref="WorkshopManifestParser"/> to parse the workshop manifest
+    /// file at <see cref="Models.AppManifest.GetWorkshopManifestFilePath"/>.
+    /// </summary>
+    /// <seealso cref="WorkshopManifestParser"/>
+    [Pure]
+    [System.Diagnostics.Contracts.Pure]
+    [MustUseReturnValue]
+    public Result<WorkshopManifest> ParseWorkshopManifest()
+    {
+        var workshopManifestFilePath = AppManifest.GetWorkshopManifestFilePath();
+        var result = WorkshopManifestParser.ParseManifestFile(workshopManifestFilePath);
+        return result;
+    }
+
+    #endregion
+
+    #region Overrides
+
+    /// <inheritdoc/>
+    public bool Equals(SteamGame? other) => AppManifest.Equals(other?.AppManifest);
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => AppManifest.GetHashCode();
+
+    #endregion
 }
+
