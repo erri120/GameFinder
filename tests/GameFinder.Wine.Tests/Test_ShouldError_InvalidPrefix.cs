@@ -10,7 +10,7 @@ public partial class WineTests
     public void Test_ShouldError_MissingVirtualDrive(InMemoryFileSystem fs)
     {
         var (prefixDirectory, prefixManager) = SetupWinePrefix(fs);
-        var virtualDriveDirectory = prefixDirectory.CombineUnchecked("drive_c");
+        var virtualDriveDirectory = prefixDirectory.Combine("drive_c");
 
         prefixManager.FindPrefixes().Should()
             .ContainSingle(result => result.IsError())
@@ -24,10 +24,10 @@ public partial class WineTests
     public void Test_ShouldError_MissingSystemRegistryFile(InMemoryFileSystem fs)
     {
         var (prefixDirectory, prefixManager) = SetupWinePrefix(fs);
-        var virtualDriveDirectory = prefixDirectory.CombineUnchecked("drive_c");
+        var virtualDriveDirectory = prefixDirectory.Combine("drive_c");
         fs.AddDirectory(virtualDriveDirectory);
 
-        var systemRegistryFile = prefixDirectory.CombineUnchecked("system.reg");
+        var systemRegistryFile = prefixDirectory.Combine("system.reg");
 
         prefixManager.FindPrefixes().Should()
             .ContainSingle(result => result.IsError())
@@ -41,13 +41,13 @@ public partial class WineTests
     public void Test_ShouldError_MissingUserRegistryFile(InMemoryFileSystem fs)
     {
         var (prefixDirectory, prefixManager) = SetupWinePrefix(fs);
-        var virtualDriveDirectory = prefixDirectory.CombineUnchecked("drive_c");
+        var virtualDriveDirectory = prefixDirectory.Combine("drive_c");
         fs.AddDirectory(virtualDriveDirectory);
 
-        var systemRegistryFile = prefixDirectory.CombineUnchecked("system.reg");
+        var systemRegistryFile = prefixDirectory.Combine("system.reg");
         fs.AddEmptyFile(systemRegistryFile);
 
-        var userRegistryFile = prefixDirectory.CombineUnchecked("user.reg");
+        var userRegistryFile = prefixDirectory.Combine("user.reg");
 
         prefixManager.FindPrefixes().Should()
             .ContainSingle(result => result.IsError())

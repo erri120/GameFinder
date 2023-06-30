@@ -105,14 +105,14 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
     {
         return fileSystem
             .GetKnownPath(KnownPath.CommonApplicationDataDirectory)
-            .CombineUnchecked("EA Desktop");
+            .Combine("EA Desktop");
     }
 
     internal static AbsolutePath GetInstallInfoFile(AbsolutePath dataFolder)
     {
         return dataFolder
-            .CombineUnchecked(AllUsersFolderName)
-            .CombineUnchecked(InstallInfoFileName);
+            .Combine(AllUsersFolderName)
+            .Combine(InstallInfoFileName);
     }
 
     internal static OneOf<string, ErrorMessage> DecryptInstallInfoFile(IFileSystem fileSystem, AbsolutePath installInfoFile, IHardwareInfoProvider hardwareInfoProvider)
@@ -244,7 +244,8 @@ public class EADesktopHandler : AHandler<EADesktopGame, EADesktopGameId>
         var game = new EADesktopGame(
             EADesktopGameId.From(softwareId),
             baseSlug,
-            fileSystem.FromFullPath(SanitizeInputPath(baseInstallPath)));
+            fileSystem.FromUnsanitizedFullPath(baseInstallPath)
+        );
 
         return game;
     }

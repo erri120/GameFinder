@@ -13,7 +13,7 @@ public partial class EGSTests
     {
         var (handler, manifestDir) = SetupHandler(fs, registry);
 
-        var manifest = manifestDir.CombineUnchecked($"{manifestItemName}.item");
+        var manifest = manifestDir.Combine($"{manifestItemName}.item");
         fs.AddFile(manifest, "{}");
 
         var error = handler.ShouldOnlyBeOneError();
@@ -26,7 +26,7 @@ public partial class EGSTests
     {
         var (handler, manifestDir) = SetupHandler(fs, registry);
 
-        var manifest = manifestDir.CombineUnchecked($"{manifestItemName}.item");
+        var manifest = manifestDir.Combine($"{manifestItemName}.item");
         fs.AddFile(manifest, $@"{{ ""CatalogItemId"": ""{value}"" }}");
 
         var error = handler.ShouldOnlyBeOneError();
@@ -39,7 +39,7 @@ public partial class EGSTests
     {
         var (handler, manifestDir) = SetupHandler(fs, registry);
 
-        var manifest = manifestDir.CombineUnchecked($"{manifestItemName}.item");
+        var manifest = manifestDir.Combine($"{manifestItemName}.item");
         fs.AddFile(manifest, $@"{{ ""CatalogItemId"": ""{value}"", ""DisplayName"": ""{value}"" }}");
 
         var error = handler.ShouldOnlyBeOneError();

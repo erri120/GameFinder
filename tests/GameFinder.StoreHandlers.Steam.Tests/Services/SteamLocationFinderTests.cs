@@ -79,7 +79,7 @@ public class SteamLocationFinderTests
     {
         var fs = new InMemoryFileSystem();
         var steamPath = ArrangeHelper.CreateSteamPath(fs);
-        var libraryFoldersFilePath = steamPath.CombineUnchecked("config").CombineUnchecked("libraryfolders.vdf");
+        var libraryFoldersFilePath = steamPath.Combine("config").Combine("libraryfolders.vdf");
 
         SteamLocationFinder.GetLibraryFoldersFilePath(steamPath).Should().Be(libraryFoldersFilePath);
     }
@@ -91,8 +91,8 @@ public class SteamLocationFinderTests
         var steamPath = ArrangeHelper.CreateSteamPath(fs);
         var steamId = ArrangeHelper.CreateSteamId();
         var userDataDirectoryPath = steamPath
-            .CombineUnchecked("userdata")
-            .CombineUnchecked(steamId.AccountId.ToString(CultureInfo.InvariantCulture));
+            .Combine("userdata")
+            .Combine(steamId.AccountId.ToString(CultureInfo.InvariantCulture));
 
         SteamLocationFinder.GetUserDataDirectoryPath(steamPath, steamId).Should().Be(userDataDirectoryPath);
     }

@@ -21,8 +21,8 @@ public partial class OriginTests
         fixture.Customize<OriginGame>(composer => composer
             .FromFactory<string>(id =>
             {
-                var installPath = manifestDir.CombineUnchecked(id);
-                var manifest = manifestDir.CombineUnchecked($"{id}.mfst");
+                var installPath = manifestDir.Combine(id);
+                var manifest = manifestDir.Combine($"{id}.mfst");
 
                 fs.AddFile(manifest, $"?id={HttpUtility.UrlEncode(id)}&dipInstallPath={HttpUtility.UrlEncode(installPath.GetFullPath())}");
                 return new OriginGame(OriginGameId.From(id), installPath);

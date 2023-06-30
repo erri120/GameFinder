@@ -111,8 +111,8 @@ public static class SteamLocationFinder
     public static AbsolutePath GetLibraryFoldersFilePath(AbsolutePath steamPath)
     {
         return steamPath
-            .CombineUnchecked(ConfigDirectoryName)
-            .CombineUnchecked(LibraryFoldersFileName);
+            .Combine(ConfigDirectoryName)
+            .Combine(LibraryFoldersFileName);
     }
 
     /// <summary>
@@ -121,8 +121,8 @@ public static class SteamLocationFinder
     public static AbsolutePath GetUserDataDirectoryPath(AbsolutePath steamPath, SteamId steamId)
     {
         return steamPath
-            .CombineUnchecked(UserDataDirectoryName)
-            .CombineUnchecked(steamId.AccountId.ToString(CultureInfo.InvariantCulture));
+            .Combine(UserDataDirectoryName)
+            .Combine(steamId.AccountId.ToString(CultureInfo.InvariantCulture));
     }
 
     /// <summary>
@@ -154,8 +154,7 @@ public static class SteamLocationFinder
                 );
             }
 
-            // TODO: sanitize the path
-            var directoryInfo = fileSystem.FromFullPath(steamPath);
+            var directoryInfo = fileSystem.FromUnsanitizedFullPath(steamPath);
             return directoryInfo;
         }
         catch (Exception e)
@@ -179,7 +178,7 @@ public static class SteamLocationFinder
         {
             yield return fileSystem
                 .GetKnownPath(KnownPath.ProgramFilesX86Directory)
-                .CombineUnchecked("Steam");
+                .Combine("Steam");
 
             yield break;
         }
@@ -189,33 +188,33 @@ public static class SteamLocationFinder
             // "$XDG_DATA_HOME/Steam" which is usually "~/.local/share/Steam"
             yield return fileSystem
                 .GetKnownPath(KnownPath.LocalApplicationDataDirectory)
-                .CombineUnchecked("Steam");
+                .Combine("Steam");
 
             // "~/.steam/debian-installation"
             yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
-                .CombineUnchecked(".steam")
-                .CombineUnchecked("debian-installation");
+                .Combine(".steam")
+                .Combine("debian-installation");
 
             // "~/.var/app/com.valvesoftware.Steam/data/Steam" (flatpak installation)
             // see https://github.com/flatpak/flatpak/wiki/Filesystem for details
             yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
-                .CombineUnchecked(".var/app/com.valvesoftware.Steam/data/Steam");
+                .Combine(".var/app/com.valvesoftware.Steam/data/Steam");
 
             // "~/.steam/steam"
             // this is a legacy installation directory and is often soft linked to
             // the actual installation directory
             yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
-                .CombineUnchecked(".steam")
-                .CombineUnchecked("steam");
+                .Combine(".steam")
+                .Combine("steam");
 
             // "~/.steam"
             yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
-                .CombineUnchecked(".steam");
+                .Combine(".steam");
 
             // "~/.local/.steam"
             yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
-                .CombineUnchecked(".local")
-                .CombineUnchecked(".steam");
+                .Combine(".local")
+                .Combine(".steam");
 
             yield break;
         }

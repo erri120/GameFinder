@@ -13,6 +13,6 @@ public partial class BottlesTests
         {
             ConfigurationDirectory = prefixDirectory,
         };
-        bottleWinePrefix.GetBottlesConfigFile().Should().Be(prefixDirectory.CombineUnchecked("bottle.yml"));
+        bottleWinePrefix.GetBottlesConfigFile().Should().Be(prefixDirectory.Combine("bottle.yml"));
     }
 }

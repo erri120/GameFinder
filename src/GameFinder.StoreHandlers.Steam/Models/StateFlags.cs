@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace GameFinder.StoreHandlers.Steam.Models;

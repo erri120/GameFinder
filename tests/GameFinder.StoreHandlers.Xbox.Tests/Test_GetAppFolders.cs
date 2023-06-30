@@ -13,8 +13,8 @@ public partial class XboxTests
             .Select(rootDirectory =>
             {
                 var modifiableWindowsAppsPath = rootDirectory
-                    .CombineUnchecked("Program Files")
-                    .CombineUnchecked("ModifiableWindowsApps");
+                    .Combine("Program Files")
+                    .Combine("ModifiableWindowsApps");
                 fs.AddDirectory(modifiableWindowsAppsPath);
                 return modifiableWindowsAppsPath;
             })

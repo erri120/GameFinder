@@ -45,19 +45,19 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
 
     internal static OneOf<bool, ErrorMessage> IsValidPrefix(IFileSystem fileSystem, AbsolutePath directory)
     {
-        var virtualDrive = directory.CombineUnchecked("drive_c");
+        var virtualDrive = directory.Combine("drive_c");
         if (!fileSystem.DirectoryExists(virtualDrive))
         {
             return new ErrorMessage($"Virtual C: drive does not exist at {virtualDrive}");
         }
 
-        var systemRegistryFile = directory.CombineUnchecked("system.reg");
+        var systemRegistryFile = directory.Combine("system.reg");
         if (!fileSystem.FileExists(systemRegistryFile))
         {
             return new ErrorMessage($"System registry file does not exist at {systemRegistryFile}");
         }
 
-        var userRegistryFile = directory.CombineUnchecked("user.reg");
+        var userRegistryFile = directory.Combine("user.reg");
         if (!fileSystem.FileExists(userRegistryFile))
         {
             return new ErrorMessage($"User registry file does not exist at {userRegistryFile}");
@@ -71,18 +71,18 @@ public class DefaultWinePrefixManager : IWinePrefixManager<WinePrefix>
         // from the docs: https://wiki.winehq.org/FAQ#Wineprefixes
 
         // ~/.wine is the default prefix
-        yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory).CombineUnchecked(".wine");
+        yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory).Combine(".wine");
 
         var winePrefixEnvVariable = Environment.GetEnvironmentVariable("WINEPREFIX");
         if (winePrefixEnvVariable is not null)
         {
-            yield return fileSystem.FromFullPath(Utils.SanitizeInputPath(winePrefixEnvVariable));
+            yield return fileSystem.FromUnsanitizedFullPath(winePrefixEnvVariable);
         }
 
         // WINEPREFIX0, WINEPREFIX1, ...
         foreach (var numberedEnvVariable in GetNumberedEnvironmentVariables())
         {
-            yield return fileSystem.FromFullPath(Utils.SanitizeInputPath(numberedEnvVariable));
+            yield return fileSystem.FromUnsanitizedFullPath(numberedEnvVariable);
         }
 
         // Bottling standards: https://wiki.winehq.org/Bottling_Standards

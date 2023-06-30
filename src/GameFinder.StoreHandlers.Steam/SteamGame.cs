@@ -55,7 +55,7 @@ public sealed record SteamGame : IGame
         var protonDirectory = AppManifest.GetCompatabilityDataDirectoryPath();
         if (!protonDirectory.DirectoryExists()) return null;
 
-        var configurationDirectory = protonDirectory.CombineUnchecked("pfx");
+        var configurationDirectory = protonDirectory.Combine("pfx");
         return new ProtonWinePrefix
         {
             ConfigurationDirectory = configurationDirectory,

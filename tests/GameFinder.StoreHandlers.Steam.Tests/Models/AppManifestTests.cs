@@ -1,4 +1,3 @@
-using System.Globalization;
 using FluentResults.Extensions.FluentAssertions;
 using GameFinder.StoreHandlers.Steam.Services;
 using NexusMods.Paths;

@@ -64,7 +64,7 @@ public sealed record LibraryFolder
     /// </summary>
     public IEnumerable<AbsolutePath> EnumerateAppManifestFilePaths()
     {
-        return Path.CombineUnchecked(SteamAppsDirectoryName).EnumerateFiles("*.acf", recursive: false);
+        return Path.Combine(SteamAppsDirectoryName).EnumerateFiles("*.acf", recursive: false);
     }
 
     #endregion

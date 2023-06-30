@@ -11,11 +11,11 @@ public partial class BottlesTests
     {
         var (prefixDirectory, prefixManager) = CreateBottle(fs, bottleName);
 
-        fs.AddDirectory(prefixDirectory.CombineUnchecked("drive_c"));
-        fs.AddEmptyFile(prefixDirectory.CombineUnchecked("system.reg"));
-        fs.AddEmptyFile(prefixDirectory.CombineUnchecked("user.reg"));
+        fs.AddDirectory(prefixDirectory.Combine("drive_c"));
+        fs.AddEmptyFile(prefixDirectory.Combine("system.reg"));
+        fs.AddEmptyFile(prefixDirectory.Combine("user.reg"));
 
-        var bottlesConfigFile = prefixDirectory.CombineUnchecked("bottle.yml");
+        var bottlesConfigFile = prefixDirectory.Combine("bottle.yml");
 
         prefixManager.FindPrefixes().Should()
             .ContainSingle(result => result.IsError())

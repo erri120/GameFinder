@@ -12,7 +12,7 @@ public partial class WineTests
         fs.AddDirectory(configurationDirectory);
         var prefix = new WinePrefix { ConfigurationDirectory = configurationDirectory };
 
-        fs.AddFile(configurationDirectory.CombineUnchecked("system.reg"), """
+        fs.AddFile(configurationDirectory.Combine("system.reg"), """
 WINE REGISTRY VERSION 2
 ;; something
 

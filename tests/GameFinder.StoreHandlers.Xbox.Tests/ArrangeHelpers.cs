@@ -40,13 +40,13 @@ public partial class XboxTests
 
     private static XboxHandler SetupHandler(InMemoryFileSystem fs, AbsolutePath appFolder)
     {
-        fs.AddDirectory(OperatingSystem.IsLinux() ? fs.FromFullPath("/") : fs.FromFullPath("C:\\"));
+        fs.AddDirectory(fs.EnumerateRootDirectories().First());
 
         var gamingRootFileContents = CreateGamingRootFile(new[] { appFolder });
         var gamingRootFilePath = fs
             .EnumerateRootDirectories()
             .First()
-            .CombineUnchecked(".GamingRoot");
+            .Combine(".GamingRoot");
 
         fs.AddFile(gamingRootFilePath, gamingRootFileContents);
         return new XboxHandler(fs);
@@ -59,8 +59,8 @@ public partial class XboxTests
         fixture.Customize<XboxGame>(composer => composer
             .FromFactory<string, string>((id, displayName) =>
             {
-                var gamePath = appFolder.CombineUnchecked(id);
-                var appManifestPath = gamePath.CombineUnchecked("appxmanifest.xml");
+                var gamePath = appFolder.Combine(id);
+                var appManifestPath = gamePath.Combine("appxmanifest.xml");
                 var appManifestContents = CreateAppManifestFile(id, displayName);
 
                 fs.AddDirectory(gamePath);

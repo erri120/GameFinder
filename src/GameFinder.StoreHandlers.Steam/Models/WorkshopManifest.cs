@@ -95,16 +95,16 @@ public sealed record WorkshopManifest
     /// </summary>
     /// <example><c>E:/SteamLibrary/steamapps/workshop/content/262060</c></example>
     public AbsolutePath GetContentDirectoryPath() => ManifestPath.Parent
-        .CombineUnchecked(ContentDirectoryName)
-        .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
+        .Combine(ContentDirectoryName)
+        .Combine(AppId.Value.ToString(CultureInfo.InvariantCulture));
 
     /// <summary>
     /// Gets the absolute path to the downloads directory.
     /// </summary>
     /// <example><c>E:/SteamLibrary/steamapps/workshop/downloads/262060</c></example>
     public AbsolutePath GetDownloadsDirectoryPath() => ManifestPath.Parent
-        .CombineUnchecked(DownloadsDirectoryName)
-        .CombineUnchecked(AppId.Value.ToString(CultureInfo.InvariantCulture));
+        .Combine(DownloadsDirectoryName)
+        .Combine(AppId.Value.ToString(CultureInfo.InvariantCulture));
 
     #endregion
 

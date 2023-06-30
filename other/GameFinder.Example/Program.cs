@@ -81,7 +81,7 @@ public static class Program
     {
         var realFileSystem = FileSystem.Shared;
 
-        var logFile = realFileSystem.GetKnownPath(KnownPath.CurrentDirectory).CombineUnchecked("log.log");
+        var logFile = realFileSystem.GetKnownPath(KnownPath.CurrentDirectory).Combine("log.log");
         if (realFileSystem.FileExists(logFile)) realFileSystem.DeleteFile(logFile);
 
         logger.LogInformation("Operating System: {OSDescription}", RuntimeInformation.OSDescription);

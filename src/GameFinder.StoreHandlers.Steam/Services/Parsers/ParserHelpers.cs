@@ -9,6 +9,7 @@ using FluentResults;
 using GameFinder.StoreHandlers.Steam.Models;
 using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 using NexusMods.Paths;
+using NexusMods.Paths.Utilities;
 using ValveKeyValue;
 
 namespace GameFinder.StoreHandlers.Steam.Services;
@@ -175,13 +176,11 @@ internal static class ParserHelpers
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static Size ParseSize(KVValue value) => Size.From(ParseUInt64(value));
 
-    // TODO: sanitize the path (requires https://github.com/Nexus-Mods/NexusMods.App/pull/345)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static RelativePath ParseRelativePath(KVValue value) => new(ParseString(value));
+    internal static RelativePath ParseRelativePath(KVValue value, IFileSystem fileSystem) => new(PathHelpers.Sanitize(ParseString(value), fileSystem.OS));
 
-    // TODO: sanitize the path (requires https://github.com/Nexus-Mods/NexusMods.App/pull/345)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static AbsolutePath ParseAbsolutePath(KVValue value, IFileSystem fileSystem) => fileSystem.FromFullPath(ParseString(value));
+    internal static AbsolutePath ParseAbsolutePath(KVValue value, IFileSystem fileSystem) => fileSystem.FromUnsanitizedFullPath(ParseString(value));
 
     #endregion
 }

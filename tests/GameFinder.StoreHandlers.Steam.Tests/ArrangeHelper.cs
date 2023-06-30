@@ -1,7 +1,5 @@
-using System.Globalization;
 using GameFinder.StoreHandlers.Steam.Models;
 using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
-using GameFinder.StoreHandlers.Steam.Services;
 using NexusMods.Paths;
 using NexusMods.Paths.Extensions;
 
@@ -20,7 +18,7 @@ public static class ArrangeHelper
     {
         var steamPath = fileSystem
             .GetKnownPath(KnownPath.TempDirectory)
-            .CombineUnchecked($"Steam-{Guid.NewGuid():N}");
+            .Combine($"Steam-{Guid.NewGuid():N}");
 
         return CreateOrReturnPath(fileSystem, steamPath, createDirectory);
     }
@@ -29,7 +27,7 @@ public static class ArrangeHelper
     {
         var libraryPath = fileSystem
             .GetKnownPath(KnownPath.TempDirectory)
-            .CombineUnchecked($"SteamLibrary-{Guid.NewGuid():N}");
+            .Combine($"SteamLibrary-{Guid.NewGuid():N}");
 
         return CreateOrReturnPath(fileSystem, libraryPath, createDirectory);
     }
@@ -37,7 +35,7 @@ public static class ArrangeHelper
     public static AbsolutePath CreateAppManifestPath(IFileSystem fileSystem, AbsolutePath libraryPath = default)
     {
         if (libraryPath == default) libraryPath = CreateSteamLibraryPath(fileSystem);
-        return libraryPath.CombineUnchecked("steamapps").CombineUnchecked($"appmanifest_{Guid.NewGuid():N}.acf");
+        return libraryPath.Combine("steamapps").Combine($"appmanifest_{Guid.NewGuid():N}.acf");
     }
 
     public static SteamId CreateSteamId() => SteamId.From(76561198110222274);
@@ -153,7 +151,7 @@ public static class ArrangeHelper
                     {
                         Path = manifestPath.FileSystem
                             .GetKnownPath(KnownPath.TempDirectory)
-                            .CombineUnchecked(folderNames),
+                            .Combine(folderNames),
                         Label = fixture.Create<string>(),
                         TotalDiskSize = fixture.Create<Size>(),
                         AppSizes = fixture.CreateMany<AppId>()

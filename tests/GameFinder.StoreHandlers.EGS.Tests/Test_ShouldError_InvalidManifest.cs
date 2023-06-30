@@ -16,7 +16,7 @@ public partial class EGSTests
         var randomBytes = new byte[128];
         Random.Shared.NextBytes(randomBytes);
 
-        var manifestItem = manifestDir.CombineUnchecked($"{manifestItemName}.item");
+        var manifestItem = manifestDir.Combine($"{manifestItemName}.item");
         fs.AddFile(manifestItem, randomBytes);
 
         var error = handler.ShouldOnlyBeOneError();
@@ -29,7 +29,7 @@ public partial class EGSTests
     {
         var (handler, manifestDir) = SetupHandler(fs, registry);
 
-        var manifestItem = manifestDir.CombineUnchecked($"{manifestItemName}.item");
+        var manifestItem = manifestDir.Combine($"{manifestItemName}.item");
         fs.AddFile(manifestItem, "null");
 
         var error = handler.ShouldOnlyBeOneError();

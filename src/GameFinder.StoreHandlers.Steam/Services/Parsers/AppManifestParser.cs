@@ -71,7 +71,7 @@ public static class AppManifestParser
             var universeResult = ParseOptionalChildObject(appState, "Universe", ParseUInt32, default).Map(x => (SteamUniverse)x);
             var nameResult = ParseRequiredChildObject(appState, "name", ParseString);
             var stateFlagsResult = ParseRequiredChildObject(appState, "StateFlags", ParseByte).Map(x => (StateFlags)x);
-            var installationDirectoryNameResult = ParseRequiredChildObject(appState, "installdir", ParseRelativePath);
+            var installationDirectoryNameResult = ParseRequiredChildObject(appState, "installdir", x => ParseRelativePath(x, manifestPath.FileSystem));
             var lastUpdatedResult = ParseOptionalChildObject(appState, "LastUpdated", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
             var sizeOnDiskResult = ParseOptionalChildObject(appState, "SizeOnDisk", ParseSize, Size.Zero);
             var stagingSizeResult = ParseOptionalChildObject(appState, "StagingSize", ParseSize, Size.Zero);
@@ -93,7 +93,7 @@ public static class AppManifestParser
                 appState,
                 "InstallScripts",
                 key => DepotId.From(uint.Parse(key)),
-                ParseRelativePath);
+                x => ParseRelativePath(x, manifestPath.FileSystem));
 
             var sharedDepotsResult = ParseBasicDictionary(
                 appState,

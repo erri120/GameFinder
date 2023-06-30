@@ -21,7 +21,7 @@ public record EADesktopGame(EADesktopGameId EADesktopGameId, string BaseSlug, Ab
     public AbsolutePath GetInstallerDataFile()
     {
         return BaseInstallPath
-            .CombineUnchecked("__Installer")
-            .CombineUnchecked("installerdata.xml");
+            .Combine("__Installer")
+            .Combine("installerdata.xml");
     }
 }

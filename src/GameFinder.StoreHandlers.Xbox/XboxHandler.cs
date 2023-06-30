@@ -73,13 +73,13 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
 
             foreach (var directory in directories)
             {
-                var appManifestFilePath = directory.CombineUnchecked("appxmanifest.xml");
+                var appManifestFilePath = directory.Combine("appxmanifest.xml");
                 if (!_fileSystem.FileExists(appManifestFilePath))
                 {
-                    var contentDirectory = directory.CombineUnchecked("Content");
+                    var contentDirectory = directory.Combine("Content");
                     if (_fileSystem.DirectoryExists(contentDirectory))
                     {
-                        appManifestFilePath = contentDirectory.CombineUnchecked("appxmanifest.xml");
+                        appManifestFilePath = contentDirectory.Combine("appxmanifest.xml");
                         if (!_fileSystem.FileExists(appManifestFilePath))
                         {
                             yield return new ErrorMessage($"Manifest file does not exist at {appManifestFilePath}");
@@ -116,10 +116,10 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
             if (!fileSystem.DirectoryExists(rootDirectory)) continue;
 
             var modifiableWindowsAppsPath = rootDirectory
-                .CombineUnchecked("Program Files")
-                .CombineUnchecked("ModifiableWindowsApps");
+                .Combine("Program Files")
+                .Combine("ModifiableWindowsApps");
 
-            var gamingRootFilePath = rootDirectory.CombineUnchecked(".GamingRoot");
+            var gamingRootFilePath = rootDirectory.Combine(".GamingRoot");
 
             var modifiableWindowsAppsDirectoryExists = fileSystem.DirectoryExists(modifiableWindowsAppsPath);
             var gamingRootFileExists = fileSystem.FileExists(gamingRootFilePath);
@@ -213,7 +213,7 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
                 }
 
                 var part = sb.ToString().ToRelativePath();
-                folders.Add(parentFolder.CombineUnchecked(part));
+                folders.Add(parentFolder.Combine(part));
             }
 
             return folders;
