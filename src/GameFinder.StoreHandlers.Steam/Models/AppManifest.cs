@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using FluentResults;
 using GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 using GameFinder.StoreHandlers.Steam.Services;
@@ -380,6 +381,20 @@ public sealed record AppManifest
         hashCode.Add(UserConfig);
         hashCode.Add(MountedConfig);
         return hashCode.ToHashCode();
+    }
+
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+
+        sb.Append("{ ");
+        sb.Append($"AppId = {AppId}, ");
+        sb.Append($"Name = {Name}, ");
+        sb.Append($"InstallationDirectoryName = {InstallationDirectoryName}");
+        sb.Append(" }");
+
+        return sb.ToString();
     }
 
     #endregion

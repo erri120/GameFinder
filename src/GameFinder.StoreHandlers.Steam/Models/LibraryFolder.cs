@@ -93,5 +93,8 @@ public sealed record LibraryFolder
         return hashCode.ToHashCode();
     }
 
+    /// <inheritdoc/>
+    public override string ToString() => Path.GetFullPath();
+
     #endregion
 }
