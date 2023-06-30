@@ -4,4 +4,13 @@
     <PropertyGroup>
         <ImplicitUsings>true</ImplicitUsings>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\SharedUsings.cs">
+            <Link>SharedUsings.cs</Link>
+        </Compile>
+        <Compile Include="..\SharedAssemblyAttributes.cs">
+            <Link>SharedAssemblyAttributes.cs</Link>
+        </Compile>
+    </ItemGroup>
 </Project>

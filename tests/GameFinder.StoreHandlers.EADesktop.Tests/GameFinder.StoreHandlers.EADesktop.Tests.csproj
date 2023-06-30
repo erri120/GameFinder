@@ -4,12 +4,6 @@
         <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Include="..\Usings.cs">
-            <Link>Usings.cs</Link>
-        </Compile>
-    </ItemGroup>
-
     <Target Name="CopyFiles" AfterTargets="PostBuildEvent">
         <ItemGroup>
             <_Files Include="files\**" />

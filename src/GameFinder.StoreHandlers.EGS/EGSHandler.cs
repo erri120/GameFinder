@@ -112,7 +112,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
             var game = new EGSGame(
                 EGSGameId.From(manifest.CatalogItemId),
                 manifest.DisplayName,
-                _fileSystem.FromFullPath(SanitizeInputPath(manifest.InstallLocation))
+                _fileSystem.FromUnsanitizedFullPath(manifest.InstallLocation)
             );
 
             return game;
@@ -134,7 +134,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
     {
         return fileSystem
             .GetKnownPath(KnownPath.CommonApplicationDataDirectory)
-            .CombineUnchecked("Epic/EpicGamesLauncher/Data/Manifests");
+            .Combine("Epic/EpicGamesLauncher/Data/Manifests");
     }
 
     private bool TryGetManifestDirFromRegistry(out AbsolutePath manifestDir)
@@ -149,7 +149,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
             if (regKey is null || !regKey.TryGetString("ModSdkMetadataDir",
                     out var registryMetadataDir)) return false;
 
-            manifestDir = _fileSystem.FromFullPath(SanitizeInputPath(registryMetadataDir));
+            manifestDir = _fileSystem.FromUnsanitizedFullPath(registryMetadataDir);
             return true;
 
         }

@@ -9,7 +9,7 @@ public partial class XboxTests
     public void Test_ParseGamingRootFile1(InMemoryFileSystem fs, AbsolutePath gamingRootFile, string[] folderNames)
     {
         var expectedFolders = folderNames
-            .Select(folderName => gamingRootFile.Parent.CombineUnchecked(folderName))
+            .Select(folderName => gamingRootFile.Parent.Combine(folderName))
             .ToList();
 
         var bytes = CreateGamingRootFile(expectedFolders);

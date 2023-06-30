@@ -13,7 +13,7 @@ public partial class OriginTests
     {
         var (handler, manifestDir) = SetupHandler(fs);
 
-        var manifest = manifestDir.CombineUnchecked($"{manifestName}.mfst");
+        var manifest = manifestDir.Combine($"{manifestName}.mfst");
         fs.AddFile(manifest, $"?id={HttpUtility.UrlEncode(id)}" +
                              $"&ID={HttpUtility.UrlEncode(id)}" +
                              $"&dipInstallPath={HttpUtility.UrlEncode(installPath.GetFullPath())}" +

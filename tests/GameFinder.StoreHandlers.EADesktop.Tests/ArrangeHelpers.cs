@@ -44,11 +44,11 @@ public partial class EADesktopTests
             {
                 var baseInstallPath = fs
                     .GetKnownPath(KnownPath.TempDirectory)
-                    .CombineUnchecked(baseSlug);
+                    .Combine(baseSlug);
 
                 var installerDataPath = baseInstallPath
-                    .CombineUnchecked("__Installer")
-                    .CombineUnchecked("installerdata.xml");
+                    .Combine("__Installer")
+                    .Combine("installerdata.xml");
 
                 fs.AddDirectory(baseInstallPath);
                 fs.AddFile(installerDataPath, "");

@@ -32,7 +32,7 @@ public record ProtonWinePrefix : AWinePrefix
     /// <returns></returns>
     public AbsolutePath GetConfigInfoFile()
     {
-        return ProtonDirectory.CombineUnchecked("config_info");
+        return ProtonDirectory.Combine("config_info");
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public record ProtonWinePrefix : AWinePrefix
     /// <returns></returns>
     public AbsolutePath GetLaunchCommandFile()
     {
-        return ProtonDirectory.CombineUnchecked("launch_command");
+        return ProtonDirectory.Combine("launch_command");
     }
 
     /// <summary>
@@ -50,6 +50,6 @@ public record ProtonWinePrefix : AWinePrefix
     /// <returns></returns>
     public AbsolutePath GetVersionFile()
     {
-        return ProtonDirectory.CombineUnchecked("version");
+        return ProtonDirectory.Combine("version");
     }
 }

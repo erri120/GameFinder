@@ -27,6 +27,7 @@ using FileSystem = NexusMods.Paths.FileSystem;
 using IFileSystem = NexusMods.Paths.IFileSystem;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
+[assembly: ExcludeFromCodeCoverage]
 namespace GameFinder.Example;
 
 public static class Program
@@ -76,12 +77,11 @@ public static class Program
             .WithParsed(x => Run(x, logger));
     }
 
-    [SuppressMessage("Design", "MA0051:Method is too long")]
     private static void Run(Options options, ILogger logger)
     {
         var realFileSystem = FileSystem.Shared;
 
-        var logFile = realFileSystem.GetKnownPath(KnownPath.CurrentDirectory).CombineUnchecked("log.log");
+        var logFile = realFileSystem.GetKnownPath(KnownPath.CurrentDirectory).Combine("log.log");
         if (realFileSystem.FileExists(logFile)) realFileSystem.DeleteFile(logFile);
 
         logger.LogInformation("Operating System: {OSDescription}", RuntimeInformation.OSDescription);
@@ -184,7 +184,7 @@ public static class Program
         {
             if (!OperatingSystem.IsLinux()) return;
             var protonPrefix = game.GetProtonPrefix();
-            if (!fileSystem.DirectoryExists(protonPrefix.ConfigurationDirectory)) return;
+            if (protonPrefix is null) return;
             logger.LogInformation("Proton Directory for this game: {}", protonPrefix.ProtonDirectory.GetFullPath());
         });
     }

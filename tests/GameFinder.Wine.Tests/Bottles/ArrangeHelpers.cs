@@ -10,9 +10,9 @@ public partial class BottlesTests
     {
         var bottlesDirectory = fs
             .GetKnownPath(KnownPath.LocalApplicationDataDirectory)
-            .CombineUnchecked("bottles");
+            .Combine("bottles");
 
-        var prefixDirectory = bottlesDirectory.CombineUnchecked("bottles").CombineUnchecked(bottleName);
+        var prefixDirectory = bottlesDirectory.Combine("bottles").Combine(bottleName);
         fs.AddDirectory(prefixDirectory);
 
         var prefixManager = new BottlesWinePrefixManager(fs);
@@ -25,10 +25,10 @@ public partial class BottlesTests
         var (prefixDirectory, prefixManager) = CreateBottle(fs, bottleName);
 
         fs.AddDirectory(prefixDirectory);
-        fs.AddDirectory(prefixDirectory.CombineUnchecked("drive_c"));
-        fs.AddEmptyFile(prefixDirectory.CombineUnchecked("system.reg"));
-        fs.AddEmptyFile(prefixDirectory.CombineUnchecked("user.reg"));
-        fs.AddEmptyFile(prefixDirectory.CombineUnchecked("bottle.yml"));
+        fs.AddDirectory(prefixDirectory.Combine("drive_c"));
+        fs.AddEmptyFile(prefixDirectory.Combine("system.reg"));
+        fs.AddEmptyFile(prefixDirectory.Combine("user.reg"));
+        fs.AddEmptyFile(prefixDirectory.Combine("bottle.yml"));
 
         return (prefixDirectory, prefixManager);
     }

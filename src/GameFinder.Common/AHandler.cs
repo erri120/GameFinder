@@ -94,7 +94,4 @@ public abstract class AHandler<TGame, TId> : AHandler
         var allGames = FindAllGamesById(out errors);
         return allGames.TryGetValue(id, out var game) ? game : null;
     }
-
-    /// <inheritdoc cref="Utils.SanitizeInputPath"/>
-    protected static string SanitizeInputPath(string input) => Utils.SanitizeInputPath(input);
 }

@@ -22,7 +22,7 @@ public partial class GOGTests
             {
                 var path = fileSystem
                     .GetKnownPath(KnownPath.TempDirectory)
-                    .CombineUnchecked(name);
+                    .Combine(name);
 
                 var gameKey = gogKey.AddSubKey(id.ToString(CultureInfo.InvariantCulture));
                 gameKey.AddValue("gameID", id.ToString(CultureInfo.InvariantCulture));

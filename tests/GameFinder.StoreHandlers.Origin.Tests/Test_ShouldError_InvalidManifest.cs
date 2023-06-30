@@ -14,7 +14,7 @@ public partial class OriginTests
         var randomBytes = new byte[128];
         Random.Shared.NextBytes(randomBytes);
 
-        var manifest = manifestDir.CombineUnchecked($"{manifestName}.mfst");
+        var manifest = manifestDir.Combine($"{manifestName}.mfst");
         fs.AddFile(manifest, randomBytes);
 
         // can't seem to reach the exception, even random garbage doesn't throw

@@ -25,7 +25,7 @@ public abstract record AWinePrefix
     /// <returns></returns>
     public AbsolutePath GetVirtualDrivePath()
     {
-        return ConfigurationDirectory.CombineUnchecked("drive_c");
+        return ConfigurationDirectory.Combine("drive_c");
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public abstract record AWinePrefix
     /// <returns></returns>
     public AbsolutePath GetSystemRegistryFile()
     {
-        return ConfigurationDirectory.CombineUnchecked("system.reg");
+        return ConfigurationDirectory.Combine("system.reg");
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public abstract record AWinePrefix
     /// <returns></returns>
     public AbsolutePath GetUserRegistryFile()
     {
-        return ConfigurationDirectory.CombineUnchecked("user.reg");
+        return ConfigurationDirectory.Combine("user.reg");
     }
 
     /// <summary>
@@ -68,8 +68,8 @@ public abstract record AWinePrefix
         var rootDirectory = GetVirtualDrivePath();
 
         var newHomeDirectory = rootDirectory
-            .CombineUnchecked("Users")
-            .CombineUnchecked(GetUserName());
+            .Combine("Users")
+            .Combine(GetUserName());
 
         var (pathMappings, knownPathMappings) = BaseFileSystem.CreateWinePathMappings(
             fileSystem,

@@ -13,7 +13,7 @@ public partial class EGSTests
         var manifestDirName = fixture.Create<string>();
         var manifestDir = fs
             .GetKnownPath(KnownPath.TempDirectory)
-            .CombineUnchecked(manifestDirName);
+            .Combine(manifestDirName);
 
         fs.AddDirectory(manifestDir);
 
@@ -32,8 +32,8 @@ public partial class EGSTests
             .Customize<EGSGame>(composer => composer
                 .FromFactory<string, string>((catalogItemId, displayName) =>
                 {
-                    var manifestItem = manifestDir.CombineUnchecked($"{catalogItemId}.item");
-                    var installLocation = manifestDir.CombineUnchecked(displayName);
+                    var manifestItem = manifestDir.Combine($"{catalogItemId}.item");
+                    var installLocation = manifestDir.Combine(displayName);
 
                     var mockData = $@"{{
     ""CatalogItemId"": ""{catalogItemId}"",

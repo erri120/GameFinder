@@ -15,6 +15,6 @@ public record BottlesWinePrefix : AWinePrefix
     /// <returns></returns>
     public AbsolutePath GetBottlesConfigFile()
     {
-        return ConfigurationDirectory.CombineUnchecked("bottle.yml");
+        return ConfigurationDirectory.Combine("bottle.yml");
     }
 }

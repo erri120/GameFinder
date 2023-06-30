@@ -17,9 +17,9 @@ public partial class WineTests
     private static (AbsolutePath prefixDirectory, DefaultWinePrefixManager prefixManager) SetupValidWinePrefix(InMemoryFileSystem fs, AbsolutePath location)
     {
         fs.AddDirectory(location);
-        fs.AddDirectory(location.CombineUnchecked("drive_c"));
-        fs.AddEmptyFile(location.CombineUnchecked("system.reg"));
-        fs.AddEmptyFile(location.CombineUnchecked("user.reg"));
+        fs.AddDirectory(location.Combine("drive_c"));
+        fs.AddEmptyFile(location.Combine("system.reg"));
+        fs.AddEmptyFile(location.Combine("user.reg"));
 
         return (location, new DefaultWinePrefixManager(fs));
     }

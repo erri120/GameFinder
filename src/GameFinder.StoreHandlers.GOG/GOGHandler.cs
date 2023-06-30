@@ -120,7 +120,7 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
             var game = new GOGGame(
                 GOGGameId.From(id),
                 name,
-                _fileSystem.FromFullPath(SanitizeInputPath(path))
+                _fileSystem.FromUnsanitizedFullPath(path)
             );
 
             return game;
