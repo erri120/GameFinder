@@ -15,6 +15,7 @@ Finally, I've been thinking a lot about result types. Over the years, I've updat
 **Changes**:
 
 - Steam: complete rework
+- Updated `NexusMods.Paths` to `0.0.6`
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
