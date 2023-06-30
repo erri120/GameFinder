@@ -12,7 +12,7 @@ public class SteamHandlerTests
     public void Test_FindAllGames()
     {
         var os = OSPlatform.Linux;
-        var fs = new InMemoryFileSystem();
+        var fs = new InMemoryFileSystem(OSInformation.FakeUnix);
 
         var steamHandler = new SteamHandler(fs, registry: null);
         steamHandler.FindAllGames()
