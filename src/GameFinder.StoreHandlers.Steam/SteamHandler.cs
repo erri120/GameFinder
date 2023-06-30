@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.InteropServices;
 using FluentResults;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
@@ -60,8 +58,7 @@ public class SteamHandler : AHandler<SteamGame, AppId>
     /// <inheritdoc/>
     public override IEnumerable<OneOf<SteamGame, ErrorMessage>> FindAllGames()
     {
-        var os = GetOS();
-        var steamPathResult = SteamLocationFinder.FindSteam(_fileSystem, _registry, os);
+        var steamPathResult = SteamLocationFinder.FindSteam(_fileSystem, _registry);
         if (steamPathResult.IsFailed)
         {
             yield return ConvertResultToErrorMessage(steamPathResult);
@@ -109,20 +106,6 @@ public class SteamHandler : AHandler<SteamGame, AppId>
                 yield return steamGame;
             }
         }
-    }
-
-    [ExcludeFromCodeCoverage]
-    private static OSPlatform GetOS()
-    {
-        // TODO: use IOSInformation once NexusMods.Paths updated
-        var os = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? OSPlatform.Windows
-            : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                ? OSPlatform.Linux
-                : RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-                    ? OSPlatform.OSX
-                    : throw new PlatformNotSupportedException();
-        return os;
     }
 
     private static ErrorMessage ConvertResultToErrorMessage<T>(Result<T> result)

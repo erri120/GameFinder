@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using FluentResults.Extensions.FluentAssertions;
 using GameFinder.Common;
 using GameFinder.StoreHandlers.Steam.Services;
@@ -11,7 +10,6 @@ public class SteamHandlerTests
     [Fact]
     public void Test_FindAllGames()
     {
-        var os = OSPlatform.Linux;
         var fs = new InMemoryFileSystem(OSInformation.FakeUnix);
 
         var steamHandler = new SteamHandler(fs, registry: null);
@@ -22,7 +20,7 @@ public class SteamHandlerTests
             .Which.Message
             .Should().Be("Unable to find a valid Steam installation at the default installation paths!");
 
-        var steamPath = SteamLocationFinder.GetDefaultSteamInstallationPaths(fs, os).First();
+        var steamPath = SteamLocationFinder.GetDefaultSteamInstallationPaths(fs).First();
         fs.AddDirectory(steamPath);
 
         var libraryFoldersFilePath = SteamLocationFinder.GetLibraryFoldersFilePath(steamPath);

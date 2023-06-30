@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using FluentResults;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.Steam.Models;
@@ -56,12 +55,10 @@ public static class SteamLocationFinder
     /// This uses <see cref="GetDefaultSteamInstallationPaths"/>, <see cref="GetSteamPathFromRegistry"/>
     /// and <see cref="IsValidSteamInstallation"/> to find a valid installation.
     /// </remarks>
-    public static Result<AbsolutePath> FindSteam(IFileSystem fileSystem, IRegistry? registry, OSPlatform os)
+    public static Result<AbsolutePath> FindSteam(IFileSystem fileSystem, IRegistry? registry)
     {
-        // TODO: use IOSInformation once NexusMods.Paths updated
-
         // 1) try the default installation paths
-        var defaultSteamInstallationPath = GetDefaultSteamInstallationPaths(fileSystem, os)
+        var defaultSteamInstallationPath = GetDefaultSteamInstallationPaths(fileSystem)
             .FirstOrDefault(IsValidSteamInstallation);
 
         if (defaultSteamInstallationPath != default) return Result.Ok(defaultSteamInstallationPath);
@@ -170,11 +167,9 @@ public static class SteamLocationFinder
     /// </summary>
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     [SuppressMessage("ReSharper", "CommentTypo")]
-    public static IEnumerable<AbsolutePath> GetDefaultSteamInstallationPaths(IFileSystem fileSystem, OSPlatform os)
+    public static IEnumerable<AbsolutePath> GetDefaultSteamInstallationPaths(IFileSystem fileSystem)
     {
-        // TODO: use IOSInformation once NexusMods.Paths updated
-
-        if (os == OSPlatform.Windows)
+        if (fileSystem.OS.IsWindows)
         {
             yield return fileSystem
                 .GetKnownPath(KnownPath.ProgramFilesX86Directory)
@@ -183,7 +178,7 @@ public static class SteamLocationFinder
             yield break;
         }
 
-        if (os == OSPlatform.Linux)
+        if (fileSystem.OS.IsLinux)
         {
             // "$XDG_DATA_HOME/Steam" which is usually "~/.local/share/Steam"
             yield return fileSystem
