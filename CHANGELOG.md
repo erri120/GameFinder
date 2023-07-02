@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
-## [3.2.0](https://github.com/erri120/GameFinder/compare/v3.1.0...v3.2.0) - 2023-07-02
+## [3.2.0](https://github.com/erri120/GameFinder/compare/v3.1.0...v3.2.0) - 2023-07-XX
 
 This is the first in a series of major updates that rework one of the store handlers. In this update, I focused on Steam and completely reworked the handler and data models. The `SteamGame` record now contains a reference to the parsed `AppManifest`, which itself is now fully fleshed out and has everything you need. Furthermore, you can now also parse the workshop manifest file, if it exists, to get a list of all installed Steam workshop items:
 
