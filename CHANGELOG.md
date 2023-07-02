@@ -8,7 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [3.2.0](https://github.com/erri120/GameFinder/compare/v3.1.0...v3.2.0) - TBD
 
-This is the first in a series of major updates that rework one of the store handlers. In this update, I focused on Steam and completely reworked the handler and data models. The `SteamGame` record now contains a reference to the parsed `AppManifest`, which itself is now fully fleshed out and has everything you need. Furthermore, you can now also parse the workshop manifest file, if it exists, to get a list of all installed Steam workshop items.
+This is the first in a series of major updates that rework one of the store handlers. In this update, I focused on Steam and completely reworked the handler and data models. The `SteamGame` record now contains a reference to the parsed `AppManifest`, which itself is now fully fleshed out and has everything you need. Furthermore, you can now also parse the workshop manifest file, if it exists, to get a list of all installed Steam workshop items:
+
+- `AppManifest`: for `appmanifest_*.acf` files.
+- `LibraryFoldersManifest`: for the single `libraryfolders.vdf` file inside the `Steam/config` folder.
+- `WorkshopManifest`: for `appworkshop_*.acf` files.
+- `LocalUserConfig` for the single `localconfig.vdf` file inside the `userdata/{steamId}/config` folder.
 
 Finally, I've been thinking a lot about result types. Over the years, I've updated GameFinder to use various different approaches for dealing with errors. This update is the beginning of me phasing out my hacky `OneOf<TResult, ErrorMessage>` solution, and replacing it with [FluentResults](https://altmann/FluentResults).
 
