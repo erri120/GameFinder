@@ -77,8 +77,10 @@ internal static class ParserHelpers
         );
     }
 
-    internal static KVObject? FindOptionalChildObject(KVObject parentObject, string childObjectName)
+    internal static KVObject? FindOptionalChildObject(KVObject? parentObject, string childObjectName)
     {
+        if (parentObject is null) return null;
+
         var childObject = parentObject
             .Children
             .FirstOrDefault(child => child.Name.Equals(childObjectName, StringComparison.OrdinalIgnoreCase));

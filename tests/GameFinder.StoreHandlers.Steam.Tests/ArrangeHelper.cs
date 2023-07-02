@@ -40,7 +40,7 @@ public static class ArrangeHelper
 
     public static SteamId CreateSteamId() => SteamId.From(76561198110222274);
 
-    public static AppManifest CreateAppManifest(AbsolutePath manifestPath)
+    private static Fixture SetupFixture()
     {
         var fixture = new Fixture();
         fixture.Customize<Size>(composer => composer.FromFactory<ulong>(Size.From));
@@ -48,9 +48,18 @@ public static class ArrangeHelper
         fixture.Customize<SteamId>(composer => composer.FromFactory<ulong>(SteamId.From));
         fixture.Customize<DepotId>(composer => composer.FromFactory<uint>(DepotId.From));
         fixture.Customize<AppId>(composer => composer.FromFactory<uint>(AppId.From));
+        fixture.Customize<WorkshopItemId>(composer => composer.FromFactory<ulong>(WorkshopItemId.From));
+        fixture.Customize<WorkshopManifestId>(composer => composer.FromFactory<ulong>(WorkshopManifestId.From));
         fixture.Customize<ManifestId>(composer => composer.FromFactory<ulong>(ManifestId.From));
         fixture.Customize<DateTimeOffset>(composer => composer.FromFactory(() => DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds())));
+        fixture.Customize<TimeSpan>(composer => composer.FromFactory<ushort>(x => TimeSpan.FromMinutes(x)));
 
+        return fixture;
+    }
+
+    public static AppManifest CreateAppManifest(AbsolutePath manifestPath)
+    {
+        var fixture = SetupFixture();
         return new AppManifest
         {
             ManifestPath = manifestPath,
@@ -104,12 +113,7 @@ public static class ArrangeHelper
 
     public static WorkshopManifest CreateWorkshopManifest(AbsolutePath manifestPath)
     {
-        var fixture = new Fixture();
-        fixture.Customize<Size>(composer => composer.FromFactory<ulong>(Size.From));
-        fixture.Customize<AppId>(composer => composer.FromFactory<uint>(AppId.From));
-        fixture.Customize<WorkshopItemId>(composer => composer.FromFactory<ulong>(WorkshopItemId.From));
-        fixture.Customize<WorkshopManifestId>(composer => composer.FromFactory<ulong>(WorkshopManifestId.From));
-        fixture.Customize<DateTimeOffset>(composer => composer.FromFactory(() => DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds())));
+        var fixture = SetupFixture();
 
         return new WorkshopManifest
         {
@@ -137,9 +141,7 @@ public static class ArrangeHelper
 
     public static LibraryFoldersManifest CreateLibraryFoldersManifest(AbsolutePath manifestPath)
     {
-        var fixture = new Fixture();
-        fixture.Customize<Size>(composer => composer.FromFactory<ulong>(Size.From));
-        fixture.Customize<AppId>(composer => composer.FromFactory<uint>(AppId.From));
+        var fixture = SetupFixture();
 
         return new LibraryFoldersManifest
         {
@@ -160,6 +162,29 @@ public static class ArrangeHelper
                     };
                 })
                 .ToList(),
+        };
+    }
+
+    public static LocalUserConfig CreateLocalUserConfig(AbsolutePath configPath)
+    {
+        var fixture = SetupFixture();
+
+        return new LocalUserConfig
+        {
+            ConfigPath = configPath,
+            User = fixture.Create<SteamId>(),
+            LocalAppData = fixture.CreateMany<AppId>()
+                .Select(id => new LocalAppData
+                {
+                    AppId = id,
+                    LastPlayed = fixture.Create<DateTimeOffset>(),
+                    Playtime = fixture.Create<TimeSpan>(),
+                    LaunchOptions = fixture.Create<string>(),
+                })
+                .ToDictionary(x => x.AppId, x => x),
+            InGameOverlayScreenshotSaveUncompressedPath = configPath.FileSystem
+            .GetKnownPath(KnownPath.TempDirectory)
+            .Combine(fixture.Create<string>()),
         };
     }
 }
