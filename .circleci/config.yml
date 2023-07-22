@@ -30,7 +30,7 @@ jobs:
           name: Move test results
           command: |
             mkdir test-results
-            Get-ChildItem -Recurse "test-result.xml" | ForEach-Object -Process { mkdir ([System.IO.Path]::Combine("test-results", $_.Directory.BaseName)) && Move-Item -Path $_.FullName -Destination ([System.IO.Path]::Combine("test-results", $_.Directory.BaseName, $_.Name)) }
+            Get-ChildItem -Recurse "test-result.xml" | ForEach-Object -Process { mkdir ([System.IO.Path]::Combine("test-results", $_.Directory.BaseName)); Move-Item -Path $_.FullName -Destination ([System.IO.Path]::Combine("test-results", $_.Directory.BaseName, $_.Name)) }
       - store_test_results:
           path: test-results
       - store_artifacts:
