@@ -30,7 +30,7 @@ jobs:
           name: Convert and move test results
           command: |
             dotnet tool install -g trx2junit
-            trx2junit tests/**/TestResults/*.trx
+            & "%USERPROFILE%\.dotnet\tools\trx2junit" tests/**/TestResults/*.trx
             mkdir test-results
             Get-ChildItem -Recurse "tests/**/TestResults/*.xml" | ForEach-Object -Process { mkdir ([System.IO.Path]::Combine("test-results", $_.Directory.Parent.BaseName )); Move-Item -Path $_.FullName -Destination ([System.IO.Path]::Combine("test-results", $_.Directory.Parent.BaseName, $_.Name)) }
       - store_test_results:
