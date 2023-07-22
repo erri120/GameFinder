@@ -25,13 +25,15 @@ jobs:
           command: dotnet build --no-restore
       - run:
           name: Test
-          command: dotnet test --no-restore --logger:"junit;LogFilePath=test-result.xml"
+          command: dotnet test --no-build --logger:"trx"
       - run:
-          name: Move test results
+          name: Convert and move test results
           command: |
+            dotnet tool install -g trx2junit
+            trx2junit tests/**/TestResults/*.trx
             mkdir test-results
-            Get-ChildItem -Recurse "test-result.xml" | ForEach-Object -Process { mkdir ([System.IO.Path]::Combine("test-results", $_.Directory.BaseName)); Move-Item -Path $_.FullName -Destination ([System.IO.Path]::Combine("test-results", $_.Directory.BaseName, $_.Name)) }
+            Get-ChildItem -Recurse "tests/**/TestResults/*.xml" | ForEach-Object -Process { mkdir ([System.IO.Path]::Combine("test-results", $_.Directory.Parent.BaseName )); Move-Item -Path $_.FullName -Destination ([System.IO.Path]::Combine("test-results", $_.Directory.Parent.BaseName, $_.Name)) }
       - store_test_results:
-          path: test-results
+          path: ./test-results
       - store_artifacts:
-          path: test-results
+          path: ./test-results
