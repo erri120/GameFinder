@@ -1,0 +1,37 @@
+version: "2.1"
+
+orbs:
+  win: circleci/windows@5.0
+
+workflows:
+  build-and-test:
+    jobs:
+      - build-and-test
+
+jobs:
+  build-and-test:
+    executor:
+      name: win/default
+    steps:
+      - checkout
+      - run:
+          name: Print debug info
+          command: dotnet --info
+      - run:
+          name: Restore dependencies
+          command: dotnet restore
+      - run:
+          name: Build
+          command: dotnet build --no-restore
+      - run:
+          name: Test
+          command: dotnet test --no-restore
+      - run:
+          name: Move test results
+          command: |
+            mkdir test-results
+            Get-ChildItem -Recurse "test-result.xml" | ForEach-Object -Process { mkdir ([System.IO.Path]::Combine("test-results", $_.Directory.BaseName)) && Move-Item -Path $_.FullName -Destination ([System.IO.Path]::Combine("test-results", $_.Directory.BaseName, $_.Name)) }
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
