@@ -25,7 +25,7 @@ jobs:
           command: dotnet build --no-restore
       - run:
           name: Test
-          command: dotnet test --no-restore
+          command: dotnet test --no-restore --logger:"junit;LogFilePath=test-result.xml"
       - run:
           name: Move test results
           command: |
