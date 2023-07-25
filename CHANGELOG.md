@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
-## [3.2.0](https://github.com/erri120/GameFinder/compare/v3.1.0...v3.2.0) - 2023-07-XX
+## [3.2.0](https://github.com/erri120/GameFinder/compare/v3.1.0...v3.2.0) - 2023-07-25
 
 This is the first in a series of major updates that rework one of the store handlers. In this update, I focused on Steam and completely reworked the handler and data models. The `SteamGame` record now contains a reference to the parsed `AppManifest`, which itself is now fully fleshed out and has everything you need. Furthermore, you can now also parse the workshop manifest file, if it exists, to get a list of all installed Steam workshop items:
 
@@ -22,7 +22,7 @@ Finally, I've been thinking a lot about result types. Over the years, I've updat
 **Changes**:
 
 - Steam: complete rework
-- Updated `NexusMods.Paths` to `0.0.6`
+- Updated `NexusMods.Paths` to `0.1.1`
 
 ## [3.1.0](https://github.com/erri120/GameFinder/compare/v3.0.2...v3.1.0) - 2023-05-23
 
