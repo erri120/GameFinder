@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.2.0...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.2.1...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [3.2.1](https://github.com/erri120/GameFinder/compare/v3.2.0...v3.2.1) - 2023-07-25
+
+- Xbox: parsed relative path is now sanitized
 
 ## [3.2.0](https://github.com/erri120/GameFinder/compare/v3.1.0...v3.2.0) - 2023-07-25
 

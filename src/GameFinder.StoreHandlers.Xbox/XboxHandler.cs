@@ -212,7 +212,7 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
                     c = reader.ReadChar();
                 }
 
-                var part = sb.ToString().ToRelativePath();
+                var part = RelativePath.FromUnsanitizedInput(sb.ToString());
                 folders.Add(parentFolder.Combine(part));
             }
 
