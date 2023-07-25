@@ -1,6 +1,7 @@
 <Project>
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">

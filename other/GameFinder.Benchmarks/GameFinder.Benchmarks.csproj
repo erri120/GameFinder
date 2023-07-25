@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <PackageReference Include="BenchmarkDotNet" Version="0.13.*" />
+        <PackageReference Include="BenchmarkDotNet" />
     </ItemGroup>
 
     <ItemGroup>

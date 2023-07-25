@@ -1,0 +1,49 @@
+<Project>
+    <ItemGroup>
+        <PackageVersion Include="BenchmarkDotNet" Version="0.13.6" />
+        <PackageVersion Include="CommandLineParser" Version="2.9.1" />
+        <PackageVersion Include="FluentResults" Version="3.15.2" />
+        <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
+        <PackageVersion Include="NexusMods.Paths" Version="0.1.1" />
+        <PackageVersion Include="NLog" Version="5.2.2" />
+        <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.2" />
+        <PackageVersion Include="OneOf" Version="3.0.255" />
+        <PackageVersion Include="SHA3.Net" Version="2.0.0" />
+        <PackageVersion Include="System.Management" Version="7.0.2" />
+        <PackageVersion Include="ValveKeyValue" Version="0.9.0.267" />
+        <PackageVersion Include="Vogen" Version="3.0.20" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="JetBrains.Annotations" Version="2023.2.0" PrivateAssets="all" />
+        <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="AutoFixture" Version="4.18.0" />
+        <PackageVersion Include="AutoFixture.AutoMoq" Version="4.18.0" />
+        <PackageVersion Include="AutoFixture.Xunit2" Version="4.18.0" />
+        <PackageVersion Include="FluentAssertions" Version="6.11.0" />
+        <PackageVersion Include="FluentAssertions.Analyzers" Version="0.17.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageVersion>
+        <PackageVersion Include="Moq" Version="4.18.4" />
+        <PackageVersion Include="NexusMods.Paths.TestingHelpers" Version="0.1.1" />
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+        <PackageVersion Include="xunit" Version="2.5.0" />
+        <PackageVersion Include="Xunit.SkippableFact" Version="1.4.13" />
+        <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageVersion>
+        <PackageVersion Include="coverlet.collector" Version="6.0.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageVersion>
+        <PackageVersion Include="GitHubActionsTestLogger" Version="2.3.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageVersion>
+    </ItemGroup>
+</Project>

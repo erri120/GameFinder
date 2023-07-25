@@ -20,13 +20,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommandLineParser" Version="2.9.*" />
+        <PackageReference Include="CommandLineParser" />
         <TrimmerRootAssembly Include="CommandLine" />
 
-        <PackageReference Include="NLog" Version="5.*" />
+        <PackageReference Include="NLog" />
         <TrimmerRootAssembly Include="NLog" />
 
-        <PackageReference Include="NLog.Extensions.Logging" Version="5.*" />
+        <PackageReference Include="NLog.Extensions.Logging" />
         <TrimmerRootAssembly Include="NLog.Extensions.Logging" />
     </ItemGroup>
 
