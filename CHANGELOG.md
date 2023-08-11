@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.2.1...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.2.2...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [3.2.2](https://github.com/erri120/GameFinder/compare/v3.2.1...v3.2.2) - 2023-08-11
+
+- Steam: fixed `StateFlag` parser throwing an exception ([#93](https://github.com/erri120/GameFinder/issues/93)).
 
 ## [3.2.1](https://github.com/erri120/GameFinder/compare/v3.2.0...v3.2.1) - 2023-07-25
 

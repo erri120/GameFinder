@@ -70,7 +70,7 @@ public static class AppManifestParser
             var appIdResult = ParseRequiredChildObject(appState, "appid", ParseAppId);
             var universeResult = ParseOptionalChildObject(appState, "Universe", ParseUInt32, default).Map(x => (SteamUniverse)x);
             var nameResult = ParseRequiredChildObject(appState, "name", ParseString);
-            var stateFlagsResult = ParseRequiredChildObject(appState, "StateFlags", ParseByte).Map(x => (StateFlags)x);
+            var stateFlagsResult = ParseRequiredChildObject(appState, "StateFlags", ParseUInt32).Map(x => (StateFlags)x);
             var installationDirectoryNameResult = ParseRequiredChildObject(appState, "installdir", x => ParseRelativePath(x, manifestPath.FileSystem));
             var lastUpdatedResult = ParseOptionalChildObject(appState, "LastUpdated", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
             var sizeOnDiskResult = ParseOptionalChildObject(appState, "SizeOnDisk", ParseSize, Size.Zero);
