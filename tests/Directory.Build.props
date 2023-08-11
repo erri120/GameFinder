@@ -8,7 +8,6 @@
 
     <ItemGroup>
         <PackageReference Include="AutoFixture" />
-        <PackageReference Include="AutoFixture.AutoMoq" />
         <PackageReference Include="AutoFixture.Xunit2" />
     </ItemGroup>
 
@@ -21,7 +20,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Moq" />
+        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="NSubstitute.Analyzers.CSharp">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

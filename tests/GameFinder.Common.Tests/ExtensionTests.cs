@@ -1,11 +1,11 @@
-using Moq;
+using NSubstitute;
 using OneOf;
 
 namespace GameFinder.Common.Tests;
 
 public class ExtensionTests
 {
-    private static readonly IGame Game = new Mock<IGame>().Object;
+    private static readonly IGame Game = Substitute.For<IGame>();
     private static readonly ErrorMessage Error = new(string.Empty);
 
     private static readonly OneOf<IGame, ErrorMessage> GameResult = OneOf<IGame, ErrorMessage>.FromT0(Game);
