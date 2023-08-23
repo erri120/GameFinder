@@ -26,7 +26,7 @@
     <ItemGroup>
         <PackageVersion Include="AutoFixture" Version="4.18.0" />
         <PackageVersion Include="AutoFixture.Xunit2" Version="4.18.0" />
-        <PackageVersion Include="FluentAssertions" Version="6.11.0" />
+        <PackageVersion Include="FluentAssertions" Version="6.12.0" />
         <PackageVersion Include="FluentAssertions.Analyzers" Version="0.21.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
