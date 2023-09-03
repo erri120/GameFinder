@@ -1,6 +1,4 @@
 <Project>
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../src'))" />
-
     <ItemGroup>
         <PackageReference Include="NexusMods.Paths.TestingHelpers" />
     </ItemGroup>

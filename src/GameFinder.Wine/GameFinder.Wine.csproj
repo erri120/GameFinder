@@ -4,8 +4,6 @@
         <PackageTags>wine games linux</PackageTags>
     </PropertyGroup>
 
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('NexusMods.Paths.props', '$(MSBuildThisFileDirectory)../'))" />
-
     <ItemGroup>
         <InternalsVisibleTo Include="GameFinder.Wine.Tests" />
     </ItemGroup>

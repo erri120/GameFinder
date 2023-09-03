@@ -39,7 +39,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EFB4E7DB-DE24-4BDE-B660-DAF1394ECC21}"
 	ProjectSection(SolutionItems) = preProject
 		src\Directory.Build.props = src\Directory.Build.props
-		src\NexusMods.Paths.props = src\NexusMods.Paths.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9C6671E1-A94D-4C76-9F61-78B491A62408}"

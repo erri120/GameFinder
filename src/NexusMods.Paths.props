@@ -1,5 +1,0 @@
-<Project>
-    <ItemGroup>
-        <PackageReference Include="NexusMods.Paths" />
-    </ItemGroup>
-</Project>
