@@ -5,7 +5,7 @@
         <Authors>erri120</Authors>
 
         <PackageReadmeFile>docs\README.md</PackageReadmeFile>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
 
         <PackageProjectUrl>https://github.com/erri120/GameFinder</PackageProjectUrl>
         <RepositoryUrl>https://github.com/erri120/GameFinder.git</RepositoryUrl>
