@@ -11,6 +11,9 @@
         <RepositoryUrl>https://github.com/erri120/GameFinder.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
+        <!-- https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#packrelease -->
+        <PackRelease>true</PackRelease>
+
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
