@@ -4,9 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v3.2.2...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.0.0...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [4.0.0](https://github.com/erri120/GameFinder/compare/v3.2.2...v4.0.0) - 2023-09-03
+
+This is a major release because I've had to change the license from MIT to GPLv3. See https://github.com/erri120/GameFinder/commit/53130f2d39fcb061366f4da9fcc695b8e0d8dd61 for details.
+
+Additionally, all builds will now be packaged in release mode and dependencies have been upgraded.
 
 ## [3.2.2](https://github.com/erri120/GameFinder/compare/v3.2.1...v3.2.2) - 2023-08-11
 
