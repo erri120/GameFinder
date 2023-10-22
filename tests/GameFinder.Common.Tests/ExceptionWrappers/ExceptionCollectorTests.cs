@@ -138,4 +138,18 @@ public class ExceptionCollectorTests
         var res = collector.WrapUnmanagedType(State, ThrowException<int>);
         AssertHasException(collector, res.GetException());
     }
+
+    [Fact]
+    public void Test_ThrowAllExceptions()
+    {
+        var collector = new ExceptionCollector();
+
+        _ = collector.WrapReferenceType(ThrowException<TestClass>);
+        _ = collector.WrapReferenceType(ThrowException<TestClass>);
+        _ = collector.WrapReferenceType(ThrowException<TestClass>);
+        _ = collector.WrapReferenceType(ThrowException<TestClass>);
+
+        var act = () => collector.ThrowAllExceptions();
+        act.Should().ThrowExactly<ExceptionCollectorAggregatedException>().And.Message.Should().NotBeEmpty();
+    }
 }

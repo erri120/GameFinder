@@ -9,7 +9,7 @@ namespace GameFinder.Common;
 /// Represents an exception collector.
 /// </summary>
 [PublicAPI]
-public class ExceptionCollector
+public sealed class ExceptionCollector
 {
     private readonly List<Exception> _exceptions = new();
 
@@ -31,6 +31,16 @@ public class ExceptionCollector
     public IReadOnlyList<Exception> GetExceptions() => _exceptions;
 
     /// <summary>
+    /// Throws all collected exceptions using <see cref="ExceptionCollectorAggregatedException"/>.
+    /// </summary>
+    /// <exception cref="ExceptionCollectorAggregatedException"></exception>
+    [ContractAnnotation("=> halt")]
+    public void ThrowAllExceptions()
+    {
+        throw ExceptionCollectorAggregatedException.Create(_exceptions);
+    }
+
+    /// <summary>
     /// Calls the given <paramref name="operation"/> and returns a new
     /// instance of <see cref="ReferenceTypeOrException{TValue}"/> that
     /// contains either the result of <paramref name="operation"/> or
@@ -40,7 +50,7 @@ public class ExceptionCollector
     /// <typeparam name="TValue">The result type of <paramref name="operation"/>.</typeparam>
     [StackTraceHidden]
     public ReferenceTypeOrException<TValue> WrapReferenceType<TValue>(
-        Func<TValue> operation) where TValue : class
+        [InstantHandle] Func<TValue> operation) where TValue : class
     {
         try
         {
@@ -66,7 +76,7 @@ public class ExceptionCollector
     /// <typeparam name="TValue">The result type of <paramref name="operation"/>.</typeparam>
     [StackTraceHidden]
     public ReferenceTypeOrException<TValue> WrapReferenceType<TState, TValue>(
-        TState state, Func<TState, TValue> operation) where TValue : class
+        TState state, [InstantHandle] Func<TState, TValue> operation) where TValue : class
     {
         try
         {
@@ -89,7 +99,7 @@ public class ExceptionCollector
     /// <typeparam name="TValue">The result type of <paramref name="operation"/>.</typeparam>
     [StackTraceHidden]
     public ValueTypeOrException<TValue> WrapValueType<TValue>(
-        Func<TValue> operation) where TValue : struct
+        [InstantHandle] Func<TValue> operation) where TValue : struct
     {
         try
         {
@@ -115,7 +125,7 @@ public class ExceptionCollector
     /// <typeparam name="TValue">The result type of <paramref name="operation"/>.</typeparam>
     [StackTraceHidden]
     public ValueTypeOrException<TValue> WrapValueType<TState, TValue>(
-        TState state, Func<TState, TValue> operation) where TValue : struct
+        TState state, [InstantHandle] Func<TState, TValue> operation) where TValue : struct
     {
         try
         {
@@ -138,7 +148,7 @@ public class ExceptionCollector
     /// <typeparam name="TValue">The result type of <paramref name="operation"/>.</typeparam>
     [StackTraceHidden]
     public UnmanagedTypeOrException<TValue> WrapUnmanagedType<TValue>(
-        Func<TValue> operation) where TValue : unmanaged
+        [InstantHandle] Func<TValue> operation) where TValue : unmanaged
     {
         try
         {
@@ -164,7 +174,7 @@ public class ExceptionCollector
     /// <typeparam name="TValue">The result type of <paramref name="operation"/>.</typeparam>
     [StackTraceHidden]
     public UnmanagedTypeOrException<TValue> WrapUnmanagedType<TState, TValue>(
-        TState state, Func<TState, TValue> operation) where TValue : unmanaged
+        TState state, [InstantHandle] Func<TState, TValue> operation) where TValue : unmanaged
     {
         try
         {
