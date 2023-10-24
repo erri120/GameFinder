@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace GameFinder.Common;
@@ -11,7 +10,8 @@ namespace GameFinder.Common;
 /// <seealso cref="ValueTypeOrException{TValue}"/>
 /// <seealso cref="ReferenceTypeOrException{TValue}"/>
 [PublicAPI]
-public readonly struct UnmanagedTypeOrException<TValue> where TValue : unmanaged
+public readonly struct UnmanagedTypeOrException<TValue> : IValueOrException<TValue>
+    where TValue : unmanaged
 {
     private readonly TValue _value;
     private readonly Exception? _exception;
@@ -35,11 +35,7 @@ public readonly struct UnmanagedTypeOrException<TValue> where TValue : unmanaged
         _hasValue = false;
     }
 
-    /// <summary>
-    /// Gets the stored value or throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    /// <returns>The stored value.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if <see cref="HasValue"/> is <c>false</c>.</exception>
+    /// <inheritdoc/>
     [Pure]
     [MustUseReturnValue]
     [StackTraceHidden]
@@ -47,22 +43,16 @@ public readonly struct UnmanagedTypeOrException<TValue> where TValue : unmanaged
         ? _value
         : throw new InvalidOperationException($"This instance doesn't contain a value but an exception: \"{_exception}\"");
 
-    /// <summary>
-    /// Tries to get the stored value and returns <c>true</c> if successful.
-    /// </summary>
+    /// <inheritdoc/>
     [Pure]
     [MustUseReturnValue]
-    public bool TryGetValue([NotNullWhen(true)] out TValue? value)
+    public bool TryGetValue(out TValue value)
     {
         value = _value;
         return _hasValue;
     }
 
-    /// <summary>
-    /// Gets the stored exception or throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    /// <returns>The stored exception.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if <see cref="HasValue"/> is <c>true</c>.</exception>
+    /// <inheritdoc/>
     [Pure]
     [MustUseReturnValue]
     [StackTraceHidden]
@@ -70,11 +60,7 @@ public readonly struct UnmanagedTypeOrException<TValue> where TValue : unmanaged
         ? _exception!
         : throw new InvalidOperationException($"This instance doesn't contain an exception but a value: \"{_value}\"");
 
-    /// <summary>
-    /// Throws the stored exception or throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    /// <exception cref="Exception">Thrown if <see cref="HasValue"/> is <c>false</c>.</exception>
-    /// <exception cref="InvalidOperationException">Thrown if <see cref="HasValue"/> is <c>true</c>.</exception>
+    /// <inheritdoc/>
     [ContractAnnotation("=> halt")]
     [StackTraceHidden]
     public void ThrowException()
@@ -84,11 +70,7 @@ public readonly struct UnmanagedTypeOrException<TValue> where TValue : unmanaged
         throw new InvalidOperationException($"This instance doesn't contain an exception but a value: \"{_value}\"");
     }
 
-
-    /// <summary>
-    /// Gets whether this instance stores a value or an exception.
-    /// </summary>
-    /// <returns><c>true</c> if this instance stores a value, otherwise <c>false</c>.</returns>
+    /// <inheritdoc/>
     [Pure]
     [MustUseReturnValue]
     public bool HasValue() => _hasValue;
