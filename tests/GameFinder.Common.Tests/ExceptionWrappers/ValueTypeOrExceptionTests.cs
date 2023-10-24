@@ -35,6 +35,26 @@ public class ValueTypeOrExceptionTests
     }
 
     [Fact]
+    public void Test_TryGetValue_WithValue()
+    {
+        var value = CreateWithValue();
+
+        var res = value.TryGetValue(out var actual);
+        res.Should().BeTrue();
+        actual.Should().Be(TestValue);
+    }
+
+    [Fact]
+    public void Test_TryGetValue_WithException()
+    {
+        var (value, _) = CreateWithException();
+
+        var res = value.TryGetValue(out var actual);
+        res.Should().BeFalse();
+        actual.Should().Be(default);
+    }
+
+    [Fact]
     public void Test_GetException_WithValue()
     {
         var value = CreateWithValue();

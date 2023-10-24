@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace GameFinder.Common;
@@ -45,6 +46,17 @@ public readonly struct UnmanagedTypeOrException<TValue> where TValue : unmanaged
     public TValue GetValue() => _hasValue
         ? _value
         : throw new InvalidOperationException($"This instance doesn't contain a value but an exception: \"{_exception}\"");
+
+    /// <summary>
+    /// Tries to get the stored value and returns <c>true</c> if successful.
+    /// </summary>
+    [Pure]
+    [MustUseReturnValue]
+    public bool TryGetValue([NotNullWhen(true)] out TValue? value)
+    {
+        value = _value;
+        return _hasValue;
+    }
 
     /// <summary>
     /// Gets the stored exception or throws an <see cref="InvalidOperationException"/>.

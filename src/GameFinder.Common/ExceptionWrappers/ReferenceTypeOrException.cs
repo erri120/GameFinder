@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace GameFinder.Common;
@@ -47,6 +48,17 @@ public readonly struct ReferenceTypeOrException<TValue> where TValue : class
         : throw new InvalidOperationException($"This instance doesn't contain a value but an exception: \"{_exception}\"");
 
     /// <summary>
+    /// Tries to get the stored value and returns <c>true</c> if successful.
+    /// </summary>
+    [Pure]
+    [MustUseReturnValue]
+    public bool TryGetValue([NotNullWhen(true)] out TValue? value)
+    {
+        value = _value;
+        return _value is not null && _hasValue;
+    }
+
+    /// <summary>
     /// Gets the stored exception or throws an <see cref="InvalidOperationException"/>.
     /// </summary>
     /// <returns>The stored exception.</returns>
@@ -71,7 +83,6 @@ public readonly struct ReferenceTypeOrException<TValue> where TValue : class
             throw _exception!;
         throw new InvalidOperationException($"This instance doesn't contain an exception but a value: \"{_value}\"");
     }
-
 
     /// <summary>
     /// Gets whether this instance stores a value or an exception.
