@@ -67,7 +67,7 @@ public static class ArrangeHelper
             Universe = SteamUniverse.Public,
             Name = fixture.Create<string>(),
             StateFlags = StateFlags.FullyInstalled,
-            InstallationDirectoryName = fixture.Create<string>().ToRelativePath(),
+            InstallationDirectory = manifestPath.Parent.Combine("common").Combine(fixture.Create<string>()),
             LastUpdated = fixture.Create<DateTimeOffset>(),
             SizeOnDisk = fixture.Create<Size>(),
             StagingSize = fixture.Create<Size>(),

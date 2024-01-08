@@ -18,7 +18,7 @@ public class AppManifestParserTests
             AppId = AppId.From(262060),
             Name = "Darkest Dungeon",
             StateFlags = StateFlags.FullyInstalled,
-            InstallationDirectoryName = "DarkestDungeon",
+            InstallationDirectory = manifestFilePath.Parent.Combine("common").Combine("DarkestDungeon"),
         };
 
         var writeResult = AppManifestWriter.Write(expected, manifestFilePath);

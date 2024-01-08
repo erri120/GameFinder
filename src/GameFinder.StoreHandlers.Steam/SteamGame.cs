@@ -40,7 +40,7 @@ public sealed record SteamGame : IGame
     /// <summary>
     /// Gets the absolute path to the game's installation directory.
     /// </summary>
-    public AbsolutePath Path => AppManifest.GetInstallationDirectoryPath();
+    public AbsolutePath Path => AppManifest.InstallationDirectory;
 
     /// <summary>
     /// Gets the absolute path to the cloud saves directory.

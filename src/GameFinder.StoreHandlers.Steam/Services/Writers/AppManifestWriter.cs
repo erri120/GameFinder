@@ -27,7 +27,7 @@ public static class AppManifestWriter
         values.AddValue("Universe", (byte)manifest.Universe, -1);
         values.AddValue("name", manifest.Name, string.Empty);
         values.AddValue("StateFlags", (byte)manifest.StateFlags, -1);
-        values.AddValue("installdir", manifest.InstallationDirectoryName.ToString(), string.Empty);
+        values.AddValue("installdir", manifest.InstallationDirectory.Name.ToString(), string.Empty);
         values.AddValue("LastUpdated", manifest.LastUpdated.ToUnixTimeSeconds(), default);
         values.AddValue("SizeOnDisk", manifest.SizeOnDisk.Value, default);
         values.AddValue("StagingSize", manifest.StagingSize.Value, default);
