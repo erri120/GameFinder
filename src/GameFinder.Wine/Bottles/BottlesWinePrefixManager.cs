@@ -35,6 +35,12 @@ public class BottlesWinePrefixManager : IWinePrefixManager<BottlesWinePrefix>
         }
 
         var bottles = defaultLocation.Combine("bottles");
+        if (!bottles.DirectoryExists())
+        {
+            yield return new ErrorMessage($"Bottles directory {bottles.GetFullPath()} does not exist");
+            yield break;
+        }
+
         foreach (var bottle in _fileSystem.EnumerateDirectories(bottles, recursive: false))
         {
             var res = IsValidBottlesPrefix(_fileSystem, bottle);
