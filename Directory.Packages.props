@@ -5,7 +5,7 @@
         <PackageVersion Include="FluentResults" Version="3.15.2" />
         <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
         <PackageVersion Include="NexusMods.Paths" Version="0.1.6" />
-        <PackageVersion Include="NLog" Version="5.2.3" />
+        <PackageVersion Include="NLog" Version="5.2.8" />
         <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.3" />
         <PackageVersion Include="OneOf" Version="3.0.255" />
         <PackageVersion Include="SHA3.Net" Version="2.0.0" />
