@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
+## [4.1.0](https://github.com/erri120/GameFinder/compare/v4.0.0...v4.1.0) - 2024-01-08
+
+- Upgraded to .NET 8.
+- Upgraded all dependencies.
+- Replaced Vogen with [TransparentValueObjects](https://github.com/erri120/TransparentValueObjects).
+- Steam: fixed `AppManifestParser` breaking when encountering an absolute path instead of a relative path in the `installdir` field ([#118](https://github.com/erri120/GameFinder/issues/118)).
+- Bottles: fixed a `DirectoryNotFoundException` when trying to enumerate a directory that doesn't exist ([#119](https://github.com/erri120/GameFinder/issues/119)).
+
 ## [4.0.0](https://github.com/erri120/GameFinder/compare/v3.2.2...v4.0.0) - 2023-09-03
 
 This is a major release because I've had to change the license from MIT to GPLv3. See https://github.com/erri120/GameFinder/commit/53130f2d39fcb061366f4da9fcc695b8e0d8dd61 for details.
