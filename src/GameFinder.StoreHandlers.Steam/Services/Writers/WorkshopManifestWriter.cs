@@ -23,7 +23,7 @@ public class WorkshopManifestWriter
     public static Result Write(WorkshopManifest manifest, AbsolutePath outputPath)
     {
         var values = new List<KVObject>();
-        values.AddValue("appid", manifest.AppId, AppId.Empty);
+        values.AddValue("appid", manifest.AppId, AppId.DefaultValue);
         values.AddValue("SizeOnDisk", manifest.SizeOnDisk.Value, default);
         values.AddValue("NeedsUpdate", manifest.NeedsUpdate ? "1" : "0", string.Empty);
         values.AddValue("NeedsDownload", manifest.NeedsDownload ? "1" : "0", string.Empty);
@@ -42,10 +42,10 @@ public class WorkshopManifestWriter
                 var workshopItemInstalledValues = new List<KVObject>();
                 workshopItemInstalledValues.AddValue("size", workshopItemDetails.SizeOnDisk.Value, default);
                 workshopItemInstalledValues.AddValue("timeupdated", workshopItemDetails.LastUpdated.ToUnixTimeSeconds(), default);
-                workshopItemInstalledValues.AddValue("manifest", workshopItemDetails.ManifestId, WorkshopManifestId.Empty);
+                workshopItemInstalledValues.AddValue("manifest", workshopItemDetails.ManifestId, WorkshopManifestId.DefaultValue);
 
                 var workshopItemDetailsValues = new List<KVObject>();
-                workshopItemDetailsValues.AddValue("manifest", workshopItemDetails.ManifestId, WorkshopManifestId.Empty);
+                workshopItemDetailsValues.AddValue("manifest", workshopItemDetails.ManifestId, WorkshopManifestId.DefaultValue);
                 workshopItemDetailsValues.AddValue("timeupdated", workshopItemDetails.LastUpdated.ToUnixTimeSeconds(), default);
                 workshopItemDetailsValues.AddValue("timetouched", workshopItemDetails.LastTouched.ToUnixTimeSeconds(), default);
                 workshopItemDetailsValues.AddValue("subscribedby", workshopItemDetails.SubscribedBy.AccountId, default);

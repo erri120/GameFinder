@@ -32,9 +32,9 @@ public record InstalledDepot
     /// Gets the optionally unique identifier of the DLC that is associated with this depot.
     /// </summary>
     /// <remarks>
-    /// This value can be <see cref="AppId.Empty"/> if the depot is not associated with a DLC.
+    /// This value can be <see cref="AppId.DefaultValue"/> if the depot is not associated with a DLC.
     /// </remarks>
-    public AppId DLCAppId { get; init; } = AppId.Empty;
+    public AppId DLCAppId { get; init; } = AppId.DefaultValue;
 
     /// <summary>
     /// Gets the URL to the SteamDB page for the depot.

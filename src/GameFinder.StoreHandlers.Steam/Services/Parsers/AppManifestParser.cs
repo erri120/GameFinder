@@ -75,14 +75,14 @@ public static class AppManifestParser
             var lastUpdatedResult = ParseOptionalChildObject(appState, "LastUpdated", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
             var sizeOnDiskResult = ParseOptionalChildObject(appState, "SizeOnDisk", ParseSize, Size.Zero);
             var stagingSizeResult = ParseOptionalChildObject(appState, "StagingSize", ParseSize, Size.Zero);
-            var buildIdResult = ParseOptionalChildObject(appState, "buildid", ParseBuildId, BuildId.Empty);
+            var buildIdResult = ParseOptionalChildObject(appState, "buildid", ParseBuildId, BuildId.DefaultValue);
             var lastOwnerResult = ParseOptionalChildObject(appState, "LastOwner", ParseSteamId, SteamId.Empty);
             var updateResult = ParseOptionalChildObject(appState, "UpdateResult", ParseUInt32, default);
             var bytesToDownloadResult = ParseOptionalChildObject(appState, "BytesToDownload", ParseSize, Size.Zero);
             var bytesDownloadedResult = ParseOptionalChildObject(appState, "BytesDownloaded", ParseSize, Size.Zero);
             var bytesToStageResult = ParseOptionalChildObject(appState, "BytesToStage", ParseSize, Size.Zero);
             var bytesStagedResult = ParseOptionalChildObject(appState, "BytesStaged", ParseSize, Size.Zero);
-            var targetBuildIdResult = ParseOptionalChildObject(appState, "TargetBuildID", ParseBuildId, BuildId.Empty);
+            var targetBuildIdResult = ParseOptionalChildObject(appState, "TargetBuildID", ParseBuildId, BuildId.DefaultValue);
             var autoUpdateBehaviorResult = ParseOptionalChildObject(appState, "AutoUpdateBehavior", ParseByte, default).Map(x => (AutoUpdateBehavior)x);
             var backgroundDownloadBehaviorResult = ParseOptionalChildObject(appState, "AllowOtherDownloadsWhileRunning", ParseByte, default).Map(x => (BackgroundDownloadBehavior)x);
             var scheduledAutoUpdateResult = ParseOptionalChildObject(appState, "ScheduledAutoUpdate", ParseDateTimeOffset, DateTimeOffset.UnixEpoch);
@@ -225,7 +225,7 @@ public static class AppManifestParser
 
         var manifestIdResult = ParseRequiredChildObject(depotObject, "manifest", ParseManifestId);
         var sizeOnDiskResult = ParseRequiredChildObject(depotObject, "size", ParseSize);
-        var dlcAppIdResult = ParseOptionalChildObject(depotObject, "dlcappid", ParseAppId, AppId.Empty);
+        var dlcAppIdResult = ParseOptionalChildObject(depotObject, "dlcappid", ParseAppId, AppId.DefaultValue);
 
         var mergedResults = Result.Merge(
             manifestIdResult,

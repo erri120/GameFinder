@@ -1,6 +1,6 @@
 using System.Globalization;
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 
@@ -10,12 +10,10 @@ namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 /// <example><c>9545898</c></example>
 [PublicAPI]
 [ValueObject<uint>]
-public readonly partial struct BuildId
+public readonly partial struct BuildId : IAugmentWith<DefaultValueAugment>
 {
-    /// <summary>
-    /// Empty or default value of <c>0</c>.
-    /// </summary>
-    public static readonly BuildId Empty = From(0);
+    /// <inheritdoc/>
+    public static BuildId DefaultValue { get; } = From(0);
 
     /// <summary>
     /// Gets the URL to the SteamDB Update Notes for the build associated with this id.

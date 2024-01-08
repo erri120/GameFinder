@@ -8,6 +8,5 @@
         <PackageReference Include="NexusMods.Paths" />
         <PackageReference Include="FluentResults" />
         <PackageReference Include="OneOf" />
-        <PackageReference Include="Vogen" />
     </ItemGroup>
 </Project>

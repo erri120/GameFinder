@@ -1,6 +1,6 @@
 using System.Globalization;
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 
@@ -10,12 +10,10 @@ namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 /// <example><c>262061</c></example>
 [PublicAPI]
 [ValueObject<uint>]
-public readonly partial struct DepotId
+public readonly partial struct DepotId : IAugmentWith<DefaultValueAugment>
 {
-    /// <summary>
-    /// Empty or default value of <c>0</c>.
-    /// </summary>
-    public static readonly DepotId Empty = From(0);
+    /// <inheritdoc/>
+    public static DepotId DefaultValue { get; } = From(0);
 
     /// <summary>
     /// Gets the URL to the SteamDB page of this depot.

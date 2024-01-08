@@ -11,7 +11,7 @@
         <PackageVersion Include="SHA3.Net" Version="2.0.0" />
         <PackageVersion Include="System.Management" Version="8.0.0" />
         <PackageVersion Include="ValveKeyValue" Version="0.9.0.267" />
-        <PackageVersion Include="Vogen" Version="3.0.23" />
+        <PackageVersion Include="TransparentValueObjects" Version="1.0.1" />
     </ItemGroup>
 
     <ItemGroup>

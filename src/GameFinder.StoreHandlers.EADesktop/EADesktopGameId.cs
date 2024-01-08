@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.EADesktop;
 
@@ -9,7 +9,11 @@ namespace GameFinder.StoreHandlers.EADesktop;
 /// Represents an id for games installed with EA Desktop.
 /// </summary>
 [ValueObject<string>]
-public readonly partial struct EADesktopGameId { }
+public readonly partial struct EADesktopGameId : IAugmentWith<DefaultEqualityComparerAugment>
+{
+    /// <inheritdoc/>
+    public static IEqualityComparer<string> InnerValueDefaultEqualityComparer { get; } = StringComparer.OrdinalIgnoreCase;
+}
 
 /// <inheritdoc/>
 [PublicAPI]

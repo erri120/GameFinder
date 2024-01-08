@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.Xbox;
 
@@ -9,7 +9,11 @@ namespace GameFinder.StoreHandlers.Xbox;
 /// Represents an id for games installed with the Xbox Game Pass.
 /// </summary>
 [ValueObject<string>]
-public readonly partial struct XboxGameId { }
+public readonly partial struct XboxGameId : IAugmentWith<DefaultEqualityComparerAugment>
+{
+    /// <inheritdoc/>
+    public static IEqualityComparer<string> InnerValueDefaultEqualityComparer { get; } = StringComparer.OrdinalIgnoreCase;
+}
 
 /// <inheritdoc/>
 [PublicAPI]

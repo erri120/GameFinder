@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.EGS;
 
@@ -9,7 +9,11 @@ namespace GameFinder.StoreHandlers.EGS;
 /// Represents an id for games installed with the Epic Games Store.
 /// </summary>
 [ValueObject<string>]
-public readonly partial struct EGSGameId { }
+public readonly partial struct EGSGameId : IAugmentWith<DefaultEqualityComparerAugment>
+{
+    /// <inheritdoc/>
+    public static IEqualityComparer<string> InnerValueDefaultEqualityComparer { get; } = StringComparer.OrdinalIgnoreCase;
+}
 
 /// <inheritdoc/>
 [PublicAPI]

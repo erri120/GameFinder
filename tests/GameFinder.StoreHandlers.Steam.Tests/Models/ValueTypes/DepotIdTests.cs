@@ -5,7 +5,7 @@ namespace GameFinder.StoreHandlers.Steam.Tests.Models.ValueTypes;
 public class DepotIdTests
 {
     [Fact]
-    public void Test_Empty() { DepotId.Empty.Value.Should().Be(0); }
+    public void Test_Empty() { DepotId.DefaultValue.Value.Should().Be(0); }
 
     [Theory]
     [InlineData(262061, "https://steamdb.info/depot/262061")]

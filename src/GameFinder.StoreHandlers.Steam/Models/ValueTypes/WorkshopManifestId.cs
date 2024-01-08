@@ -1,5 +1,5 @@
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 
@@ -13,10 +13,8 @@ namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 /// <seealso cref="ManifestId"/>
 [PublicAPI]
 [ValueObject<ulong>]
-public readonly partial struct WorkshopManifestId
+public readonly partial struct WorkshopManifestId : IAugmentWith<DefaultValueAugment>
 {
-    /// <summary>
-    /// Empty or default value of <c>0</c>.
-    /// </summary>
-    public static readonly WorkshopManifestId Empty = From(0);
+    /// <inheritdoc/>
+    public static WorkshopManifestId DefaultValue { get; } = From(0);
 }

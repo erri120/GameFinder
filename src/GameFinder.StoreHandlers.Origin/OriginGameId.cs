@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.Origin;
 
@@ -9,7 +9,11 @@ namespace GameFinder.StoreHandlers.Origin;
 /// Represents an id for games installed with Origin.
 /// </summary>
 [ValueObject<string>]
-public readonly partial struct OriginGameId { }
+public readonly partial struct OriginGameId : IAugmentWith<DefaultEqualityComparerAugment>
+{
+    /// <inheritdoc/>
+    public static IEqualityComparer<string> InnerValueDefaultEqualityComparer { get; } = StringComparer.OrdinalIgnoreCase;
+}
 
 /// <inheritdoc/>
 [PublicAPI]

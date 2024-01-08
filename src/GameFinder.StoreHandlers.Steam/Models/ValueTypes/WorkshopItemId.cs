@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 
@@ -16,12 +16,10 @@ namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 /// <example><c>942405260</c></example>
 [PublicAPI]
 [ValueObject<ulong>]
-public readonly partial struct WorkshopItemId
+public readonly partial struct WorkshopItemId : IAugmentWith<DefaultValueAugment>
 {
-    /// <summary>
-    /// Empty or default value of <c>0</c>.
-    /// </summary>
-    public static readonly WorkshopItemId Empty = From(0);
+    /// <inheritdoc/>
+    public static WorkshopItemId DefaultValue { get; } = From(0);
 
     /// <summary>
     /// Gets the URL to the Steam Workshop page of this item.

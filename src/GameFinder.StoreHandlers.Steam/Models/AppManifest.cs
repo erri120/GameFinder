@@ -105,7 +105,7 @@ public sealed record AppManifest
     /// </remarks>
     /// <seealso cref="GetCurrentUpdateNotesUrl"/>
     /// <seealso cref="TargetBuildId"/>
-    public BuildId BuildId { get; init; } = BuildId.Empty;
+    public BuildId BuildId { get; init; } = BuildId.DefaultValue;
 
     /// <summary>
     /// Gets the last owner of this app.
@@ -160,7 +160,7 @@ public sealed record AppManifest
     /// </remarks>
     /// <seealso cref="GetNextUpdateNotesUrl"/>
     /// <seealso cref="BuildId"/>
-    public BuildId TargetBuildId { get; init; } = BuildId.Empty;
+    public BuildId TargetBuildId { get; init; } = BuildId.DefaultValue;
 
     /// <summary>
     /// Gets the automatic update behavior for this app.
@@ -266,7 +266,7 @@ public sealed record AppManifest
     /// Gets all locally installed DLCs.
     /// </summary>
     public IReadOnlyDictionary<AppId, InstalledDepot> GetInstalledDLCs() => InstalledDepots
-        .Where(kv => kv.Value.DLCAppId != AppId.Empty)
+        .Where(kv => kv.Value.DLCAppId != AppId.DefaultValue)
         .ToDictionary(kv => kv.Value.DLCAppId, kv => kv.Value);
 
     /// <summary>
@@ -278,9 +278,9 @@ public sealed record AppManifest
     /// Gets the URL to the Update Notes for the next update using <see cref="TargetBuildId"/> on SteamDB.
     /// </summary>
     /// <remarks>
-    /// This value will be <c>null</c>, if <see cref="TargetBuildId"/> is <see cref="ValueTypes.BuildId.Empty"/>.
+    /// This value will be <c>null</c>, if <see cref="TargetBuildId"/> is <see cref="ValueTypes.BuildId.DefaultValue"/>.
     /// </remarks>
-    public string? GetNextUpdateNotesUrl() => TargetBuildId == BuildId.Empty ? null : TargetBuildId.GetSteamDbUpdateNotesUrl();
+    public string? GetNextUpdateNotesUrl() => TargetBuildId == BuildId.DefaultValue ? null : TargetBuildId.GetSteamDbUpdateNotesUrl();
 
     /// <summary>
     /// Gets the user-data path for the current app using <see cref="LastOwner"/> and

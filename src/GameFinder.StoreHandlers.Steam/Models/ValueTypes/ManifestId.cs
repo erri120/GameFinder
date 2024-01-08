@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 
@@ -17,12 +17,10 @@ namespace GameFinder.StoreHandlers.Steam.Models.ValueTypes;
 /// <example><c>5542773349944116172</c></example>
 [PublicAPI]
 [ValueObject<ulong>]
-public readonly partial struct ManifestId
+public readonly partial struct ManifestId : IAugmentWith<DefaultValueAugment>
 {
-    /// <summary>
-    /// Empty or default value of <c>0</c>.
-    /// </summary>
-    public static readonly ManifestId Empty = From(0);
+    /// <inheritdoc/>
+    public static ManifestId DefaultValue { get; } = From(0);
 
     /// <summary>
     /// Gets the URL to the SteamDB page for the Changeset of the manifest associated with this id.

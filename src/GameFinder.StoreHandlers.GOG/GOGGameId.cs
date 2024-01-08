@@ -1,4 +1,4 @@
-using Vogen;
+using TransparentValueObjects;
 
 namespace GameFinder.StoreHandlers.GOG;
 
@@ -7,4 +7,3 @@ namespace GameFinder.StoreHandlers.GOG;
 /// </summary>
 [ValueObject<long>]
 public readonly partial struct GOGGameId { }
-

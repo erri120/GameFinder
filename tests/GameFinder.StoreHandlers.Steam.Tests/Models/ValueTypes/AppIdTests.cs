@@ -5,7 +5,7 @@ namespace GameFinder.StoreHandlers.Steam.Tests.Models.ValueTypes;
 public class AppIdTests
 {
     [Fact]
-    public void Test_Empty() { AppId.Empty.Value.Should().Be(0); }
+    public void Test_Empty() { AppId.DefaultValue.Value.Should().Be(0); }
 
     [Theory]
     [InlineData(262060, "https://store.steampowered.com/app/262060")]
