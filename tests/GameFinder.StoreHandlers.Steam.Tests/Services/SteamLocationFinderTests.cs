@@ -151,7 +151,7 @@ public class SteamLocationFinderTests
     }
 
     [Fact]
-    public void Test_GetDefaultSteamInstallationPaths_Unsupported()
+    public void Test_GetDefaultSteamInstallationPaths_OSX()
     {
         var fs = new InMemoryFileSystem(new OSInformation(OSPlatform.OSX));
 

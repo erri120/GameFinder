@@ -55,6 +55,10 @@ jobs:
 
     - name: Publish (Windows)
       if: runner.os == 'Windows'
+      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=fal
+
+    - name: Publish (macOS)
+      if: runner.os == 'macOS'
       run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
 
     - name: Upload Artifact
