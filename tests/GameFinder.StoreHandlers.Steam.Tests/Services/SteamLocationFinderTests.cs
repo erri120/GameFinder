@@ -151,13 +151,20 @@ public class SteamLocationFinderTests
     }
 
     [Fact]
-    public void Test_GetDefaultSteamInstallationPaths_Unsupported()
+    public void Test_GetDefaultSteamInstallationPaths_OSX()
     {
         var fs = new InMemoryFileSystem(new OSInformation(OSPlatform.OSX));
 
-        var act = () => SteamLocationFinder.GetDefaultSteamInstallationPaths(fs).ToArray();
-        act
-            .Should().ThrowExactly<PlatformNotSupportedException>()
-            .WithMessage("GameFinder doesn't support the current platform!");
+        var overlayFileSystem = fs.CreateOverlayFileSystem(
+            new Dictionary<AbsolutePath, AbsolutePath>(),
+            new Dictionary<KnownPath, AbsolutePath>
+            {
+                { KnownPath.ProgramFilesX86Directory, fs.GetKnownPath(KnownPath.TempDirectory) },
+            });
+
+        SteamLocationFinder
+            .GetDefaultSteamInstallationPaths(overlayFileSystem)
+            .ToArray()
+            .Should().HaveCount(1);
     }
 }

@@ -214,6 +214,15 @@ public static class SteamLocationFinder
             yield break;
         }
 
+        if (fileSystem.OS.IsOSX)
+        {
+            // ~/Library/Application Support/Steam
+            yield return fileSystem.GetKnownPath(KnownPath.LocalApplicationDataDirectory)
+                .Combine("Steam");
+
+            yield break;
+        }
+
         throw new PlatformNotSupportedException("GameFinder doesn't support the current platform!");
     }
 }

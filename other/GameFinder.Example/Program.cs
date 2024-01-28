@@ -133,6 +133,12 @@ public static class Program
                 if (options.Xbox) RunXboxHandler(wineFileSystem);
             }
         }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            if (options.Steam)
+                RunSteamHandler(realFileSystem, null);
+        }
     }
 
     private static void RunGOGHandler(IRegistry registry, IFileSystem fileSystem)
