@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.0.0...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.2.0...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [4.2.0](https://github.com/erri120/GameFinder/compare/v4.1.0...v4.2.0) - 2024-01-28
+
+- Added support for OSX version of Steam ([#122](https://github.com/erri120/GameFinder/pull/122))
 
 ## [4.1.0](https://github.com/erri120/GameFinder/compare/v4.0.0...v4.1.0) - 2024-01-08
 
