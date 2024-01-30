@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.2.0...HEAD)
 
+- Upgrade deps
+
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
 ## [4.2.0](https://github.com/erri120/GameFinder/compare/v4.1.0...v4.2.0) - 2024-01-28
