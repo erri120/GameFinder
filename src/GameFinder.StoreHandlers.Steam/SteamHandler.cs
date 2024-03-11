@@ -22,7 +22,7 @@ public class SteamHandler : AHandler<SteamGame, AppId>
     private readonly IRegistry? _registry;
     private readonly IFileSystem _fileSystem;
 
-    private static readonly KVSerializerOptions KvSerializerOptions =
+    public static readonly KVSerializerOptions KvSerializerOptions =
         new()
         {
             HasEscapeSequences = true,

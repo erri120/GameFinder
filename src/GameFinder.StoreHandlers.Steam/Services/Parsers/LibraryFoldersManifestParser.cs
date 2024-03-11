@@ -35,7 +35,7 @@ public static class LibraryFoldersManifestParser
             using var stream = manifestPath.Read();
 
             var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
-            var data = kv.Deserialize(stream, KVSerializerOptions.DefaultOptions);
+            var data = kv.Deserialize(stream, SteamHandler.KvSerializerOptions); // KVSerializerOptions.DefaultOptions);
 
             if (data is null)
             {
