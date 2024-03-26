@@ -34,8 +34,10 @@ internal static class WMIHelper
             var searcher = new ManagementObjectSearcher(selectQuery);
 
             using var results = searcher.Get();
+            if (results.Count <= 0)
+                throw new Exception("Property from query is not found.");
 
-            var arr = new ManagementBaseObject[1];
+            var arr = new ManagementBaseObject[results.Count];
             results.CopyTo(arr, 0);
 
             var baseObject = arr[0];
