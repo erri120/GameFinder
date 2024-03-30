@@ -1,4 +1,5 @@
 using System;
+using GameFinder.Common;
 using Microsoft.Extensions.Logging;
 using NexusMods.Paths;
 
@@ -104,7 +105,7 @@ internal static partial class LogMessages
     public static partial void ParsedManifestFile(
         ILogger logger,
         AbsolutePath manifestFile,
-        OriginGame game
+        IGame game
     );
 
     [LoggerMessage(

@@ -40,4 +40,29 @@ public class ManifestParserTests
 
         res.Should().BeNull();
     }
+
+    [Theory]
+    [InlineData("Origin.OFR.50.0002694.mfst")]
+    public async Task Test_WithFile(string fileName)
+    {
+        var fileSystem = FileSystem.Shared;
+
+        var file = fileSystem.GetKnownPath(KnownPath.EntryDirectory).Combine("files").Combine(fileName);
+        var contents = await file.ReadAllTextAsync();
+
+        var fakeFileSystem = new InMemoryFileSystem(OSInformation.FakeWindows);
+
+        var res = ManifestParser.ParseManifestFile(
+            _logger,
+            fakeFileSystem,
+            contents,
+            file
+        );
+
+        res.Should().NotBeNull();
+        res.Should().Be(new OriginGame(
+            OriginGameId.From("Origin.OFR.50.0002694"),
+            fakeFileSystem.FromUnsanitizedFullPath("C:/Program Files (x86)/Origin Games/Apex"))
+        );
+    }
 }
