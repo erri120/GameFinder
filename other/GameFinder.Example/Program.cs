@@ -1,7 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using CommandLine;
+using GameFinder.Common;
+using GameFinder.RegistryUtils;
+using GameFinder.StoreHandlers.GOG;
+using GameFinder.StoreHandlers.Origin;
 using Microsoft.Extensions.Logging;
 using NexusMods.Paths;
 using NLog;
@@ -16,8 +21,6 @@ namespace GameFinder.Example;
 
 public static class Program
 {
-    private static NLogLoggerProvider _provider = null!;
-
     public static void Main(string[] args)
     {
         var config = new LoggingConfiguration();
@@ -35,6 +38,7 @@ public static class Program
                     CompileRegex = true,
                     ForegroundColor = ConsoleOutputColor.Gray,
                 },
+                new ConsoleWordHighlightingRule("TRACE", ConsoleOutputColor.Gray, ConsoleOutputColor.NoChange),
                 new ConsoleWordHighlightingRule("DEBUG", ConsoleOutputColor.Gray, ConsoleOutputColor.NoChange),
                 new ConsoleWordHighlightingRule("INFO", ConsoleOutputColor.Cyan, ConsoleOutputColor.NoChange),
                 new ConsoleWordHighlightingRule("ERROR", ConsoleOutputColor.Red, ConsoleOutputColor.NoChange),
@@ -52,22 +56,44 @@ public static class Program
         config.AddRuleForAllLevels(fileTarget);
 
         LogManager.Configuration = config;
-        _provider = new NLogLoggerProvider();
-
-        var logger = _provider.CreateLogger(nameof(Program));
+        ILoggerFactory loggerFactory = new NLogLoggerFactory();
 
         Parser.Default
             .ParseArguments<Options>(args)
-            .WithParsed(x => Run(x, logger));
+            .WithParsed(x => Run(x, loggerFactory));
     }
 
-    private static void Run(Options options, ILogger logger)
+    private static void Run(Options options, ILoggerFactory loggerFactory)
     {
         var realFileSystem = FileSystem.Shared;
 
         var logFile = realFileSystem.GetKnownPath(KnownPath.CurrentDirectory).Combine("log.log");
         if (realFileSystem.FileExists(logFile)) realFileSystem.DeleteFile(logFile);
 
+        var logger = loggerFactory.CreateLogger(nameof(Program));
         logger.LogInformation("Operating System: {OSDescription}", RuntimeInformation.OSDescription);
+
+        // TODO: Linux and macOS
+        if (!OperatingSystem.IsWindows()) return;
+
+        if (options.Origin)
+        {
+            var handler = new OriginHandler(loggerFactory, realFileSystem);
+            PrintGames(logger, handler.Search());
+        }
+
+        if (options.GOG)
+        {
+            var handler = new GOGHandler(loggerFactory, realFileSystem, new WindowsRegistry());
+            PrintGames(logger, handler.Search());
+        }
+    }
+
+    private static void PrintGames<TGame>(ILogger logger, IReadOnlyList<TGame> games) where TGame : IGame
+    {
+        foreach (var game in games)
+        {
+            logger.LogInformation("Found Game {Game}", game);
+        }
     }
 }
