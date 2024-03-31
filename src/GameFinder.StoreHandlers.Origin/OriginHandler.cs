@@ -28,7 +28,7 @@ public abstract class OriginHandler<TGame> where TGame : class, IGame
     protected readonly ILogger Logger;
 
     /// <summary>
-    /// FileSystem.
+    /// Filesystem.
     /// </summary>
     protected readonly IFileSystem FileSystem;
 
@@ -39,7 +39,7 @@ public abstract class OriginHandler<TGame> where TGame : class, IGame
         ILoggerFactory loggerFactory,
         IFileSystem fileSystem)
     {
-        Logger = loggerFactory.CreateLogger<OriginHandler>();
+        Logger = loggerFactory.CreateLogger<OriginHandler<TGame>>();
         FileSystem = fileSystem;
     }
 
