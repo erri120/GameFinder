@@ -1,3 +1,4 @@
+using GameFinder.Common;
 using JetBrains.Annotations;
 using TransparentValueObjects;
 
@@ -8,4 +9,4 @@ namespace GameFinder.StoreHandlers.GOG;
 /// </summary>
 [PublicAPI]
 [ValueObject<ulong>]
-public readonly partial struct GOGGameId { }
+public readonly partial struct GOGGameId : IId<GOGGameId> { }
