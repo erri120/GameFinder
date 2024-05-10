@@ -17,7 +17,7 @@ public static class AppManifest
     public record Identity
     {
         [XmlAttribute(AttributeName = "Name", Namespace = "")]
-        public required string Name { get; set; }
+        public required string Name { get; init; }
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -25,7 +25,7 @@ public static class AppManifest
     public record Properties
     {
         [XmlElement(ElementName = "DisplayName", Namespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10")]
-        public required string DisplayName { get; set; }
+        public required string DisplayName { get; init; }
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -33,10 +33,10 @@ public static class AppManifest
     public record Package
     {
         [XmlElement(ElementName = "Identity", Namespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10")]
-        public required Identity Identity { get; set; }
+        public required Identity Identity { get; init; }
 
         [XmlElement(ElementName = "Properties", Namespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10")]
-        public required Properties Properties { get; set; }
+        public required Properties Properties { get; init; }
     }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 

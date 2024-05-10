@@ -1,28 +1,20 @@
 using System.Xml;
 using System.Xml.Schema;
 using GameFinder.StoreHandlers.Xbox.Serialization;
-using Microsoft.Extensions.Logging;
-using NexusMods.Paths;
 using TestUtils;
 using Xunit.Abstractions;
 
 namespace GameFinder.StoreHandlers.Xbox.Tests;
 
-public class AppManifestTests
+public class AppManifestTests : TestWrapper
 {
-    private readonly ILogger _logger;
-    public AppManifestTests(ITestOutputHelper output)
-    {
-        _logger = new XunitLogger(output);
-    }
+    public AppManifestTests(ITestOutputHelper output) : base(output) { }
 
     [Fact]
     public void Test_ParseManifest()
     {
-        var fileSystem = FileSystem.Shared;
-
-        var file = fileSystem.GetKnownPath(KnownPath.EntryDirectory).Combine("files").Combine("appxmanifest.xml");
-        using var stream = fileSystem.ReadFile(file);
+        var file = GetTestFile("appxmanifest.xml");
+        using var stream = FileSystem.ReadFile(file);
         using var reader = XmlReader.Create(stream, new XmlReaderSettings
         {
             IgnoreComments = true,
@@ -31,7 +23,7 @@ public class AppManifestTests
         });
 
         var res = AppManifest.ParseAppManifest(
-            _logger,
+            Logger,
             reader,
             file
         );
