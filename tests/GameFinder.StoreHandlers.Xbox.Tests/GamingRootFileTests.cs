@@ -24,5 +24,6 @@ public class GamingRootFileTests : TestWrapper
         res.Should().NotBeNull();
         res!.FilePath.Should().Be(file);
         res.Folders.Should().Equal(RelativePath.FromUnsanitizedInput("XboxGames"));
+        res.GetAbsoluteFolderPaths().Should().Equal(file.Parent.Combine("XboxGames"));
     }
 }

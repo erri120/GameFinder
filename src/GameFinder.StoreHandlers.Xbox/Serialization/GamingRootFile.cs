@@ -1,7 +1,5 @@
 using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
+using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using NexusMods.Paths;
@@ -9,15 +7,48 @@ using Reloaded.Memory.Extensions;
 
 namespace GameFinder.StoreHandlers.Xbox.Serialization;
 
+/// <summary>
+/// Represents a <c>GamingRoot</c> file.
+/// </summary>
 [PublicAPI]
 public record GamingRootFile
 {
-    public const uint Magic = 0x58424752;
+    /// <summary>
+    /// Expected magic constant at the start of the file.
+    /// </summary>
+    public const uint ExpectedMagic = 0x58424752;
 
+    /// <summary>
+    /// Max folder count. Anything more than this indicates a parsing/file error.
+    /// It's very unlikely that someone has more than 255 folders.
+    /// </summary>
+    public const uint MaxFolderCount = byte.MaxValue;
+
+    /// <summary>
+    /// Gets the absolute path to the parsed file.
+    /// </summary>
     public required AbsolutePath FilePath { get; init; }
 
+    /// <summary>
+    /// Gets the array of folder paths parsed from the file.
+    /// All of these paths are relative to the parent directory of
+    /// <see cref="FilePath"/>.
+    /// </summary>
+    /// <seealso cref="GetAbsoluteFolderPaths"/>
     public required RelativePath[] Folders { get; init; }
 
+    /// <summary>
+    /// Converts <see cref="Folders"/> into <see cref="AbsolutePath"/>.
+    /// </summary>
+    public AbsolutePath[] GetAbsoluteFolderPaths()
+    {
+        var parent = FilePath.Parent;
+        return Folders.Select(x => parent.Combine(x)).ToArray();
+    }
+
+    /// <summary>
+    /// Parses the provided span.
+    /// </summary>
     public static GamingRootFile? ParseGamingRootFiles(
         ILogger logger,
         ReadOnlySpan<byte> bytes,
@@ -25,17 +56,17 @@ public record GamingRootFile
     {
         try
         {
-            var magic = ParseUInt32(ref bytes);
-            if (magic != Magic)
+            var actualMagic = ParseUInt32(ref bytes);
+            if (actualMagic != ExpectedMagic)
             {
-                // TODO: logging
+                LogMessages.MagicMismatch(logger, ExpectedMagic, actualMagic, filePath);
                 return null;
             }
 
             var folderCount = ParseUInt32(ref bytes);
-            if (folderCount >= byte.MaxValue)
+            if (folderCount >= MaxFolderCount)
             {
-                // TODO: logging
+                LogMessages.CountTooHigh(logger, MaxFolderCount, folderCount, filePath);
                 return null;
             }
 
@@ -50,7 +81,7 @@ public record GamingRootFile
                 var nullIndex = span.IndexOf('\0');
                 if (nullIndex == -1)
                 {
-                    // TODO: logging
+                    LogMessages.MissingNullTerminator(logger, filePath);
                     return null;
                 }
 
@@ -67,13 +98,12 @@ public record GamingRootFile
         }
         catch (Exception e)
         {
-            // TODO: logging
+            LogMessages.ExceptionWhileParsingGamingRootFile(logger, e, filePath);
             return null;
         }
 
         static uint ParseUInt32(ref ReadOnlySpan<byte> span)
         {
-            // TODO: logging
             var value = BitConverter.ToUInt32(span);
             span = span[sizeof(uint)..];
             return value;
