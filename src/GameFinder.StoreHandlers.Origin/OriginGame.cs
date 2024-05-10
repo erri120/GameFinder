@@ -8,4 +8,11 @@ namespace GameFinder.StoreHandlers.Origin;
 /// Represents a game installed with Origin.
 /// </summary>
 [PublicAPI]
-public record OriginGame(OriginGameId Id, AbsolutePath InstallPath) : IGame;
+public record OriginGame : IGame, IGameId<OriginGameId>
+{
+    /// <inheritdoc/>
+    public required OriginGameId Id { get; init; }
+
+    /// <inheritdoc/>
+    public required AbsolutePath Path { get; init; }
+}

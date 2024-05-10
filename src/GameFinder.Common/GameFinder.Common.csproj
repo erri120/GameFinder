@@ -9,4 +9,13 @@
         <PackageReference Include="FluentResults" />
         <PackageReference Include="OneOf" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="IGameId.cs">
+        <DependentUpon>IGame.cs</DependentUpon>
+      </Compile>
+      <Compile Update="IGameName.cs">
+        <DependentUpon>IGame.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>

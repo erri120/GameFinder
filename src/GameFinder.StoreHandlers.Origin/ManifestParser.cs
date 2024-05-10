@@ -101,10 +101,11 @@ public static class ManifestParser
         var installPath = installPathValues[0];
         LogMessages.FoundValueForKey(logger, manifestFile, keyInstallPath, installPath);
 
-        var game = new OriginGame(
-            OriginGameId.From(id),
-            fileSystem.FromUnsanitizedFullPath(installPath)
-        );
+        var game = new OriginGame
+        {
+            Id = OriginGameId.From(id),
+            Path = fileSystem.FromUnsanitizedFullPath(installPath),
+        };
 
         return game;
     }

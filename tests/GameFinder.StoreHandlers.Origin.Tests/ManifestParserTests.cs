@@ -25,7 +25,11 @@ public class ManifestParserTests
         );
 
         res.Should().NotBeNull();
-        res.Should().Be(new OriginGame(OriginGameId.From("foo"), installPath));
+        res.Should().Be(new OriginGame
+        {
+            Id = OriginGameId.From("foo"),
+            Path = installPath,
+        });
     }
 
     [Theory, AutoFileSystem]
@@ -60,9 +64,10 @@ public class ManifestParserTests
         );
 
         res.Should().NotBeNull();
-        res.Should().Be(new OriginGame(
-            OriginGameId.From("Origin.OFR.50.0002694"),
-            fakeFileSystem.FromUnsanitizedFullPath("C:/Program Files (x86)/Origin Games/Apex"))
-        );
+        res.Should().Be(new OriginGame
+        {
+            Id = OriginGameId.From("Origin.OFR.50.0002694"),
+            Path = fakeFileSystem.FromUnsanitizedFullPath("C:/Program Files (x86)/Origin Games/Apex"),
+        });
     }
 }

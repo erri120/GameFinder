@@ -47,7 +47,13 @@ public static class RegistryParser
         if (!TryGetGameName(logger, subKey, out var gameName)) return null;
         if (!TryGetPath(logger, fileSystem, subKey, out var path)) return null;
 
-        var game = new GOGGame(id, gameName, path);
+        var game = new GOGGame
+        {
+            Id = id,
+            Name = gameName,
+            Path = path,
+        };
+
         return game;
     }
 
