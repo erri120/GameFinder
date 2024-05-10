@@ -3,4 +3,12 @@
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.Xbox\GameFinder.StoreHandlers.Xbox.csproj" />
         <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>
+
+    <Target Name="CopyFiles" AfterTargets="PostBuildEvent">
+        <ItemGroup>
+            <_Files Include="files\**" />
+        </ItemGroup>
+
+        <Copy SourceFiles="@(_Files)" DestinationFolder="$(TargetDir)\files" />
+    </Target>
 </Project>
