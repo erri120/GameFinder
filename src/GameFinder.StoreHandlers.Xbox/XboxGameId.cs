@@ -11,8 +11,11 @@ namespace GameFinder.StoreHandlers.Xbox;
 /// </summary>
 [PublicAPI]
 [ValueObject<string>]
-public readonly partial struct XboxGameId : IId<XboxGameId>, IAugmentWith<DefaultEqualityComparerAugment>
+public readonly partial struct XboxGameId : IId, IAugmentWith<DefaultEqualityComparerAugment>
 {
     /// <inheritdoc/>
     public static IEqualityComparer<string> InnerValueDefaultEqualityComparer { get; } = StringComparer.OrdinalIgnoreCase;
+
+    /// <inheritdoc/>
+    public bool Equals(IId? other) => other is XboxGameId same && Equals(same);
 }

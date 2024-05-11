@@ -31,7 +31,7 @@ public interface IGame
 /// Represents a game with a concrete ID type.
 /// </summary>
 public interface IGame<out TId> : IGame
-    where TId : IId<TId>
+    where TId : IId
 {
     /// <inheritdoc/>
     IId IGame.Id => Id;

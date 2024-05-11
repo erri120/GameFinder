@@ -11,8 +11,11 @@ namespace GameFinder.StoreHandlers.Origin;
 /// </summary>
 [PublicAPI]
 [ValueObject<string>]
-public readonly partial struct OriginGameId : IId<OriginGameId>, IAugmentWith<DefaultEqualityComparerAugment>
+public readonly partial struct OriginGameId : IId, IAugmentWith<DefaultEqualityComparerAugment>
 {
     /// <inheritdoc/>
     public static IEqualityComparer<string> InnerValueDefaultEqualityComparer { get; } = StringComparer.OrdinalIgnoreCase;
+
+    /// <inheritdoc/>
+    public bool Equals(IId? other) => other is OriginGameId same && Equals(same);
 }

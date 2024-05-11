@@ -41,7 +41,7 @@ public interface IGameFinder
     /// <seealso cref="TryFindGameWithId"/>
     bool TryFindGameWithId<TId, TGame>(TId id, [NotNullWhen(true)] out TGame? game)
         where TGame : IGame<TId>
-        where TId : IId<TId>;
+        where TId : IId;
 
     /// <summary>
     /// Tries to find a single game which ID is contained in <paramref name="ids"/>.
@@ -52,5 +52,7 @@ public interface IGameFinder
     /// Tries to find a single game of type <typeparamref name="TGame"/> which ID of type
     /// <typeparamref name="TId"/> is contained in <paramref name="ids"/>.
     /// </summary>
-    bool TryFindGameWithManyIds<TId, TGame>(TId[] ids, [NotNullWhen(true)] out TGame? game);
+    bool TryFindGameWithManyIds<TId, TGame>(TId[] ids, [NotNullWhen(true)] out TGame? game)
+        where TGame : IGame<TId>
+        where TId : IId;
 }

@@ -9,4 +9,8 @@ namespace GameFinder.StoreHandlers.GOG;
 /// </summary>
 [PublicAPI]
 [ValueObject<ulong>]
-public readonly partial struct GOGGameId : IId<GOGGameId> { }
+public readonly partial struct GOGGameId : IId
+{
+    /// <inheritdoc/>
+    public bool Equals(IId? other) => other is GOGGameId same && Equals(same);
+}
