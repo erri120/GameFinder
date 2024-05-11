@@ -76,24 +76,12 @@ public static class Program
         // TODO: Linux and macOS
         if (!OperatingSystem.IsWindows()) return;
 
-        if (options.Origin)
-        {
-            var handler = new OriginHandler(loggerFactory, realFileSystem);
-            PrintGames(logger, handler.Search());
-        }
+        var gameFinder = GameFinderBuilder.Create(
+            loggerFactory,
+            new OriginHandler(loggerFactory, realFileSystem),
+            new GOGHandler(loggerFactory, realFileSystem, new WindowsRegistry())
+        );
 
-        if (options.GOG)
-        {
-            var handler = new GOGHandler(loggerFactory, realFileSystem, new WindowsRegistry());
-            PrintGames(logger, handler.Search());
-        }
-    }
-
-    private static void PrintGames<TGame>(ILogger logger, IReadOnlyList<TGame> games) where TGame : IGame
-    {
-        foreach (var game in games)
-        {
-            logger.LogInformation("Found Game {Game}", game);
-        }
+        var foundGames = gameFinder.FindAllGames();
     }
 }
