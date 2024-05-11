@@ -25,7 +25,7 @@ public class XunitLogger : ILogger
 
     public bool IsEnabled(LogLevel logLevel) => true;
 
-    public IDisposable BeginScope<TState>(TState state) => EmptyDisposable.Instance;
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull => EmptyDisposable.Instance;
 
     private sealed class EmptyDisposable : IDisposable
     {

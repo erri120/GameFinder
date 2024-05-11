@@ -6,7 +6,6 @@ namespace GameFinder.Common;
 /// Represents a game with a name.
 /// </summary>
 /// <seealso cref="IGame"/>
-/// <seealso cref="IGameId{TId}"/>
 [PublicAPI]
 public interface IGameName
 {

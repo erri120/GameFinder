@@ -8,7 +8,7 @@ namespace GameFinder.StoreHandlers.Xbox;
 /// Represents a game installed with the Xbox App.
 /// </summary>
 [PublicAPI]
-public record XboxGame : IGame, IGameId<XboxGameId>, IGameName
+public record XboxGame : IGame<XboxGameId>, IGameName
 {
     /// <inheritdoc/>
     public required XboxGameId Id { get; init; }

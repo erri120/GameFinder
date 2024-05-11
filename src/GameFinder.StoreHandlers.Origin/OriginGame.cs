@@ -8,7 +8,7 @@ namespace GameFinder.StoreHandlers.Origin;
 /// Represents a game installed with Origin.
 /// </summary>
 [PublicAPI]
-public record OriginGame : IGame, IGameId<OriginGameId>
+public record OriginGame : IGame<OriginGameId>
 {
     /// <inheritdoc/>
     public required OriginGameId Id { get; init; }

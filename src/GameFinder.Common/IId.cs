@@ -1,5 +1,4 @@
 using System;
-using JetBrains.Annotations;
 
 namespace GameFinder.Common;
 
@@ -21,18 +20,4 @@ public interface IId<TId> : IId, IEquatable<TId>
     {
         return other is IId<TId> same && Equals(same);
     }
-}
-
-/// <summary>
-/// Represents a game with an ID.
-/// </summary>
-/// <seealso cref="IGame"/>
-/// <seealso cref="IGameName"/>
-[PublicAPI]
-public interface IGameId<out TId> where TId : IId<TId>
-{
-    /// <summary>
-    /// Gets the ID of the game.
-    /// </summary>
-    TId Id { get; }
 }

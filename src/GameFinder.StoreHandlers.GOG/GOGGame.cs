@@ -8,7 +8,7 @@ namespace GameFinder.StoreHandlers.GOG;
 /// Represents a game installed with GOG Galaxy.
 /// </summary>
 [PublicAPI]
-public record GOGGame : IGame, IGameId<GOGGameId>, IGameName
+public record GOGGame : IGame<GOGGameId>, IGameName
 {
     /// <summary>
     /// Gets the ID of this game.

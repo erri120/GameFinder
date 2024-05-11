@@ -11,25 +11,46 @@ namespace GameFinder.Common;
 public interface IGameFinder
 {
     /// <summary>
-    /// Uses all registered handlers to find all games.
+    /// Uses all registered handlers to find all installed games.
     /// </summary>
+    /// <seealso cref="FindAllGames{TGame}"/>
+    [MustUseReturnValue]
     IReadOnlyList<IGame> FindAllGames();
 
     /// <summary>
-    /// Finds all games with the provided type.
+    /// Uses all registered handlers that implement <see cref="IHandler{TGame}"/> with <typeparamref name="TGame"/>
+    /// to find all installed games of type <typeparamref name="TGame"/>.
     /// </summary>
+    [MustUseReturnValue]
     IReadOnlyList<TGame> FindAllGames<TGame>()
         where TGame : IGame;
 
     /// <summary>
     /// Tries to find a single game with the provided ID.
     /// </summary>
-    bool TryFindGameWithId<TId, TGame>([NotNullWhen(true)] out TGame? game)
-        where TGame : IGame, IGameId<TId>
+    /// <seealso cref="TryFindGameWithId{TId, TGame}"/>
+    bool TryFindGameWithId(IId id, [NotNullWhen(true)] out IGame? game);
+
+    /// <summary>
+    /// Tries to find a single game of type <typeparamref name="TGame"/> with the provided ID of type <typeparamref name="TId"/>.
+    /// </summary>
+    /// <remarks>
+    /// Similar to <see cref="FindAllGames{TGame}"/>, this method only uses registered handlers that implement
+    /// <see cref="IHandler{TGame}"/> with <typeparamref name="TGame"/>.
+    /// </remarks>
+    /// <seealso cref="TryFindGameWithId"/>
+    bool TryFindGameWithId<TId, TGame>(TId id, [NotNullWhen(true)] out TGame? game)
+        where TGame : IGame<TId>
         where TId : IId<TId>;
 
     /// <summary>
-    /// Tries to find a single game using many IDs as reference.
+    /// Tries to find a single game which ID is contained in <paramref name="ids"/>.
     /// </summary>
-    bool TryFindGameWithManyIds([NotNullWhen(true)] out IGame? game, IId[] ids);
+    bool TryFindGameWithManyIds(IId[] ids, [NotNullWhen(true)] out IGame? game);
+
+    /// <summary>
+    /// Tries to find a single game of type <typeparamref name="TGame"/> which ID of type
+    /// <typeparamref name="TId"/> is contained in <paramref name="ids"/>.
+    /// </summary>
+    bool TryFindGameWithManyIds<TId, TGame>(TId[] ids, [NotNullWhen(true)] out TGame? game);
 }

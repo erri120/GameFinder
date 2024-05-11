@@ -20,7 +20,8 @@ namespace GameFinder.StoreHandlers.Origin;
 /// </remarks>
 /// <seealso cref="OriginHandler"/>
 [PublicAPI]
-public abstract class OriginHandler<TGame> where TGame : class, IGame
+public abstract class OriginHandler<TGame> : IHandler<TGame>
+    where TGame : class, IGame
 {
     /// <summary>
     /// Logger.
@@ -43,6 +44,7 @@ public abstract class OriginHandler<TGame> where TGame : class, IGame
         FileSystem = fileSystem;
     }
 
+    /// <inheritdoc/>
     [Pure]
     public IReadOnlyList<TGame> Search()
     {

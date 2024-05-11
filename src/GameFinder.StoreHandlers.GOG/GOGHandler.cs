@@ -19,7 +19,8 @@ namespace GameFinder.StoreHandlers.GOG;
 /// </remarks>
 /// <seealso cref="GOGHandler"/>
 [PublicAPI]
-public abstract class GOGHandler<TGame> where TGame : class, IGame
+public abstract class GOGHandler<TGame> : IHandler<TGame>
+    where TGame : class, IGame
 {
     /// <summary>
     /// Registry sub-key of GOG Galaxy.
@@ -58,6 +59,7 @@ public abstract class GOGHandler<TGame> where TGame : class, IGame
         Registry = registry;
     }
 
+    /// <inheritdoc/>
     [Pure]
     public IReadOnlyList<TGame> Search()
     {
