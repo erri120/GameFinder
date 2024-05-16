@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6" xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:wincap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/windowscapabilities" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap uap3 desktop desktop6 wincap rescap" xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10">
+    <Identity Name="BethesdaSoftworks.FalloutNewVegas" Publisher="CN=21E520D9-F467-4438-A16E-79ADDBE4ECB1" Version="1.1.0.0" ProcessorArchitecture="x86" />
+    <Properties>
+        <DisplayName>Fallout: New Vegas Ultimate Edition (PC)</DisplayName>
+        <PublisherDisplayName>Bethesda Softworks</PublisherDisplayName>
+        <Logo>FalloutNV_storelogo.png</Logo>
+        <Description>Fallout: New Vegas Ultimate Edition (PC)</Description>
+        <desktop6:RegistryWriteVirtualization>disabled</desktop6:RegistryWriteVirtualization>
+        <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
+    </Properties>
+    <Dependencies>
+        <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.18362.0" MaxVersionTested="10.0.18362.0" />
+        <PackageDependency Name="Microsoft.DirectXRuntime" MinVersion="9.29.952.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+        <PackageDependency Name="Microsoft.VCLibs.140.00.UWPDesktop" MinVersion="14.0.29231.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+    </Dependencies>
+    <Resources>
+        <Resource Language="en-US" />
+        <Resource Language="fr-FR" />
+        <Resource Language="de-DE" />
+        <Resource Language="es-ES" />
+        <Resource Language="it-IT" />
+    </Resources>
+    <Applications>
+        <Application Id="Game" Executable="GameLaunchHelper.exe" EntryPoint="Windows.FullTrustApplication">
+            <uap:VisualElements DisplayName="Fallout: New Vegas Ultimate Edition (PC)" Square150x150Logo="FalloutNV_logo.png" Square44x44Logo="FalloutNV_smalllogo.png" Description="Fallout: New Vegas Ultimate Edition (PC)" ForegroundText="light" BackgroundColor="#000040">
+                <uap:SplashScreen Image="FalloutNV_splashscreen.png" />
+            </uap:VisualElements>
+        </Application>
+    </Applications>
+    <Capabilities>
+        <Capability Name="internetClient" />
+        <rescap:Capability Name="allowElevation" />
+        <rescap:Capability Name="runFullTrust" />
+        <rescap:Capability Name="unvirtualizedResources" />
+    </Capabilities>
+</Package>

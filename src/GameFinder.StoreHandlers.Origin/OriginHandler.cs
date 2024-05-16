@@ -1,129 +1,125 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Web;
 using GameFinder.Common;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using NexusMods.Paths;
-using OneOf;
 
 namespace GameFinder.StoreHandlers.Origin;
 
 /// <summary>
-/// Handler for finding games install with Origin.
+/// Handler for finding games installed with Origin.
 /// </summary>
+/// <remarks>
+/// This is the base class of <see cref="OriginHandler"/> which is probably
+/// what you're looking for instead. This abstract class is only useful if you
+/// want to extend the base functionality.
+/// </remarks>
+/// <seealso cref="OriginHandler"/>
 [PublicAPI]
-public class OriginHandler : AHandler<OriginGame, OriginGameId>
+public abstract class OriginHandler<TGame> : IHandler<TGame>
+    where TGame : class, IGame
 {
-    private readonly IFileSystem _fileSystem;
+    /// <summary>
+    /// Logger.
+    /// </summary>
+    protected readonly ILogger Logger;
+
+    /// <summary>
+    /// Filesystem.
+    /// </summary>
+    protected readonly IFileSystem FileSystem;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="fileSystem">
-    /// The implementation of <see cref="IFileSystem"/> to use. For a shared instance use
-    /// <see cref="FileSystem.Shared"/>. For tests either use <see cref="InMemoryFileSystem"/>,
-    /// a custom implementation or just a mock of the interface. See the README for more information
-    /// if you want to use Wine.
-    /// </param>
-    public OriginHandler(IFileSystem fileSystem)
+    protected OriginHandler(
+        ILoggerFactory loggerFactory,
+        IFileSystem fileSystem)
     {
-        _fileSystem = fileSystem;
-    }
-
-    internal static AbsolutePath GetManifestDir(IFileSystem fileSystem)
-    {
-        return fileSystem.GetKnownPath(KnownPath.CommonApplicationDataDirectory)
-            .Combine("Origin")
-            .Combine("LocalContent");
+        Logger = loggerFactory.CreateLogger<OriginHandler<TGame>>();
+        FileSystem = fileSystem;
     }
 
     /// <inheritdoc/>
-    public override Func<OriginGame, OriginGameId> IdSelector => game => game.Id;
-
-    /// <inheritdoc/>
-    public override IEqualityComparer<OriginGameId> IdEqualityComparer => OriginGameIdComparer.Default;
-
-    /// <inheritdoc/>
-    public override IEnumerable<OneOf<OriginGame, ErrorMessage>> FindAllGames()
+    [Pure]
+    public IReadOnlyList<TGame> Search()
     {
-        var manifestDir = GetManifestDir(_fileSystem);
-
-        if (!_fileSystem.DirectoryExists(manifestDir))
+        var manifestDir = ManifestLocator.GetManifestDirectory(FileSystem);
+        if (!FileSystem.DirectoryExists(manifestDir))
         {
-            yield return new ErrorMessage($"Manifest folder {manifestDir} does not exist!");
-            yield break;
+            LogMessages.MissingManifestDirectory(Logger, manifestDir);
+            return Array.Empty<TGame>();
         }
 
-        var mfstFiles = _fileSystem.EnumerateFiles(manifestDir, "*.mfst").ToList();
-        if (mfstFiles.Count == 0)
+        var manifestFiles = FileSystem.EnumerateFiles(manifestDir, "*.mfst").ToArray();
+        if (manifestFiles.Length == 0)
         {
-            yield return new ErrorMessage($"Manifest folder {manifestDir} does not contain any .mfst files");
-            yield break;
+            LogMessages.NoManifestFiles(Logger, manifestDir);
+            return Array.Empty<TGame>();
         }
 
-        foreach (var mfstFile in mfstFiles)
+        var games = new List<TGame>(capacity: manifestFiles.Length);
+
+        foreach (var manifestFile in manifestFiles)
         {
-            var result = ParseMfstFile(mfstFile);
+            LogMessages.ParsingManifestFile(Logger, manifestFile);
 
-            // ignore steam games
-            if (result.IsT2) continue;
+            string contents;
 
-            if (result.IsT1)
+            try
             {
-                yield return result.AsT1;
+                using var stream = FileSystem.ReadFile(manifestFile);
+                using var reader = new StreamReader(stream, Encoding.UTF8);
+                contents = reader.ReadToEnd();
+            }
+            catch (Exception e)
+            {
+                LogMessages.ExceptionWhileReadingManifest(Logger, e, manifestFile);
                 continue;
             }
 
-            yield return result.AsT0;
+            try
+            {
+                var game = ParseManifestFile(contents, manifestFile);
+                if (game is null) continue;
+
+                LogMessages.ParsedManifestFile(Logger, manifestFile, game);
+                games.Add(game);
+            }
+            catch (Exception e)
+            {
+                LogMessages.ExceptionWhileParsingManifest(Logger, e, manifestFile);
+            }
         }
+
+        return games;
     }
 
-    [SuppressMessage("ReSharper", "IdentifierTypo")]
-    private OneOf<OriginGame, ErrorMessage, bool> ParseMfstFile(AbsolutePath filePath)
+    /// <summary>
+    /// Parses the given Manifest file into <typeparamref name="TGame"/>.
+    /// </summary>
+    public abstract TGame? ParseManifestFile(string contents, AbsolutePath manifestFile);
+}
+
+/// <summary>
+/// Handler for finding games installed with Origin.
+/// </summary>
+[PublicAPI]
+public class OriginHandler : OriginHandler<OriginGame>
+{
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public OriginHandler(ILoggerFactory loggerFactory, IFileSystem fileSystem) : base(loggerFactory, fileSystem) { }
+
+    /// <inheritdoc/>
+    [Pure]
+    public override OriginGame? ParseManifestFile(string contents, AbsolutePath manifestFile)
     {
-        try
-        {
-            using var stream = _fileSystem.ReadFile(filePath);
-            using var reader = new StreamReader(stream, Encoding.UTF8);
-            var contents = reader.ReadToEnd();
-
-            var query = HttpUtility.ParseQueryString(contents, Encoding.UTF8);
-
-            // using GetValues because some manifest have duplicate key-value entries for whatever reason
-            var ids = query.GetValues("id");
-            if (ids is null || ids.Length == 0)
-            {
-                return new ErrorMessage($"Manifest {filePath} does not have a value \"id\"");
-            }
-
-            var id = ids[0];
-            if (id.EndsWith("@steam", StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            var installPaths = query.GetValues("dipInstallPath");
-            if (installPaths is null || installPaths.Length == 0)
-            {
-                return new ErrorMessage($"Manifest {filePath} does not have a value \"dipInstallPath\"");
-            }
-
-            var path = installPaths
-                .OrderByDescending(x => x.Length)
-                .First();
-
-            var game = new OriginGame(
-                OriginGameId.From(id),
-                _fileSystem.FromUnsanitizedFullPath(path)
-            );
-
-            return game;
-        }
-        catch (Exception e)
-        {
-            return new ErrorMessage(e, $"Exception while parsing {filePath}");
-        }
+        return ManifestParser.ParseManifestFile(Logger, FileSystem, contents, manifestFile);
     }
 }

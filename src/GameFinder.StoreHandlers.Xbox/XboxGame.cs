@@ -5,10 +5,17 @@ using NexusMods.Paths;
 namespace GameFinder.StoreHandlers.Xbox;
 
 /// <summary>
-/// Represents a game installed with Xbox Game Pass.
+/// Represents a game installed with the Xbox App.
 /// </summary>
-/// <param name="Id"></param>
-/// <param name="DisplayName"></param>
-/// <param name="Path"></param>
 [PublicAPI]
-public record XboxGame(XboxGameId Id, string DisplayName, AbsolutePath Path) : IGame;
+public record XboxGame : IGame<XboxGameId>, IGameName
+{
+    /// <inheritdoc/>
+    public required XboxGameId Id { get; init; }
+
+    /// <inheritdoc/>
+    public required string Name { get; init; }
+
+    /// <inheritdoc/>
+    public required AbsolutePath Path { get; init; }
+}

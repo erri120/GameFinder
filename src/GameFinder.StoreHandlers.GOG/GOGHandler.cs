@@ -1,133 +1,123 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using GameFinder.Common;
 using GameFinder.RegistryUtils;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using NexusMods.Paths;
-using OneOf;
 
 namespace GameFinder.StoreHandlers.GOG;
 
 /// <summary>
 /// Handler for finding games installed with GOG Galaxy.
 /// </summary>
+/// <remarks>
+/// This is the base class of <see cref="GOGHandler"/> which is probably
+/// what you're looking for instead. This abstract class is only useful if you
+/// want to extend the base functionality.
+/// </remarks>
+/// <seealso cref="GOGHandler"/>
 [PublicAPI]
-public class GOGHandler : AHandler<GOGGame, GOGGameId>
+public abstract class GOGHandler<TGame> : IHandler<TGame>
+    where TGame : class, IGame
 {
-    internal const string GOGRegKey = @"Software\GOG.com\Games";
+    /// <summary>
+    /// Registry sub-key of GOG Galaxy.
+    /// </summary>
+    /// <remarks>
+    /// The base key for this is <see cref="RegistryHive.LocalMachine"/>,
+    /// also make sure to use the 32-bit registry view.
+    /// </remarks>
+    public const string GOGRegKey = @"Software\GOG.com\Games";
 
-    private readonly IRegistry _registry;
-    private readonly IFileSystem _fileSystem;
+    /// <summary>
+    /// Logger.
+    /// </summary>
+    protected readonly ILogger Logger;
+
+    /// <summary>
+    /// Filesystem.
+    /// </summary>
+    protected readonly IFileSystem FileSystem;
+
+    /// <summary>
+    /// Registry.
+    /// </summary>
+    protected readonly IRegistry Registry;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="registry">
-    /// The implementation of <see cref="IRegistry"/> to use. For a shared instance
-    /// use <see cref="WindowsRegistry.Shared"/> on Windows. For tests either use
-    /// <see cref="InMemoryRegistry"/>, a custom implementation or just a mock
-    /// of the interface. See the README for more information if you want to use
-    /// Wine.
-    /// </param>
-    /// <param name="fileSystem">
-    /// The implementation of <see cref="IFileSystem"/> to use. For a shared instance use
-    /// <see cref="FileSystem.Shared"/>. For tests either use <see cref="InMemoryFileSystem"/>,
-    /// a custom implementation or just a mock of the interface. See the README for more information
-    /// if you want to use Wine.
-    /// </param>
-    public GOGHandler(IRegistry registry, IFileSystem fileSystem)
+    protected GOGHandler(
+        ILoggerFactory loggerFactory,
+        IFileSystem fileSystem,
+        IRegistry registry)
     {
-        _registry = registry;
-        _fileSystem = fileSystem;
+        Logger = loggerFactory.CreateLogger<GOGHandler<TGame>>();
+        FileSystem = fileSystem;
+        Registry = registry;
     }
 
     /// <inheritdoc/>
-    public override Func<GOGGame, GOGGameId> IdSelector => game => game.Id;
-
-    /// <inheritdoc/>
-    public override IEqualityComparer<GOGGameId>? IdEqualityComparer => null;
-
-    /// <inheritdoc/>
-    public override IEnumerable<OneOf<GOGGame, ErrorMessage>> FindAllGames()
+    [Pure]
+    public IReadOnlyList<TGame> Search()
     {
-        try
+        var baseKey = Registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+
+        using var gogKey = baseKey.OpenSubKey(GOGRegKey);
+        if (gogKey is null)
         {
-            var localMachine = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-
-            using var gogKey = localMachine.OpenSubKey(GOGRegKey);
-            if (gogKey is null)
-            {
-                return new OneOf<GOGGame, ErrorMessage>[]
-                {
-                    new ErrorMessage($"Unable to open HKEY_LOCAL_MACHINE\\{GOGRegKey}"),
-                };
-            }
-
-            var subKeyNames = gogKey.GetSubKeyNames().ToArray();
-            if (subKeyNames.Length == 0)
-            {
-                return new OneOf<GOGGame, ErrorMessage>[]
-                {
-                    new ErrorMessage($"Registry key {gogKey.GetName()} has no sub-keys"),
-                };
-            }
-
-            return subKeyNames
-                .Select(subKeyName => ParseSubKey(gogKey, subKeyName))
-                .ToArray();
+            LogMessages.UnableToOpenGOGSubKey(Logger, baseKey.GetName(), GOGRegKey);
+            return Array.Empty<TGame>();
         }
-        catch (Exception e)
+
+        var subKeyNames = gogKey.GetSubKeyNames().ToArray();
+        LogMessages.FoundSubKeyNames(Logger, gogKey.GetName(), subKeyNames.Length, subKeyNames);
+
+        var res = new List<TGame>(capacity: subKeyNames.Length);
+        foreach (var subKeyName in subKeyNames)
         {
-            return new OneOf<GOGGame, ErrorMessage>[]
+            try
             {
-                new ErrorMessage(e, "Exception looking for GOG games"),
-            };
+                var game = ParseSubKey(gogKey, subKeyName);
+                if (game is null) continue;
+
+                LogMessages.ParsedRegistryKey(Logger, subKeyName, game);
+                res.Add(game);
+            }
+            catch (Exception e)
+            {
+                LogMessages.ExceptionWhileParsingRegistryKey(Logger, e, subKeyName);
+            }
         }
+
+        return res;
     }
 
-    private OneOf<GOGGame, ErrorMessage> ParseSubKey(IRegistryKey gogKey, string subKeyName)
+    /// <summary>
+    /// Parses the given <see cref="IRegistryKey"/> and key name into <typeparamref name="TGame"/>.
+    /// </summary>
+    protected abstract TGame? ParseSubKey(IRegistryKey gogKey, string subKeyName);
+}
+
+/// <summary>
+/// Handler for finding games installed with GOG Galaxy.
+/// </summary>
+[PublicAPI]
+public class GOGHandler : GOGHandler<GOGGame>
+{
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public GOGHandler(
+        ILoggerFactory loggerFactory,
+        IFileSystem fileSystem,
+        IRegistry registry) : base(loggerFactory, fileSystem, registry) { }
+
+    /// <inheritdoc/>
+    protected override GOGGame? ParseSubKey(IRegistryKey gogKey, string subKeyName)
     {
-        try
-        {
-            using var subKey = gogKey.OpenSubKey(subKeyName);
-            if (subKey is null)
-            {
-                return new ErrorMessage($"Unable to open {gogKey}\\{subKeyName}");
-            }
-
-            if (!subKey.TryGetString("gameID", out var sId))
-            {
-                return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"gameID\"");
-            }
-
-            if (!long.TryParse(sId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
-            {
-                return new ErrorMessage($"The value \"gameID\" of {subKey.GetName()} is not a number: \"{sId}\"");
-            }
-
-            if (!subKey.TryGetString("gameName", out var name))
-            {
-                return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"gameName\"");
-            }
-
-            if (!subKey.TryGetString("path", out var path))
-            {
-                return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"path\"");
-            }
-
-            var game = new GOGGame(
-                GOGGameId.From(id),
-                name,
-                _fileSystem.FromUnsanitizedFullPath(path)
-            );
-
-            return game;
-        }
-        catch (Exception e)
-        {
-            return new ErrorMessage(e, $"Exception while parsing registry key {gogKey}\\{subKeyName}");
-        }
+        return RegistryParser.ParseSubKey(Logger, FileSystem, gogKey, subKeyName);
     }
 }

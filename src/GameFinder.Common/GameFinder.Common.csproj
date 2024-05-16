@@ -5,8 +5,19 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="NexusMods.Paths" />
-        <PackageReference Include="FluentResults" />
-        <PackageReference Include="OneOf" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="IGameName.cs">
+        <DependentUpon>IGame.cs</DependentUpon>
+      </Compile>
+      <Compile Update="GameFinder.cs">
+        <DependentUpon>IGameFinder.cs</DependentUpon>
+      </Compile>
+      <Compile Update="IId.cs">
+        <DependentUpon>IGame.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

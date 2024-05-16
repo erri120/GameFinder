@@ -7,8 +7,20 @@ namespace GameFinder.StoreHandlers.GOG;
 /// <summary>
 /// Represents a game installed with GOG Galaxy.
 /// </summary>
-/// <param name="Id"></param>
-/// <param name="Name"></param>
-/// <param name="Path"></param>
 [PublicAPI]
-public record GOGGame(GOGGameId Id, string Name, AbsolutePath Path) : IGame;
+public record GOGGame : IGame<GOGGameId>, IGameName
+{
+    /// <summary>
+    /// Gets the ID of this game.
+    /// </summary>
+    /// <remarks>
+    /// This corresponds to the "Product ID" field found on https://www.gogdb.org
+    /// </remarks>
+    public required GOGGameId Id { get; init; }
+
+    /// <inheritdoc/>
+    public required string Name { get; init; }
+
+    /// <inheritdoc/>
+    public required AbsolutePath Path { get; init; }
+}
