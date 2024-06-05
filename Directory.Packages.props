@@ -1,54 +1,52 @@
 <Project>
-    <ItemGroup>
-        <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
-        <PackageVersion Include="CommandLineParser" Version="2.9.1" />
-        <PackageVersion Include="FluentResults" Version="3.15.2" />
-        <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
-        <PackageVersion Include="NexusMods.Paths" Version="0.9.0" />
-        <PackageVersion Include="NexusMods.Paths.TestingHelpers" Version="0.9.0" />
-        <PackageVersion Include="NLog" Version="5.2.8" />
-        <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.8" />
-        <PackageVersion Include="OneOf" Version="3.0.263" />
-        <PackageVersion Include="SHA3.Net" Version="2.0.0" />
-        <PackageVersion Include="System.Management" Version="8.0.0" />
-        <PackageVersion Include="ValveKeyValue" Version="0.10.0.360" />
-        <PackageVersion Include="TransparentValueObjects" Version="1.0.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageVersion Include="Meziantou.Analyzer" Version="2.0.146"/>
-        <PackageVersion Include="JetBrains.Annotations" Version="2023.3.0"/>
-        <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageVersion Include="AutoFixture" Version="4.18.1" />
-        <PackageVersion Include="AutoFixture.Xunit2" Version="4.18.1" />
-        <PackageVersion Include="FluentAssertions" Version="6.12.0" />
-        <PackageVersion Include="FluentAssertions.Analyzers" Version="0.31.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageVersion>
-        <PackageVersion Include="FluentResults.Extensions.FluentAssertions" Version="2.1.1" />
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-        <PackageVersion Include="NSubstitute" Version="5.1.0" />
-        <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageVersion>
-        <PackageVersion Include="xunit" Version="2.7.0" />
-        <PackageVersion Include="Xunit.SkippableFact" Version="1.4.13" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.7">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-            <PrivateAssets>all</PrivateAssets>
-        </PackageVersion>
-        <PackageVersion Include="coverlet.collector" Version="6.0.2">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-            <PrivateAssets>all</PrivateAssets>
-        </PackageVersion>
-        <PackageVersion Include="GitHubActionsTestLogger" Version="2.3.3">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageVersion>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
+    <PackageVersion Include="CommandLineParser" Version="2.9.1" />
+    <PackageVersion Include="FluentResults" Version="3.15.2" />
+    <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageVersion Include="NexusMods.Paths" Version="0.9.4" />
+    <PackageVersion Include="NexusMods.Paths.TestingHelpers" Version="0.9.4" />
+    <PackageVersion Include="NLog" Version="5.2.8" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.8" />
+    <PackageVersion Include="OneOf" Version="3.0.271" />
+    <PackageVersion Include="SHA3.Net" Version="2.0.0" />
+    <PackageVersion Include="System.Management" Version="8.0.0" />
+    <PackageVersion Include="ValveKeyValue" Version="0.10.0.360" />
+    <PackageVersion Include="TransparentValueObjects" Version="1.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.146" />
+    <PackageVersion Include="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="AutoFixture" Version="4.18.1" />
+    <PackageVersion Include="AutoFixture.Xunit2" Version="4.18.1" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="FluentAssertions.Analyzers" Version="0.31.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageVersion>
+    <PackageVersion Include="FluentResults.Extensions.FluentAssertions" Version="2.1.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageVersion Include="NSubstitute" Version="5.1.0" />
+    <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageVersion>
+    <PackageVersion Include="xunit" Version="2.7.0" />
+    <PackageVersion Include="Xunit.SkippableFact" Version="1.4.13" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageVersion>
+    <PackageVersion Include="coverlet.collector" Version="6.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageVersion>
+    <PackageVersion Include="GitHubActionsTestLogger" Version="2.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageVersion>
+  </ItemGroup>
 </Project>
