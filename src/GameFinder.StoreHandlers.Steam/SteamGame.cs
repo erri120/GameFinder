@@ -20,6 +20,11 @@ public sealed record SteamGame : IGame
     public required AppManifest AppManifest { get; init; }
 
     /// <summary>
+    /// Gets the parsed <see cref="RegistryEntry"/> of this game.
+    /// </summary>
+    public RegistryEntry? RegistryEntry { get; init; }
+
+    /// <summary>
     /// Gets the library folder that contains this game.
     /// </summary>
     public required LibraryFolder LibraryFolder { get; init; }
