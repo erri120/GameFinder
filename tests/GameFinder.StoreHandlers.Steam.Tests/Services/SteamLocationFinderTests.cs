@@ -130,7 +130,7 @@ public class SteamLocationFinderTests
         SteamLocationFinder
             .GetDefaultSteamInstallationPaths(fs)
             .ToArray()
-            .Should().HaveCount(6);
+            .Should().HaveCount(7);
     }
 
     [Fact]
