@@ -195,6 +195,10 @@ public static class SteamLocationFinder
             yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
                 .Combine(".var/app/com.valvesoftware.Steam/data/Steam");
 
+            // "~/snap/steam/common/.local/share/Steam" (snap installation)
+            yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
+                .Combine("snap/steam/common/.local/share/Steam");
+
             // "~/.steam/steam"
             // this is a legacy installation directory and is often soft linked to
             // the actual installation directory
