@@ -62,7 +62,7 @@ jobs:
       run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: GameFinder.Example-${{ runner.os }}-${{ github.sha }}
         path: ${{ github.workspace }}/bin/${{ runner.os }}/GameFinder*
