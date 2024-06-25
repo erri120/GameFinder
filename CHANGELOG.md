@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.2.2...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.2.3...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [4.2.3](https://github.com/erri120/GameFinder/compare/v4.2.2...v4.2.3) - 2024-06-25
+
+- Steam: find snap installation
 
 ## [4.2.2](https://github.com/erri120/GameFinder/compare/v4.2.1...v4.2.2) - 2024-06-06
 
