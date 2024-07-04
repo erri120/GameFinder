@@ -195,6 +195,11 @@ public static class SteamLocationFinder
             yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
                 .Combine(".var/app/com.valvesoftware.Steam/data/Steam");
 
+            // "~/.var/app/com.valvesoftware.Steam/.local/share/Steam" (flatpak installation)
+            // see https://github.com/flatpak/flatpak/wiki/Filesystem for details
+            yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
+                .Combine(".var/app/com.valvesoftware.Steam/.local/share/Steam");
+
             // "~/snap/steam/common/.local/share/Steam" (snap installation)
             yield return fileSystem.GetKnownPath(KnownPath.HomeDirectory)
                 .Combine("snap/steam/common/.local/share/Steam");
