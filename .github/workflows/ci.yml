@@ -41,7 +41,7 @@ jobs:
       run: dotnet test --no-build --no-restore --logger "GitHubActions" --collect:"XPlat Code Coverage;Format=opencover"
 
     - name: Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: coverage.xml
