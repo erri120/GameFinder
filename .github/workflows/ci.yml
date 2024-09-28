@@ -40,14 +40,14 @@ jobs:
     - name: Run Tests
       run: dotnet test --no-build --no-restore --logger "GitHubActions" --collect:"XPlat Code Coverage;Format=opencover"
 
-    - name: Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: coverage.xml
-        fail_ci_if_error: false
-        env_vars: OS
-        flags: ${{ env.OS }}
+#    - name: Codecov
+#      uses: codecov/codecov-action@v3
+#      with:
+#        token: ${{ secrets.CODECOV_TOKEN }}
+#        files: coverage.xml
+#        fail_ci_if_error: false
+#        env_vars: OS
+#        flags: ${{ env.OS }}
 
     - name: Publish (Linux)
       if: runner.os == 'Linux'
