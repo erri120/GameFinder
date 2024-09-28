@@ -27,4 +27,7 @@ public class Options
 
     [Option("bottles", HelpText = "Search for wine prefixes managed with bottles")]
     public bool Bottles { get; set; } = true;
+
+    [Option("heroic", HelpText = "Search for games from Heroic")]
+    public bool Heroic { get; set; } = true;
 }

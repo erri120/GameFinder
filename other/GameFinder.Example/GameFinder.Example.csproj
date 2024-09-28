@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\GameFinder.Launcher.Heroic\GameFinder.Launcher.Heroic.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.EGS\GameFinder.StoreHandlers.EGS.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.GOG\GameFinder.StoreHandlers.GOG.csproj" />
         <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.Origin\GameFinder.StoreHandlers.Origin.csproj" />

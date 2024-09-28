@@ -10,6 +10,7 @@
 - [Origin](#origin) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.Origin)](https://www.nuget.org/packages/GameFinder.StoreHandlers.Origin)
 - [EA Desktop](#ea-desktop) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.EADesktop)](https://www.nuget.org/packages/GameFinder.StoreHandlers.EADesktop)
 - [Xbox Game Pass](#xbox-game-pass) [![Nuget](https://img.shields.io/nuget/v/GameFinder.StoreHandlers.Xbox)](https://www.nuget.org/packages/GameFinder.StoreHandlers.Xbox)
+- Heroic [![Nuget](https://img.shields.io/nuget/v/GameFinder.Launcher.Heroic)](https://www.nuget.org/packages/GameFinder.Launcher.Heroic)
 
 The following launchers are not yet supported or support has been dropped:
 
