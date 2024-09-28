@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using CommandLine;
 using GameFinder.Common;
+using GameFinder.Launcher.Heroic;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.EADesktop;
 using GameFinder.StoreHandlers.EADesktop.Crypto;
@@ -108,6 +109,11 @@ public static class Program
         if (OperatingSystem.IsLinux())
         {
             if (options.Steam) RunSteamHandler(realFileSystem, registry: null);
+            if (options.Heroic)
+            {
+                RunHeroicGOGHandler(realFileSystem);
+            }
+
             var winePrefixes = new List<AWinePrefix>();
 
             if (options.Wine)
@@ -145,6 +151,13 @@ public static class Program
     {
         var logger = _provider.CreateLogger(nameof(GOGHandler));
         var handler = new GOGHandler(registry, fileSystem);
+        LogGamesAndErrors(handler.FindAllGames(), logger);
+    }
+
+    private static void RunHeroicGOGHandler(IFileSystem fileSystem)
+    {
+        var logger = _provider.CreateLogger(nameof(HeroicGOGHandler));
+        var handler = new HeroicGOGHandler(fileSystem);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 

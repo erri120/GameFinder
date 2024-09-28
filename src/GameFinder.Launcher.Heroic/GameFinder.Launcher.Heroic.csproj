@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <IsTrimmable>false</IsTrimmable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFinder.StoreHandlers.GOG\GameFinder.StoreHandlers.GOG.csproj" />
+    </ItemGroup>
+</Project>
