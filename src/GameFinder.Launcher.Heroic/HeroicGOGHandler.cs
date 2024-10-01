@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         AllowTrailingCommas = true,
+        ReadCommentHandling = JsonCommentHandling.Skip,
     };
 
     /// <summary>
@@ -39,24 +41,25 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
     /// <inheritdoc/>
     public override IEnumerable<OneOf<GOGGame, ErrorMessage>> FindAllGames()
     {
-        var installedJsonFile = FindConfigDirectory(_fileSystem)
-            .Select(GetInstalledJsonFilePath)
-            .FirstOrDefault(path => path.FileExists);
+        var configDirectory = FindConfigDirectory(_fileSystem)
+            .FirstOrDefault(path => path.DirectoryExists());
 
-        if (installedJsonFile == default)
+        if (configDirectory == default)
         {
             yield return new ErrorMessage("Didn't find any heroic files, this can be ignored if heroic isn't installed");
             yield break;
         }
 
-        var games = ParseInstalledJsonFile(installedJsonFile);
+        var installedJsonFile = GetInstalledJsonFilePath(configDirectory);
+
+        var games = ParseInstalledJsonFile(installedJsonFile, configDirectory);
         foreach (var x in games)
         {
             yield return x;
         }
     }
 
-    internal static IEnumerable<OneOf<GOGGame, ErrorMessage>> ParseInstalledJsonFile(AbsolutePath path)
+    internal static IEnumerable<OneOf<GOGGame, ErrorMessage>> ParseInstalledJsonFile(AbsolutePath path, AbsolutePath configPath)
     {
         using var stream = path.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
         var root = JsonSerializer.Deserialize<DTOs.Root>(stream, JsonSerializerOptions);
@@ -71,7 +74,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
             OneOf<GOGGame, ErrorMessage> res;
             try
             {
-                res = Parse(installed, path.FileSystem);
+                res = Parse(installed, configPath, path.FileSystem);
             }
             catch (Exception e)
             {
@@ -82,15 +85,40 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         }
     }
 
-    internal static OneOf<GOGGame, ErrorMessage> Parse(DTOs.Installed installed, IFileSystem fileSystem)
+    [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(JsonSerializerOptions)")]
+    internal static OneOf<GOGGame, ErrorMessage> Parse(
+        DTOs.Installed installed,
+        AbsolutePath configPath,
+        IFileSystem fileSystem)
     {
         if (!long.TryParse(installed.AppName, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
         {
             return new ErrorMessage($"The value \"appName\" is not a number: \"{installed.AppName}\"");
         }
 
+        var gamesConfigFile = GetGamesConfigJsonFile(configPath, id.ToString(CultureInfo.InvariantCulture));
+        if (!gamesConfigFile.FileExists) return new ErrorMessage($"File `{gamesConfigFile}` doesn't exist!");
+
+        using var stream = gamesConfigFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var doc = JsonDocument.Parse(stream, new JsonDocumentOptions
+        {
+            AllowTrailingCommas = true,
+            CommentHandling = JsonCommentHandling.Skip,
+        });
+
+        var element = doc.RootElement.GetProperty(id.ToString(CultureInfo.InvariantCulture));
+        var gameConfig = element.Deserialize<DTOs.GameConfig>();
+        if (gameConfig is null) return new ErrorMessage($"Unable to deserialize `{gamesConfigFile}`");
+
         var path = fileSystem.FromUnsanitizedFullPath(installed.InstallPath);
-        return new GOGGame(GOGGameId.From(id), installed.AppName, path);
+        var winePrefixPath = fileSystem.FromUnsanitizedFullPath(gameConfig.WinePrefix);
+
+        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, winePrefixPath, gameConfig.WineVersion);
+    }
+
+    internal static AbsolutePath GetGamesConfigJsonFile(AbsolutePath configPath, string name)
+    {
+        return configPath.Combine("GamesConfig").Combine($"{name}.json");
     }
 
     internal static AbsolutePath GetInstalledJsonFilePath(AbsolutePath configPath)

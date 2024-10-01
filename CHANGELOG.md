@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
+## [4.3.1](https://github.com/erri120/GameFinder/compare/v4.3.0...v4.3.1) - 2024-10-01
+
+- Heroic: pass along the wine prefix
+
 ## [4.3.0](https://github.com/erri120/GameFinder/compare/v4.2.4...v4.3.0) - 2024-09-28
 
 Adds support for Heroic.
