@@ -52,6 +52,12 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
 
         var installedJsonFile = GetInstalledJsonFilePath(configDirectory);
 
+        if (!installedJsonFile.FileExists)
+        {
+            yield return new ErrorMessage($"Didn't find the installed.json file in `{configDirectory}`. This can be ignored if you haven't signed into GOG on Heroic yet.");
+            yield break;
+        }
+
         var games = ParseInstalledJsonFile(installedJsonFile, configDirectory);
         foreach (var x in games)
         {
