@@ -37,6 +37,14 @@ public static class AppManifestParser
         {
             using var stream = manifestPath.Read();
 
+            if (stream.Length == 0)
+            {
+                return Result.Fail(
+                    new Error("Manifest file is empty!")
+                        .WithMetadata("Path", manifestPath.GetFullPath())
+                );
+            }
+
             var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
             var appState = kv.Deserialize(stream, KVSerializerOptions.DefaultOptions);
 
