@@ -68,7 +68,7 @@ public abstract record AWinePrefix
         var rootDirectory = GetVirtualDrivePath();
 
         var newHomeDirectory = rootDirectory
-            .Combine("Users")
+            .Combine("users")
             .Combine(GetUserName());
 
         var (pathMappings, knownPathMappings) = BaseFileSystem.CreateWinePathMappings(
