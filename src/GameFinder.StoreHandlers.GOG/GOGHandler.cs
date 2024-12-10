@@ -117,10 +117,16 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
                 return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"path\"");
             }
 
+            if (!subKey.TryGetString("buildId", out var buildId))
+            {
+                return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"buildId\"");
+            }
+
             var game = new GOGGame(
                 GOGGameId.From(id),
                 name,
-                _fileSystem.FromUnsanitizedFullPath(path)
+                _fileSystem.FromUnsanitizedFullPath(path),
+                buildId
             );
 
             return game;

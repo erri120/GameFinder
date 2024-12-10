@@ -119,7 +119,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         var path = fileSystem.FromUnsanitizedFullPath(installed.InstallPath);
         var winePrefixPath = fileSystem.FromUnsanitizedFullPath(gameConfig.WinePrefix);
 
-        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, winePrefixPath, gameConfig.WineVersion);
+        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, installed.BuildId, winePrefixPath, gameConfig.WineVersion);
     }
 
     internal static AbsolutePath GetGamesConfigJsonFile(AbsolutePath configPath, string name)

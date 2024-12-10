@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.2.4...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.4.0...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [4.4.0](https://github.com/erri120/GameFinder/compare/v4.3.4...v4.4.0) - 2024-12-10
+
+- GOG & Heroic (GOG): Add `BuildId`
 
 ## [4.3.3](https://github.com/erri120/GameFinder/compare/v4.3.2...v4.3.3) - 2024-10-31
 

@@ -8,8 +8,9 @@ public record HeroicGOGGame(
     GOGGameId Id,
     string Name,
     AbsolutePath Path,
+    string BuildId,
     AbsolutePath WinePrefixPath,
-    DTOs.WineVersion WineVersion) : GOGGame(Id, Name, Path)
+    DTOs.WineVersion WineVersion) : GOGGame(Id, Name, Path, BuildId)
 {
     public WinePrefix GetWinePrefix()
     {

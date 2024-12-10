@@ -18,7 +18,7 @@ public partial class GOGTests
         var fixture = new Fixture();
 
         fixture.Customize<GOGGame>(composer => composer
-            .FromFactory<long, string>((id, name) =>
+            .FromFactory<long, string, string>((id, name, buildId) =>
             {
                 var path = fileSystem
                     .GetKnownPath(KnownPath.TempDirectory)
@@ -28,8 +28,9 @@ public partial class GOGTests
                 gameKey.AddValue("gameID", id.ToString(CultureInfo.InvariantCulture));
                 gameKey.AddValue("gameName", name);
                 gameKey.AddValue("path", path.GetFullPath());
+                gameKey.AddValue("buildId", buildId);
 
-                return new GOGGame(GOGGameId.From(id), name, path);
+                return new GOGGame(GOGGameId.From(id), name, path, buildId);
             })
             .OmitAutoProperties());
 
