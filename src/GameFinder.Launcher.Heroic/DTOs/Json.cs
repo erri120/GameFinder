@@ -9,7 +9,7 @@ internal record Installed(
     [property: JsonPropertyName("install_path")] string InstallPath,
     [property: JsonPropertyName("install_size")] string InstallSize,
     [property: JsonPropertyName("is_dlc")] bool IsDlc,
-    [property: JsonPropertyName("version")] string Version,
+    [property: JsonPropertyName("version")] string? Version,
     [property: JsonPropertyName("appName")] string AppName,
     [property: JsonPropertyName("installedDLCs")] IReadOnlyList<object> InstalledDLCs,
     [property: JsonPropertyName("language")] string Language,
@@ -22,7 +22,7 @@ internal record Root(
     [property: JsonPropertyName("installed")] IReadOnlyList<Installed> Installed
 );
 
-internal record GameConfig(
+internal record LinuxGameConfig(
     [property: JsonPropertyName("autoInstallDxvk")] bool AutoInstallDxvk,
     [property: JsonPropertyName("autoInstallDxvkNvapi")] bool AutoInstallDxvkNvapi,
     [property: JsonPropertyName("autoInstallVkd3d")] bool AutoInstallVkd3d,

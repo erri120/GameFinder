@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
+## [4.5.0](https://github.com/erri120/GameFinder/compare/v4.4.0...v4.5.0) - 2025-02-17
+
+- Heroic (GOG): Support linux native games
+
 ## [4.4.0](https://github.com/erri120/GameFinder/compare/v4.3.4...v4.4.0) - 2024-12-10
 
 - GOG & Heroic (GOG): Add `BuildId`

@@ -109,10 +109,7 @@ public static class Program
         if (OperatingSystem.IsLinux())
         {
             if (options.Steam) RunSteamHandler(realFileSystem, registry: null);
-            if (options.Heroic)
-            {
-                RunHeroicGOGHandler(realFileSystem);
-            }
+            if (options.Heroic) RunHeroicGOGHandler(realFileSystem);
 
             var winePrefixes = new List<AWinePrefix>();
 
@@ -157,7 +154,7 @@ public static class Program
     private static void RunHeroicGOGHandler(IFileSystem fileSystem)
     {
         var logger = _provider.CreateLogger(nameof(HeroicGOGHandler));
-        var handler = new HeroicGOGHandler(fileSystem);
+        var handler = new HeroicGOGHandler(fileSystem, logger);
         LogGamesAndErrors(handler.FindAllGames(), logger);
     }
 
