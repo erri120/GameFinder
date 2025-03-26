@@ -220,10 +220,10 @@ public sealed record AppManifest
 
     #region Helpers
 
-    private static readonly RelativePath CommonDirectoryName = "common".ToRelativePath();
-    private static readonly RelativePath ShaderCacheDirectoryName = "shadercache".ToRelativePath();
-    private static readonly RelativePath WorkshopDirectoryName = "workshop".ToRelativePath();
-    private static readonly RelativePath CompatabilityDataDirectoryName = "compatdata".ToRelativePath();
+    private static readonly RelativePath CommonDirectoryName = "common";
+    private static readonly RelativePath ShaderCacheDirectoryName = "shadercache";
+    private static readonly RelativePath WorkshopDirectoryName = "workshop";
+    private static readonly RelativePath CompatabilityDataDirectoryName = "compatdata";
 
     /// <summary>
     /// Parses the file at <see cref="ManifestPath"/> again and returns a new

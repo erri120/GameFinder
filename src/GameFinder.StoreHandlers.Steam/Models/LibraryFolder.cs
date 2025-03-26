@@ -57,7 +57,7 @@ public sealed record LibraryFolder
     /// </summary>
     public Size GetFreeSpaceEstimate() => TotalDiskSize - GetTotalSizeOfInstalledApps();
 
-    public static readonly RelativePath SteamAppsDirectoryName = "steamapps".ToRelativePath();
+    public static readonly RelativePath SteamAppsDirectoryName = "steamapps";
 
     /// <summary>
     /// Returns an enumerable for every <c>appmanifest_*.acf</c> file path in the current library.

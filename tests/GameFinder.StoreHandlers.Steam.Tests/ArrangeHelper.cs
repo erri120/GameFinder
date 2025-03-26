@@ -94,7 +94,7 @@ public static class ArrangeHelper
                 .ToDictionary(depot => depot.DepotId, depot => depot),
             InstallScripts = fixture
                 .CreateMany<DepotId>()
-                .Select(depotId => (depotId, fixture.Create<string>().ToRelativePath()))
+                .Select(depotId => (depotId, RelativePath.FromUnsanitizedInput(fixture.Create<string>())))
                 .ToDictionary(kv => kv.Item1, kv => kv.Item2),
             SharedDepots = fixture
                 .CreateMany<DepotId>()

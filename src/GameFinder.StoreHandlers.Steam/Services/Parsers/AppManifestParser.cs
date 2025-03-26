@@ -102,7 +102,7 @@ public static class AppManifestParser
                 appState,
                 "InstallScripts",
                 key => DepotId.From(uint.Parse(key)),
-                x => ParseRelativePath(x, manifestPath.FileSystem));
+                x => ParseRelativePath(x));
 
             var sharedDepotsResult = ParseBasicDictionary(
                 appState,
@@ -206,16 +206,16 @@ public static class AppManifestParser
         if (parseResult.IsFailed) return parseResult.ToResult();
 
         var rawPath = parseResult.Value;
-        var sanitizedPath = PathHelpers.Sanitize(rawPath, fileSystem.OS);
-        var isRelative = PathHelpers.GetRootLength(sanitizedPath, fileSystem.OS) == -1;
+        var sanitizedPath = PathHelpers.Sanitize(rawPath);
+        var isRelative = !PathHelpers.IsRooted(sanitizedPath);
 
         if (isRelative)
         {
-            var relativePath = new RelativePath(sanitizedPath);
+            var relativePath = RelativePath.CreateUnsafe(sanitizedPath);
             return Result.Ok(manifestPath.Parent.Combine("common").Combine(relativePath));
         }
 
-        var absolutePath = fileSystem.FromUnsanitizedFullPath(rawPath);
+        var absolutePath = fileSystem.FromUnsanitizedFullPath(sanitizedPath);
         return absolutePath;
     }
 

@@ -111,7 +111,9 @@ public class XboxHandler : AHandler<XboxGame, XboxGameId>
         var paths = new List<AbsolutePath>();
         var errors = new List<ErrorMessage>();
 
-        foreach (var rootDirectory in fileSystem.EnumerateRootDirectories())
+        var rootDirectories = fileSystem.EnumerateRootDirectories().ToArray();
+
+        foreach (var rootDirectory in rootDirectories)
         {
             if (!fileSystem.DirectoryExists(rootDirectory)) continue;
 

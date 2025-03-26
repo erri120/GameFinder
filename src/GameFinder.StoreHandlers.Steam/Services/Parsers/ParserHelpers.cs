@@ -179,7 +179,7 @@ internal static class ParserHelpers
     internal static Size ParseSize(KVValue value) => Size.From(ParseUInt64(value));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static RelativePath ParseRelativePath(KVValue value, IFileSystem fileSystem) => new(PathHelpers.Sanitize(ParseString(value), fileSystem.OS));
+    internal static RelativePath ParseRelativePath(KVValue value) => ParseString(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static AbsolutePath ParseAbsolutePath(KVValue value, IFileSystem fileSystem) => fileSystem.FromUnsanitizedFullPath(ParseString(value));

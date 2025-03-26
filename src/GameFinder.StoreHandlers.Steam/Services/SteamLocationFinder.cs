@@ -22,19 +22,19 @@ public static class SteamLocationFinder
     /// The name of the <c>config</c> directory.
     /// </summary>
     /// <seealso cref="GetLibraryFoldersFilePath"/>
-    public static readonly RelativePath ConfigDirectoryName = "config".ToRelativePath();
+    public static readonly RelativePath ConfigDirectoryName = "config";
 
     /// <summary>
     /// The name of the <c>libraryfolders.vdf</c> file.
     /// </summary>
     /// <seealso cref="GetLibraryFoldersFilePath"/>
-    public static readonly RelativePath LibraryFoldersFileName = "libraryfolders.vdf".ToRelativePath();
+    public static readonly RelativePath LibraryFoldersFileName = "libraryfolders.vdf";
 
     /// <summary>
     /// The name of the <c>userdata</c> directory.
     /// </summary>
     /// <seealso cref="GetUserDataDirectoryPath"/>
-    public static readonly RelativePath UserDataDirectoryName = "userdata".ToRelativePath();
+    public static readonly RelativePath UserDataDirectoryName = "userdata";
 
     /// <summary>
     /// The registry key used to find Steam.
