@@ -14,6 +14,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Setup .NET Core SDK 9
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9'
+
     - name: Check formatting
       run: dotnet format --verify-no-changes --severity error
 
@@ -27,6 +32,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Setup .NET Core SDK 9
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9'
 
     - name: Print Debug Info
       run: dotnet --info
