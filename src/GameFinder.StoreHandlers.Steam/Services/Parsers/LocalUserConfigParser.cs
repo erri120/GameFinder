@@ -36,7 +36,10 @@ public static class LocalUserConfigParser
             using var stream = configPath.Read();
 
             var kv = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
-            var localConfigStore = kv.Deserialize(stream, KVSerializerOptions.DefaultOptions);
+            var localConfigStore = kv.Deserialize(stream, new KVSerializerOptions
+            {
+                HasEscapeSequences = true,
+            });
 
             if (localConfigStore is null)
             {

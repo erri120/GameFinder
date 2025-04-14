@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
+## [4.6.1](https://github.com/erri120/GameFinder/compare/v4.6.0...v4.6.1) - 2025-04-14
+
+- Steam: fix escape sequences in local user config files
+
 ## [4.6.0](https://github.com/erri120/GameFinder/compare/v4.5.0...v4.6.0) - 2025-03-26
 
 - Upgrade to .NET 9
