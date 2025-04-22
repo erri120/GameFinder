@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using GameFinder.StoreHandlers.GOG;
 using GameFinder.Wine;
@@ -34,4 +35,4 @@ public record HeroicGOGGame(
 }
 
 [PublicAPI]
-public record WineData(AbsolutePath WinePrefixPath, DTOs.WineVersion WineVersion);
+public record WineData(AbsolutePath WinePrefixPath, IReadOnlyDictionary<string, string> EnvironmentVariables, DTOs.WineVersion WineVersion);

@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.4.0...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.6.2...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [4.6.2](https://github.com/erri120/GameFinder/compare/v4.6.1...v4.6.2) - 2025-04-22
+
+- Heroic: include environment variables in the output
 
 ## [4.6.1](https://github.com/erri120/GameFinder/compare/v4.6.0...v4.6.1) - 2025-04-14
 

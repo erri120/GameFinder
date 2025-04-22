@@ -145,7 +145,16 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
 
         var winePrefixPath = _fileSystem.FromUnsanitizedFullPath(gameConfig.WinePrefix);
 
-        return new WineData(winePrefixPath, gameConfig.WineVersion);
+        var environmentOptions = new Dictionary<string, string>(comparer: StringComparer.OrdinalIgnoreCase);
+        if (gameConfig.EnvironmentOptions is not null && gameConfig.EnvironmentOptions.Count > 0)
+        {
+            foreach (var option in gameConfig.EnvironmentOptions)
+            {
+                environmentOptions[option.Key] = option.Value;
+            }
+        }
+
+        return new WineData(winePrefixPath, environmentOptions, gameConfig.WineVersion);
     }
 
     internal static AbsolutePath GetLinuxGamesConfigJsonFile(AbsolutePath configPath, string name)

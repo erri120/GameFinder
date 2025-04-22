@@ -31,7 +31,7 @@ internal record LinuxGameConfig(
     [property: JsonPropertyName("enableMsync")] bool EnableMsync,
     [property: JsonPropertyName("enableFsync")] bool EnableFsync,
     [property: JsonPropertyName("nvidiaPrime")] bool NvidiaPrime,
-    [property: JsonPropertyName("enviromentOptions")] IReadOnlyList<object> EnviromentOptions,
+    [property: JsonPropertyName("enviromentOptions")] IReadOnlyList<EnvironmentOption> EnvironmentOptions,
     [property: JsonPropertyName("wrapperOptions")] IReadOnlyList<object> WrapperOptions,
     [property: JsonPropertyName("showFps")] bool ShowFps,
     [property: JsonPropertyName("useGameMode")] bool UseGameMode,
@@ -43,6 +43,11 @@ internal record LinuxGameConfig(
     [property: JsonPropertyName("wineVersion")] WineVersion WineVersion,
     [property: JsonPropertyName("winePrefix")] string WinePrefix,
     [property: JsonPropertyName("wineCrossoverBottle")] string WineCrossoverBottle
+);
+
+public record EnvironmentOption(
+    [property: JsonPropertyName("key")] string Key,
+    [property: JsonPropertyName("value")] string Value
 );
 
 public record WineVersion(
