@@ -13,12 +13,7 @@ public class SteamHandlerTests
         var fs = new InMemoryFileSystem();
 
         var steamHandler = new SteamHandler(fs, registry: null);
-        steamHandler.FindAllGames()
-            .Should().ContainSingle()
-            .Which.Value
-            .Should().BeOfType<ErrorMessage>()
-            .Which.Message
-            .Should().Be("Unable to find a valid Steam installation at the default installation paths!");
+        steamHandler.FindAllGames().Should().BeEmpty();
 
         var steamPath = SteamLocationFinder.GetDefaultSteamInstallationPaths(fs).First();
         fs.AddDirectory(steamPath);
@@ -26,12 +21,7 @@ public class SteamHandlerTests
         var libraryFoldersFilePath = SteamLocationFinder.GetLibraryFoldersFilePath(steamPath);
         fs.AddEmptyFile(libraryFoldersFilePath);
 
-        steamHandler.FindAllGames()
-            .Should().ContainSingle()
-            .Which.Value
-            .Should().BeOfType<ErrorMessage>()
-            .Which.Message
-            .Should().Be("Exception was thrown while parsing the manifest file!");
+        steamHandler.FindAllGames().Should().BeEmpty();
 
         var libraryFoldersManifest = ArrangeHelper.CreateLibraryFoldersManifest(libraryFoldersFilePath);
         LibraryFoldersManifestWriter.Write(libraryFoldersManifest, libraryFoldersFilePath).Should().BeSuccess();

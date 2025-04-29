@@ -56,7 +56,7 @@ internal static class ParserHelpers
         );
     }
 
-    internal static Result<T> ParseValue<T>(KVValue value, Func<KVValue, T> parser)
+    private static Result<T> ParseValue<T>(KVValue value, Func<KVValue, T> parser)
     {
         return Result.Try(
             () => parser(value),

@@ -7,8 +7,9 @@ using FluentResults;
 using GameFinder.RegistryUtils;
 using GameFinder.StoreHandlers.Steam.Models;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NexusMods.Paths;
-using NexusMods.Paths.Extensions;
 
 namespace GameFinder.StoreHandlers.Steam.Services;
 
@@ -48,41 +49,53 @@ public static class SteamLocationFinder
     /// <seealso cref="GetSteamPathFromRegistry"/>
     public const string SteamRegistryValueName = "SteamPath";
 
-    /// <summary>
-    /// Tries to find a valid Steam installation.
-    /// </summary>
-    /// <remarks>
-    /// This uses <see cref="GetDefaultSteamInstallationPaths"/>, <see cref="GetSteamPathFromRegistry"/>
-    /// and <see cref="IsValidSteamInstallation"/> to find a valid installation.
-    /// </remarks>
-    public static Result<AbsolutePath> FindSteam(IFileSystem fileSystem, IRegistry? registry)
+    /// <inheritdoc cref="TryFindSteam"/>
+    [Obsolete($"Use {nameof(TryFindSteam)} instead")]
+    public static Result<AbsolutePath> FindSteam(IFileSystem fileSystem, IRegistry? registry, ILogger? logger = null)
     {
+        if (TryFindSteam(fileSystem, registry, logger ?? NullLogger.Instance, out var steamPath))
+        {
+            return steamPath;
+        }
+
+        return Result.Fail("Failed to find Steam");
+    }
+
+    /// <summary>
+    /// Tries to find the Steam installation.
+    /// </summary>
+    public static bool TryFindSteam(IFileSystem fileSystem, IRegistry? registry, ILogger logger, out AbsolutePath steamPath)
+    {
+        steamPath = default;
+
         // 1) try the default installation paths
         var defaultSteamInstallationPath = GetDefaultSteamInstallationPaths(fileSystem)
-            .FirstOrDefault(IsValidSteamInstallation);
+            .FirstOrDefault(path => IsValidSteamInstallation(path, logger));
 
-        if (defaultSteamInstallationPath != default) return Result.Ok(defaultSteamInstallationPath);
+        if (defaultSteamInstallationPath != default)
+        {
+            logger.LogInformation("Found Steam at the default installation path `{Path}`", defaultSteamInstallationPath);
+            steamPath = defaultSteamInstallationPath;
+            return true;
+        }
 
         // 2) try the registry, if there is any
         if (registry is null)
         {
-            return Result.Fail(
-                new Error("Unable to find a valid Steam installation at the default installation paths!")
-            );
+            logger.LogWarning("Unable to find Steam at the default installation paths");
+            return false;
         }
 
-        var pathFromRegistryResult = GetSteamPathFromRegistry(fileSystem, registry);
-        if (pathFromRegistryResult.IsFailed || !IsValidSteamInstallation(pathFromRegistryResult.Value))
+        if (!TryGetSteamPathFromRegistry(fileSystem, registry, logger, out var pathFromRegistry))
         {
-            return Result.Merge(
-                Result.Fail(
-                    new Error("Unable to find a valid Steam installation at the default installation paths, and in the Registry!")
-                ),
-                pathFromRegistryResult
-            ).ToResult();
+            logger.LogWarning("Unable to find Steam at the default installation paths and the registry");
+            return false;
         }
 
-        return Result.Ok(pathFromRegistryResult.Value);
+        if (!IsValidSteamInstallation(pathFromRegistry, logger)) return false;
+
+        steamPath = pathFromRegistry;
+        return true;
     }
 
     /// <summary>
@@ -93,12 +106,19 @@ public static class SteamLocationFinder
     /// and a existing <c>libraryfolders.vdf</c> file. This method
     /// uses <see cref="GetLibraryFoldersFilePath"/> to get that file path.
     /// </remarks>
-    public static bool IsValidSteamInstallation(AbsolutePath steamPath)
+    public static bool IsValidSteamInstallation(AbsolutePath steamPath, ILogger logger)
     {
-        if (!steamPath.DirectoryExists()) return false;
+        if (!steamPath.DirectoryExists())
+        {
+            logger.LogDebug("Directory at `{Path}` isn't a valid steam installation because the directory doesn't exist", steamPath);
+            return false;
+        }
 
         var libraryFoldersFile = GetLibraryFoldersFilePath(steamPath);
-        return libraryFoldersFile.FileExists;
+        if (libraryFoldersFile.FileExists) return true;
+
+        logger.LogDebug("Directory at `{DirectoryPath}` isn't a valid steam installation because the library folders file at `{FilePath}` doesn't exist", steamPath, libraryFoldersFile);
+        return false;
     }
 
     /// <summary>
@@ -122,13 +142,29 @@ public static class SteamLocationFinder
             .Combine(steamId.AccountId.ToString(CultureInfo.InvariantCulture));
     }
 
+    /// <inheritdoc cref="TryGetSteamPathFromRegistry"/>
+    [Obsolete($"Use {nameof(TryGetSteamPathFromRegistry)} instead")]
+    public static Result<AbsolutePath> GetSteamPathFromRegistry(IFileSystem fileSystem, IRegistry registry, ILogger? logger = null)
+    {
+        if (TryGetSteamPathFromRegistry(fileSystem, registry, logger ?? NullLogger.Instance, out var steamPath))
+        {
+            return steamPath;
+        }
+
+        return Result.Fail("Unable to get Steam path from registry");
+    }
+
     /// <summary>
     /// Tries to get the Steam installation path from the registry.
     /// </summary>
-    public static Result<AbsolutePath> GetSteamPathFromRegistry(
+    public static bool TryGetSteamPathFromRegistry(
         IFileSystem fileSystem,
-        IRegistry registry)
+        IRegistry registry,
+        ILogger logger,
+        out AbsolutePath steamPath)
     {
+        steamPath = default;
+
         try
         {
             var currentUser = registry.OpenBaseKey(RegistryHive.CurrentUser);
@@ -136,29 +172,23 @@ public static class SteamLocationFinder
             using var regKey = currentUser.OpenSubKey(SteamRegistryKey);
             if (regKey is null)
             {
-                return Result.Fail(
-                    new Error("Unable to open the Steam registry key!")
-                        .WithMetadata("RegistryKey", SteamRegistryKey)
-                );
+                logger.LogWarning("Unable to open the Steam registry key `{RegistryKey}`", SteamRegistryKey);
+                return false;
             }
 
-            if (!regKey.TryGetString(SteamRegistryValueName, out var steamPath))
+            if (!regKey.TryGetString(SteamRegistryValueName, out var steamPathString))
             {
-                return Result.Fail(
-                    new Error("Unable to get string value from the Steam registry key!")
-                        .WithMetadata("RegistryKey", SteamRegistryKey)
-                        .WithMetadata("ValueName", SteamRegistryValueName)
-                );
+                logger.LogWarning("Unable to get string value `{RegistryValueName}` from Steam registry key `{RegistryKey}`", SteamRegistryValueName, SteamRegistryKey);
+                return false;
             }
 
-            var directoryInfo = fileSystem.FromUnsanitizedFullPath(steamPath);
-            return directoryInfo;
+            steamPath = fileSystem.FromUnsanitizedFullPath(steamPathString);
+            return true;
         }
         catch (Exception e)
         {
-            return Result.Fail(
-                new ExceptionalError("Exception thrown while getting the Steam installation path from the registry!", e)
-            );
+            logger.LogError(e, "Exception thrown while getting the Steam installation path from the registry");
+            return false;
         }
     }
 

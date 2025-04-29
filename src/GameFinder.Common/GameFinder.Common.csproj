@@ -8,5 +8,6 @@
         <PackageReference Include="NexusMods.Paths" />
         <PackageReference Include="FluentResults" />
         <PackageReference Include="OneOf" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
     </ItemGroup>
 </Project>
