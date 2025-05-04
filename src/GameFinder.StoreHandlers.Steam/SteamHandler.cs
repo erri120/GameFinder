@@ -24,7 +24,7 @@ public class SteamHandler : AHandler<SteamGame, AppId>
     private readonly IFileSystem _fileSystem;
     private readonly ILogger _logger;
 
-    private static readonly KVSerializerOptions KvSerializerOptions =
+    public static readonly KVSerializerOptions KvSerializerOptions =
         new()
         {
             HasEscapeSequences = true,
