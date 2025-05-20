@@ -8,4 +8,4 @@ namespace GameFinder.StoreHandlers.GOG;
 /// Represents a game installed with GOG Galaxy.
 /// </summary>
 [PublicAPI]
-public record GOGGame(GOGGameId Id, string Name, AbsolutePath Path, string BuildId) : IGame;
+public record GOGGame(GOGGameId Id, string Name, AbsolutePath Path, ulong BuildId) : IGame;

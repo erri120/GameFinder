@@ -15,7 +15,7 @@ public record HeroicGOGGame(
     GOGGameId Id,
     string Name,
     AbsolutePath Path,
-    string BuildId,
+    ulong BuildId,
     WineData? WineData,
     OSPlatform Platform) : GOGGame(Id, Name, Path, BuildId)
 {

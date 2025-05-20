@@ -117,9 +117,14 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
                 return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"path\"");
             }
 
-            if (!subKey.TryGetString("buildId", out var buildId))
+            if (!subKey.TryGetString("buildId", out var sBuildId))
             {
                 return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"buildId\"");
+            }
+
+            if (!ulong.TryParse(sBuildId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var buildId))
+            {
+                return new ErrorMessage($"The value \"buildId\" of {subKey.GetName()} is not a number: \"{sBuildId}\"");
             }
 
             var game = new GOGGame(

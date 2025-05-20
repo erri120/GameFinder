@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using GameFinder.Common;
 using GameFinder.StoreHandlers.GOG;
 using JetBrains.Annotations;
@@ -25,6 +26,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
     {
         AllowTrailingCommas = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString,
     };
 
     /// <summary>

@@ -18,7 +18,7 @@ public partial class GOGTests
         var fixture = new Fixture();
 
         fixture.Customize<GOGGame>(composer => composer
-            .FromFactory<long, string, string>((id, name, buildId) =>
+            .FromFactory<long, string, ulong>((id, name, buildId) =>
             {
                 var path = fileSystem
                     .GetKnownPath(KnownPath.TempDirectory)
