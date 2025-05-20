@@ -100,10 +100,19 @@ public class SteamHandler : AHandler<SteamGame, AppId>
                     continue;
                 }
 
+                var registryEntryResult = RegistryEntryParser.ParseRegistryEntry(appManifestResult.Value.AppId, _fileSystem, _registry);
+                /*
+                if (registryEntryResult.IsFailed)
+                {
+                    yield return ConvertResultToErrorMessage(registryEntryResult);
+                }
+                */
+
                 var steamGame = new SteamGame
                 {
                     SteamPath = steamPath,
                     AppManifest = appManifestResult.Value,
+                    RegistryEntry = registryEntryResult.Value ?? default,
                     LibraryFolder = libraryFolder,
                 };
 
