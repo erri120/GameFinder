@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
+## [4.7.1](https://github.com/erri120/GameFinder/compare/v4.7.0...v4.7.1) - 2025-05-21
+
+- Update dependencies
+
 ## [4.7.0](https://github.com/erri120/GameFinder/compare/v4.6.3...v4.7.0) - 2025-05-20
 
 - GOG: Change `BuildId` from `string` to `ulong`
