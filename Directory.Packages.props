@@ -13,7 +13,8 @@
     <PackageVersion Include="SHA3.Net" Version="2.0.0" />
     <PackageVersion Include="System.Management" Version="8.0.0" />
     <PackageVersion Include="ValveKeyValue" Version="0.13.1.398" />
-    <PackageVersion Include="TransparentValueObjects" Version="1.0.1" />
+      <PackageVersion Include="TransparentValueObjects" Version="1.1.0" />
+      <PackageVersion Include="TransparentValueObjects.Abstractions" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Meziantou.Analyzer" Version="2.0.146" />

@@ -12,6 +12,7 @@
         <PackageReference Include="SHA3.Net" />
         <PackageReference Include="System.Management" />
         <PackageReference Include="TransparentValueObjects" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="TransparentValueObjects.Abstractions" />
     </ItemGroup>
 
     <ItemGroup>
