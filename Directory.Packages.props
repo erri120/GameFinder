@@ -8,7 +8,7 @@
     <PackageVersion Include="NexusMods.Paths" Version="0.19.1" />
     <PackageVersion Include="NexusMods.Paths.TestingHelpers" Version="0.19.1" />
     <PackageVersion Include="NLog" Version="5.2.8" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.8" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="5.5.0" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="SHA3.Net" Version="2.0.0" />
     <PackageVersion Include="System.Management" Version="8.0.0" />
