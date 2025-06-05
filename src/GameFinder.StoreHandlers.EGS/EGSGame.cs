@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
@@ -11,4 +12,4 @@ namespace GameFinder.StoreHandlers.EGS;
 /// <param name="DisplayName"></param>
 /// <param name="InstallLocation"></param>
 [PublicAPI]
-public record EGSGame(EGSGameId CatalogItemId, string DisplayName, AbsolutePath InstallLocation) : IGame;
+public record EGSGame(EGSGameId CatalogItemId, string DisplayName, AbsolutePath InstallLocation, IReadOnlyList<string> ManifestHash) : IGame;
