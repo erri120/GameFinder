@@ -11,7 +11,7 @@ using OneOf;
 namespace GameFinder.StoreHandlers.EGS;
 
 [UsedImplicitly]
-internal record ManifestFile(string CatalogItemId, string DisplayName, string InstallLocation);
+internal record ManifestFile(string CatalogItemId, string DisplayName, string InstallLocation, string ManifestHash, string MainGameCatalogItemId);
 
 /// <summary>
 /// Handler for finding games installed with the Epic Games Store.
@@ -73,13 +73,38 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
             yield break;
         }
 
-        foreach (var itemFile in itemFiles)
+        // Parse all the files
+        var allItems = itemFiles.Select(DeserializeItem).ToList();
+
+        // Group by the MainGameCatalogItemId, and collect all the manifest hashes
+        // for each game. If a game has multiple DLCs, all the DLCs will reference the
+        // same MainGameCatalogItemId.
+        var itemsGrouped = allItems
+            .Where(f => f.Match(f0: static _ => true, f1: static _ => false))
+            .Select(f => f.AsT0)
+            .GroupBy(c => c.MainGameCatalogItemId, StringComparer.OrdinalIgnoreCase)
+            .Select(group =>
+            {
+                return new EGSGame(
+                    EGSGameId.From(group.Key),
+                    group.First().DisplayName,
+                    _fileSystem.FromUnsanitizedFullPath(group.First().InstallLocation),
+                    group.Select(g => g.ManifestHash).ToArray());
+            });
+
+        foreach (var game in itemsGrouped)
         {
-            yield return DeserializeGame(itemFile);
+            yield return game;
+        }
+
+        foreach (var errorMessage in allItems
+                     .Where(f => f.Match(f0: static _ => false, f1: static _ => true)))
+        {
+            yield return errorMessage.AsT1;
         }
     }
 
-    private OneOf<EGSGame, ErrorMessage> DeserializeGame(AbsolutePath itemFile)
+    private OneOf<ManifestFile, ErrorMessage> DeserializeItem(AbsolutePath itemFile)
     {
         using var stream = _fileSystem.ReadFile(itemFile);
 
@@ -109,13 +134,7 @@ public class EGSHandler : AHandler<EGSGame, EGSGameId>
                 return new ErrorMessage($"Manifest {itemFile.GetFullPath()} does not have a value \"InstallLocation\"");
             }
 
-            var game = new EGSGame(
-                EGSGameId.From(manifest.CatalogItemId),
-                manifest.DisplayName,
-                _fileSystem.FromUnsanitizedFullPath(manifest.InstallLocation)
-            );
-
-            return game;
+            return manifest;
         }
         catch (Exception e)
         {

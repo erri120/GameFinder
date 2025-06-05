@@ -38,13 +38,15 @@ public partial class EGSTests
                     var mockData = $@"{{
     ""CatalogItemId"": ""{catalogItemId}"",
     ""DisplayName"": ""{displayName}"",
-    ""InstallLocation"": ""{installLocation.GetFullPath().ToEscapedString()}""
+    ""InstallLocation"": ""{installLocation.GetFullPath().ToEscapedString()}"",
+    ""MainGameCatalogItemId"": ""{catalogItemId}"",
+    ""ManifestHash"": ""{catalogItemId}_manifest""
 }}";
 
                     fs.AddDirectory(installLocation);
                     fs.AddFile(manifestItem, mockData);
 
-                    return new EGSGame(EGSGameId.From(catalogItemId), displayName, installLocation);
+                    return new EGSGame(EGSGameId.From(catalogItemId), displayName, installLocation, new [] { catalogItemId + "_manifest" });
                 })
                 .OmitAutoProperties());
 
