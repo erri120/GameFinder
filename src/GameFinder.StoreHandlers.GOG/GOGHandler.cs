@@ -97,15 +97,8 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
                 return new ErrorMessage($"Unable to open {gogKey}\\{subKeyName}");
             }
 
-            if (!subKey.TryGetString("gameID", out var sId))
-            {
-                return new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"gameID\"");
-            }
-
-            if (!long.TryParse(sId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
-            {
-                return new ErrorMessage($"The value \"gameID\" of {subKey.GetName()} is not a number: \"{sId}\"");
-            }
+            var idResult = GetId(subKey, subKeyName);
+            if (idResult.IsT1) return idResult.AsT1;
 
             if (!subKey.TryGetString("gameName", out var name))
             {
@@ -128,7 +121,7 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
             }
 
             var game = new GOGGame(
-                GOGGameId.From(id),
+                GOGGameId.From(idResult.AsT0),
                 name,
                 _fileSystem.FromUnsanitizedFullPath(path),
                 buildId
@@ -140,5 +133,38 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
         {
             return new ErrorMessage(e, $"Exception while parsing registry key {gogKey}\\{subKeyName}");
         }
+    }
+
+    private static OneOf<long, ErrorMessage> GetId(IRegistryKey subKey, string subKeyName)
+    {
+        ErrorMessage? subKeyError = null;
+        ErrorMessage? idError = null;
+
+        if (!long.TryParse(subKeyName, CultureInfo.InvariantCulture, out var subKeyId))
+        {
+            subKeyError = new ErrorMessage($"`{subKeyName}` of `{subKey.GetName()}` is not a number!");
+        }
+
+        long id = -1;
+        if (subKey.TryGetString("gameID", out var sID))
+        {
+            if (!long.TryParse(sID, CultureInfo.InvariantCulture, out id))
+            {
+                idError = new ErrorMessage($"The value \"gameID\" of {subKey.GetName()} is not a number: \"{sID}\"");
+            }
+        }
+        else
+        {
+            idError = new ErrorMessage($"{subKey.GetName()} doesn't have a string value \"gameID\"");
+        }
+
+        if (subKeyError.HasValue && idError.HasValue)
+        {
+            return new ErrorMessage($"{subKeyError.Value} | {idError.Value}");
+        }
+
+        if (subKeyError.HasValue && !idError.HasValue) return id;
+        if (!subKeyError.HasValue && idError.HasValue) return subKeyId;
+        return id;
     }
 }
