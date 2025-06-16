@@ -107,6 +107,15 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
             return new ErrorMessage($"The value \"appName\" is not a number: \"{installed.AppName}\"");
         }
 
+        ulong buildId;
+        if (string.IsNullOrWhiteSpace(installed.BuildId))
+        {
+            buildId = 0;
+        } else if (!ulong.TryParse(installed.BuildId, CultureInfo.InvariantCulture, out buildId))
+        {
+            return new ErrorMessage($"The value \"buildID\" is not a number: \"{installed.BuildId}\"");
+        }
+
         var installedPlatform = installed.Platform switch
         {
             "windows" => OSPlatform.Windows,
@@ -125,7 +134,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         }
 
         var path = fileSystem.FromUnsanitizedFullPath(installed.InstallPath);
-        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, installed.BuildId, wineData, installedPlatform);
+        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, buildId, wineData, installedPlatform);
     }
 
     [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(JsonSerializerOptions)")]

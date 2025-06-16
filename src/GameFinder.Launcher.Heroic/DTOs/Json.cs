@@ -14,7 +14,7 @@ internal record Installed(
     [property: JsonPropertyName("installedDLCs")] IReadOnlyList<object> InstalledDLCs,
     [property: JsonPropertyName("language")] string Language,
     [property: JsonPropertyName("versionEtag")] string VersionEtag,
-    [property: JsonPropertyName("buildId")] ulong BuildId,
+    [property: JsonPropertyName("buildId")] string BuildId,
     [property: JsonPropertyName("pinnedVersion")] bool PinnedVersion
 );
 
