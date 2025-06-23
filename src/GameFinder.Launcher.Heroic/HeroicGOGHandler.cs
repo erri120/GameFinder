@@ -71,6 +71,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         }
     }
 
+    [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(Stream, JsonSerializerOptions)")]
     internal IEnumerable<OneOf<GOGGame, ErrorMessage>> ParseInstalledJsonFile(AbsolutePath path, AbsolutePath configPath)
     {
         using var stream = path.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -97,6 +98,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         }
     }
 
+    [RequiresUnreferencedCode("Calls GameFinder.Launcher.Heroic.HeroicGOGHandler.GetWineData(Installed, AbsolutePath, Int64)")]
     internal OneOf<GOGGame, ErrorMessage> Parse(
         DTOs.Installed installed,
         AbsolutePath configPath,
@@ -111,7 +113,8 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         if (string.IsNullOrWhiteSpace(installed.BuildId))
         {
             buildId = 0;
-        } else if (!ulong.TryParse(installed.BuildId, CultureInfo.InvariantCulture, out buildId))
+        }
+        else if (!ulong.TryParse(installed.BuildId, CultureInfo.InvariantCulture, out buildId))
         {
             return new ErrorMessage($"The value \"buildID\" is not a number: \"{installed.BuildId}\"");
         }

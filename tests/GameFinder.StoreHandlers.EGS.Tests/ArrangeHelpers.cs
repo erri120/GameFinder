@@ -46,7 +46,7 @@ public partial class EGSTests
                     fs.AddDirectory(installLocation);
                     fs.AddFile(manifestItem, mockData);
 
-                    return new EGSGame(EGSGameId.From(catalogItemId), displayName, installLocation, new [] { catalogItemId + "_manifest" });
+                    return new EGSGame(EGSGameId.From(catalogItemId), displayName, installLocation, new[] { catalogItemId + "_manifest" });
                 })
                 .OmitAutoProperties());
 
