@@ -54,6 +54,7 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
     {
         try
         {
+            var result = new List<OneOf<GOGGame, ErrorMessage>>();
             var localMachine = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
 
             using var gogKey = localMachine.OpenSubKey(GOGRegKey);
@@ -74,9 +75,41 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
                 };
             }
 
-            return subKeyNames
+            // Group all the results by type
+            var byType = subKeyNames
                 .Select(subKeyName => ParseSubKey(gogKey, subKeyName))
-                .ToArray();
+                .ToLookup(key =>
+                {
+                    if (key.IsT1)
+                        return Grouping.Error;
+                    if (key.AsT0.DependsOn is not null)
+                        return Grouping.DLC;
+                    return Grouping.Game;
+                });
+
+            // Add the errors
+            result.AddRange(byType[Grouping.Error]);
+
+            // Find any DLC for every game found
+            foreach (var game in byType[Grouping.Game])
+            {
+                // Loop through the DLC
+                var dlc = new List<GOGGame>();
+                foreach (var dlcKey in byType[Grouping.DLC])
+                {
+                    var gogDLC = dlcKey.AsT0;
+                    if (gogDLC.DependsOn is not null && gogDLC.DependsOn == game.AsT0.Id)
+                        dlc.Add(gogDLC);
+                }
+
+                // Add the DLC as subentries to the main game
+                if (dlc.Count == 0)
+                    result.Add(game);
+                else
+                    result.Add(game.AsT0 with { DLC = dlc.ToArray() });
+            }
+
+            return result;
         }
         catch (Exception e)
         {
@@ -87,11 +120,19 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
         }
     }
 
+    private enum Grouping
+    {
+        Error,
+        Game,
+        DLC,
+    }
+
     private OneOf<GOGGame, ErrorMessage> ParseSubKey(IRegistryKey gogKey, string subKeyName)
     {
         try
         {
             using var subKey = gogKey.OpenSubKey(subKeyName);
+
             if (subKey is null)
             {
                 return new ErrorMessage($"Unable to open {gogKey}\\{subKeyName}");
@@ -120,11 +161,19 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
                 return new ErrorMessage($"The value \"buildId\" of {subKey.GetName()} is not a number: \"{sBuildId}\"");
             }
 
+            // Optional Sub-Keys
+            long dependsOnId = 0;
+            var haveDependsOn = subKey.TryGetString("dependsOn", out var dependsOn) &&
+                                long.TryParse(dependsOn, NumberFormatInfo.InvariantInfo, out dependsOnId);
+
+
             var game = new GOGGame(
                 GOGGameId.From(idResult.AsT0),
                 name,
                 _fileSystem.FromUnsanitizedFullPath(path),
-                buildId
+                buildId,
+                haveDependsOn ? GOGGameId.From(dependsOnId) : null,
+                Array.Empty<GOGGame>()
             );
 
             return game;

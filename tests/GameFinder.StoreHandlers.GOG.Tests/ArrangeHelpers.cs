@@ -30,7 +30,7 @@ public partial class GOGTests
                 gameKey.AddValue("path", path.GetFullPath());
                 gameKey.AddValue("buildId", $"{buildId}");
 
-                return new GOGGame(GOGGameId.From(id), name, path, buildId);
+                return new GOGGame(GOGGameId.From(id), name, path, buildId, null, Array.Empty<GOGGame>());
             })
             .OmitAutoProperties());
 
