@@ -16,6 +16,6 @@ public partial class GOGTests
         invalidKey.AddValue("gameId", gameId);
 
         var error = handler.ShouldOnlyBeOneError();
-        error.Should().Be($"The value \"gameID\" of {invalidKey.GetName()} is not a number: \"{gameId}\"");
+        error.Message.Should().EndWith($"The value \"gameID\" of {invalidKey.GetName()} is not a number: \"{gameId}\"");
     }
 }

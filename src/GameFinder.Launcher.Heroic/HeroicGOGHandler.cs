@@ -71,6 +71,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         }
     }
 
+    [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(Stream, JsonSerializerOptions)")]
     internal IEnumerable<OneOf<GOGGame, ErrorMessage>> ParseInstalledJsonFile(AbsolutePath path, AbsolutePath configPath)
     {
         using var stream = path.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -97,6 +98,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         }
     }
 
+    [RequiresUnreferencedCode("Calls GameFinder.Launcher.Heroic.HeroicGOGHandler.GetWineData(Installed, AbsolutePath, Int64)")]
     internal OneOf<GOGGame, ErrorMessage> Parse(
         DTOs.Installed installed,
         AbsolutePath configPath,
@@ -105,6 +107,16 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         if (!long.TryParse(installed.AppName, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
         {
             return new ErrorMessage($"The value \"appName\" is not a number: \"{installed.AppName}\"");
+        }
+
+        ulong buildId;
+        if (string.IsNullOrWhiteSpace(installed.BuildId))
+        {
+            buildId = 0;
+        }
+        else if (!ulong.TryParse(installed.BuildId, CultureInfo.InvariantCulture, out buildId))
+        {
+            return new ErrorMessage($"The value \"buildID\" is not a number: \"{installed.BuildId}\"");
         }
 
         var installedPlatform = installed.Platform switch
@@ -125,7 +137,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
         }
 
         var path = fileSystem.FromUnsanitizedFullPath(installed.InstallPath);
-        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, installed.BuildId, wineData, installedPlatform);
+        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, buildId, wineData, installedPlatform);
     }
 
     [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(JsonSerializerOptions)")]

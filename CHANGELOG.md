@@ -4,9 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.7.2...HEAD)
+## [Unreleased](https://github.com/erri120/GameFinder/compare/v4.7.3...HEAD)
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
+
+## [4.8.0](https://github.com/erri120/GameFinder/compare/v4.7.3...v4.8.0) - 2025-06-23
+
+- EGS: [#161](https://github.com/erri120/GameFinder/pull/161) by @[halgari](https://github.com/halgari)
+
+## [4.7.3](https://github.com/erri120/GameFinder/compare/v4.7.2...v4.7.3) - 2025-06-16
+
+- Heroic: fix parser exception when `buildID` is empty
+- GOG: Better ID parsing
 
 ## [4.7.2](https://github.com/erri120/GameFinder/compare/v4.7.1...v4.7.2) - 2025-05-21
 

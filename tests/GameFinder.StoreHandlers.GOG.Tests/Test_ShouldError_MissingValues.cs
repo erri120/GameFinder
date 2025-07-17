@@ -9,17 +9,6 @@ namespace GameFinder.StoreHandlers.GOG.Tests;
 public partial class GOGTests
 {
     [Theory, AutoFileSystem]
-    public void Test_ShouldError_MissingGameId(IFileSystem fileSystem, InMemoryRegistry registry, string keyName)
-    {
-        var (handler, gogKey) = SetupHandler(fileSystem, registry);
-
-        var invalidKey = gogKey.AddSubKey(keyName);
-
-        var error = handler.ShouldOnlyBeOneError();
-        error.Should().Be($"{invalidKey.GetName()} doesn't have a string value \"gameID\"");
-    }
-
-    [Theory, AutoFileSystem]
     public void Test_ShouldError_MissingGameName(IFileSystem fileSystem, InMemoryRegistry registry, string keyName, long gameId)
     {
         var (handler, gogKey) = SetupHandler(fileSystem, registry);
