@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using GameFinder.Common;
 using GameFinder.StoreHandlers.GOG;
 using GameFinder.Wine;
 using JetBrains.Annotations;
@@ -17,7 +18,8 @@ public record HeroicGOGGame(
     AbsolutePath Path,
     ulong BuildId,
     WineData? WineData,
-    OSPlatform Platform) : GOGGame(Id, Name, Path, BuildId)
+    OSPlatform Platform,
+    IReadOnlyList<GOGGameId> InstalledDLCs) : IGame
 {
     /// <summary>
     /// Gets the wine prefix, if any.

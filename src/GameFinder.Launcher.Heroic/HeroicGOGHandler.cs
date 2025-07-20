@@ -17,7 +17,7 @@ using OneOf;
 namespace GameFinder.Launcher.Heroic;
 
 [PublicAPI]
-public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
+public class HeroicGOGHandler : AHandler<HeroicGOGGame, GOGGameId>
 {
     private readonly IFileSystem _fileSystem;
     private readonly ILogger _logger;
@@ -39,13 +39,13 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
     }
 
     /// <inheritdoc/>
-    public override Func<GOGGame, GOGGameId> IdSelector { get; } = static game => game.Id;
+    public override Func<HeroicGOGGame, GOGGameId> IdSelector { get; } = static game => game.Id;
 
     /// <inheritdoc/>
     public override IEqualityComparer<GOGGameId>? IdEqualityComparer => null;
 
     /// <inheritdoc/>
-    public override IEnumerable<OneOf<GOGGame, ErrorMessage>> FindAllGames()
+    public override IEnumerable<OneOf<HeroicGOGGame, ErrorMessage>> FindAllGames()
     {
         var configDirectory = FindConfigDirectory(_fileSystem)
             .FirstOrDefault(path => path.DirectoryExists());
@@ -72,7 +72,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
     }
 
     [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(Stream, JsonSerializerOptions)")]
-    internal IEnumerable<OneOf<GOGGame, ErrorMessage>> ParseInstalledJsonFile(AbsolutePath path, AbsolutePath configPath)
+    internal IEnumerable<OneOf<HeroicGOGGame, ErrorMessage>> ParseInstalledJsonFile(AbsolutePath path, AbsolutePath configPath)
     {
         using var stream = path.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
         var root = JsonSerializer.Deserialize<DTOs.Root>(stream, JsonSerializerOptions);
@@ -84,7 +84,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
 
         foreach (var installed in root.Installed)
         {
-            OneOf<GOGGame, ErrorMessage> res;
+            OneOf<HeroicGOGGame, ErrorMessage> res;
             try
             {
                 res = Parse(installed, configPath, path.FileSystem);
@@ -99,7 +99,7 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
     }
 
     [RequiresUnreferencedCode("Calls GameFinder.Launcher.Heroic.HeroicGOGHandler.GetWineData(Installed, AbsolutePath, Int64)")]
-    internal OneOf<GOGGame, ErrorMessage> Parse(
+    internal OneOf<HeroicGOGGame, ErrorMessage> Parse(
         DTOs.Installed installed,
         AbsolutePath configPath,
         IFileSystem fileSystem)
@@ -136,8 +136,17 @@ public class HeroicGOGHandler : AHandler<GOGGame, GOGGameId>
             }
         }
 
+        var installedDLCs = new List<GOGGameId>();
+        foreach (var sRawId in installed.InstalledDLCs)
+        {
+            if (long.TryParse(sRawId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var rawId))
+            {
+                installedDLCs.Add(GOGGameId.From(rawId));
+            }
+        }
+
         var path = fileSystem.FromUnsanitizedFullPath(installed.InstallPath);
-        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, buildId, wineData, installedPlatform);
+        return new HeroicGOGGame(GOGGameId.From(id), installed.AppName, path, buildId, wineData, installedPlatform, installedDLCs);
     }
 
     [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(JsonSerializerOptions)")]

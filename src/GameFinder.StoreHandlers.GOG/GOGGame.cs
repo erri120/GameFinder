@@ -1,3 +1,4 @@
+using System;
 using GameFinder.Common;
 using JetBrains.Annotations;
 using NexusMods.Paths;
@@ -8,4 +9,4 @@ namespace GameFinder.StoreHandlers.GOG;
 /// Represents a game installed with GOG Galaxy.
 /// </summary>
 [PublicAPI]
-public record GOGGame(GOGGameId Id, string Name, AbsolutePath Path, ulong BuildId) : IGame;
+public record GOGGame(GOGGameId Id, string Name, AbsolutePath Path, ulong BuildId, Nullable<GOGGameId> ParentGameId = null) : IGame;

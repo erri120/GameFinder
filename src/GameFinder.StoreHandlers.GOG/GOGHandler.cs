@@ -120,11 +120,21 @@ public class GOGHandler : AHandler<GOGGame, GOGGameId>
                 return new ErrorMessage($"The value \"buildId\" of {subKey.GetName()} is not a number: \"{sBuildId}\"");
             }
 
+            Nullable<GOGGameId> parentGameId = null;
+            if (subKey.TryGetString("dependsOn", out var dependsOn))
+            {
+                if (long.TryParse(dependsOn, NumberStyles.Integer, CultureInfo.InvariantCulture, out var rawParentGameId))
+                {
+                    parentGameId = GOGGameId.From(rawParentGameId);
+                }
+            }
+
             var game = new GOGGame(
                 GOGGameId.From(idResult.AsT0),
                 name,
                 _fileSystem.FromUnsanitizedFullPath(path),
-                buildId
+                buildId,
+                parentGameId
             );
 
             return game;

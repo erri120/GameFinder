@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 
 ## [Released](https://github.com/erri120/GameFinder/releases)
 
+## [4.9.0](https://github.com/erri120/GameFinder/compare/v4.8.0...v4.9.0) - 2025-07-20
+
+- GOG: parse parent game ID for DLCs.
+- Heroic: parse installed DLCs.
+
 ## [4.8.0](https://github.com/erri120/GameFinder/compare/v4.7.3...v4.8.0) - 2025-06-23
 
 - EGS: [#161](https://github.com/erri120/GameFinder/pull/161) by @[halgari](https://github.com/halgari)
