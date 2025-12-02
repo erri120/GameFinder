@@ -97,6 +97,7 @@
     "typescript-eslint": "^8.48.1"
   },
   "dependencies": {
-    "neverthrow": "^8.1.1"
+    "neverthrow": "^8.1.1",
+    "vdf-parser": "^1.2.1"
   }
 }
