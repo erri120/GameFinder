@@ -43,6 +43,9 @@
       "types": "./dist/launchers/heroic/index.d.ts"
     }
   },
+  "bin": {
+    "gamefinder": "./dist/cli.js"
+  },
   "files": [
     "dist",
     "README.md",
@@ -50,6 +53,8 @@
   ],
   "scripts": {
     "build": "tsc",
+    "cli": "node dist/cli.js",
+    "start": "pnpm run build && pnpm run cli",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
