@@ -9,26 +9,6 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./common": {
-      "import": "./dist/common/index.js",
-      "types": "./dist/common/index.d.ts"
-    },
-    "./steam": {
-      "import": "./dist/store-handlers/steam/index.js",
-      "types": "./dist/store-handlers/steam/index.d.ts"
-    },
-    "./gog": {
-      "import": "./dist/store-handlers/gog/index.js",
-      "types": "./dist/store-handlers/gog/index.d.ts"
-    },
-    "./epic": {
-      "import": "./dist/store-handlers/epic/index.js",
-      "types": "./dist/store-handlers/epic/index.d.ts"
-    },
-    "./xbox": {
-      "import": "./dist/store-handlers/xbox/index.js",
-      "types": "./dist/store-handlers/xbox/index.d.ts"
     }
   },
   "bin": {

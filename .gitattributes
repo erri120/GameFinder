@@ -29,19 +29,6 @@
 *.tgz       binary
 *.zip       binary
 
-# Code files
-*.cs        text diff=csharp
-
-# Project files
-*.sln       text eol=crlf
-*.csproj    text eol=crlf
-
-*.props     text eol=crlf
-*.targets   text eol=crlf
-*.filters   text eol=crlf
-*.filters   text eol=crlf
-*.vcxitems  text eol=crlf
-
 # Text files where line endings should be preserved
 *.patch     -text
 
