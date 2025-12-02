@@ -51,13 +51,7 @@ describe('GOGHandler', () => {
 
 describe('createGOGGame', () => {
   it('should create a base game correctly', () => {
-    const game = createGOGGame(
-      1234567890n,
-      'Test Game',
-      '/path/to/game',
-      98765n,
-      undefined
-    );
+    const game = createGOGGame(1234567890n, 'Test Game', '/path/to/game', 98765n, undefined);
 
     expect(game.id).toBe('1234567890');
     expect(game.name).toBe('Test Game');
@@ -70,13 +64,7 @@ describe('createGOGGame', () => {
   });
 
   it('should create a DLC game correctly', () => {
-    const game = createGOGGame(
-      1111111111n,
-      'Test DLC',
-      '/path/to/game',
-      55555n,
-      1234567890n
-    );
+    const game = createGOGGame(1111111111n, 'Test DLC', '/path/to/game', 55555n, 1234567890n);
 
     expect(game.id).toBe('1111111111');
     expect(game.name).toBe('Test DLC');

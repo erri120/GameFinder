@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   formatting:
@@ -12,15 +12,15 @@ jobs:
     continue-on-error: true
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup .NET Core SDK 9
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '9'
+      - name: Setup .NET Core SDK 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9'
 
-    - name: Check formatting
-      run: dotnet format --verify-no-changes --severity error
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --severity error
 
   build:
     runs-on: ${{ matrix.os }}
@@ -31,49 +31,49 @@ jobs:
       OS: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup .NET Core SDK 9
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '9'
+      - name: Setup .NET Core SDK 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9'
 
-    - name: Print Debug Info
-      run: dotnet --info
+      - name: Print Debug Info
+        run: dotnet --info
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore
+      - name: Build
+        run: dotnet build --no-restore
 
-    - name: Run Tests
-      run: dotnet test --no-build --no-restore --logger "GitHubActions" --collect:"XPlat Code Coverage;Format=opencover"
+      - name: Run Tests
+        run: dotnet test --no-build --no-restore --logger "GitHubActions" --collect:"XPlat Code Coverage;Format=opencover"
 
-#    - name: Codecov
-#      uses: codecov/codecov-action@v3
-#      with:
-#        token: ${{ secrets.CODECOV_TOKEN }}
-#        files: coverage.xml
-#        fail_ci_if_error: false
-#        env_vars: OS
-#        flags: ${{ env.OS }}
+      #    - name: Codecov
+      #      uses: codecov/codecov-action@v3
+      #      with:
+      #        token: ${{ secrets.CODECOV_TOKEN }}
+      #        files: coverage.xml
+      #        fail_ci_if_error: false
+      #        env_vars: OS
+      #        flags: ${{ env.OS }}
 
-    - name: Publish (Linux)
-      if: runner.os == 'Linux'
-      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
+      - name: Publish (Linux)
+        if: runner.os == 'Linux'
+        run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
 
-    - name: Publish (Windows)
-      if: runner.os == 'Windows'
-      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
+      - name: Publish (Windows)
+        if: runner.os == 'Windows'
+        run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
 
-    - name: Publish (macOS)
-      if: runner.os == 'macOS'
-      run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
+      - name: Publish (macOS)
+        if: runner.os == 'macOS'
+        run: dotnet publish other/GameFinder.Example/GameFinder.Example.csproj -o ${{ github.workspace }}/bin/${{ runner.os }} -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: GameFinder.Example-${{ env.OS }}-${{ github.sha }}
-        path: ${{ github.workspace }}/bin/${{ runner.os }}/GameFinder*
-        if-no-files-found: error
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameFinder.Example-${{ env.OS }}-${{ github.sha }}
+          path: ${{ github.workspace }}/bin/${{ runner.os }}/GameFinder*
+          if-no-files-found: error

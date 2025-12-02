@@ -1,13 +1,13 @@
 ignore:
-  - "tests/**/*"
-  - "other/**/*"
-  - "extern/**/*"
+  - 'tests/**/*'
+  - 'other/**/*'
+  - 'extern/**/*'
 
 github_checks:
   annotations: true
 
 comment:
-  layout: "header, diff, flags, components"
+  layout: 'header, diff, flags, components'
   behavior: default
   require_changes: false
   after_n_builds: 2
@@ -23,29 +23,29 @@ component_management:
     - component_id: core
       name: Core
       paths:
-        - "src/GameFinder.Common/**"
-        - "src/GameFinder.RegistryUtils/**"
+        - 'src/GameFinder.Common/**'
+        - 'src/GameFinder.RegistryUtils/**'
     - component_id: wine
       name: Wine
       paths:
-        - "src/GameFinder.Wine/**"
+        - 'src/GameFinder.Wine/**'
     - component_id: store_handler_ea_desktop
       name: EA Desktop
       paths:
-        - "src/GameFinder.StoreHandlers.EADesktop/**"
+        - 'src/GameFinder.StoreHandlers.EADesktop/**'
     - component_id: store_handler_egs
       name: EGS
       paths:
-        - "src/GameFinder.StoreHandlers.EGS/**"
+        - 'src/GameFinder.StoreHandlers.EGS/**'
     - component_id: store_handler_gog
       name: GOG
       paths:
-        - "src/GameFinder.StoreHandlers.GOG/**"
+        - 'src/GameFinder.StoreHandlers.GOG/**'
     - component_id: store_handler_origin
       name: Origin
       paths:
-        - "src/GameFinder.StoreHandlers.Origin/**"
+        - 'src/GameFinder.StoreHandlers.Origin/**'
     - component_id: store_handler_steam
       name: Steam
       paths:
-        - "src/GameFinder.StoreHandlers.Steam/**"
+        - 'src/GameFinder.StoreHandlers.Steam/**'

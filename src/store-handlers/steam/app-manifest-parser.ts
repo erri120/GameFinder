@@ -51,9 +51,7 @@ function parseInstalledDepots(depotsObj: VdfObject | undefined): InstalledDepot[
 /**
  * Parse an appmanifest_*.acf file
  */
-export function parseAppManifest(
-  filePath: string
-): Result<AppManifest, GameFinderError> {
+export function parseAppManifest(filePath: string): Result<AppManifest, GameFinderError> {
   const parseResult = parseVdfFile(filePath);
   if (parseResult.isErr()) {
     return err(parseResult.error);

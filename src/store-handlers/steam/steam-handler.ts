@@ -60,9 +60,7 @@ export class SteamHandler implements StoreHandler {
   /**
    * Find all games in a specific library folder
    */
-  private findGamesInLibrary(
-    libraryFolder: LibraryFolder
-  ): Result<SteamGame[], GameFinderError> {
+  private findGamesInLibrary(libraryFolder: LibraryFolder): Result<SteamGame[], GameFinderError> {
     const steamAppsPath = getSteamAppsPath(libraryFolder.path);
 
     if (!existsSync(steamAppsPath)) {

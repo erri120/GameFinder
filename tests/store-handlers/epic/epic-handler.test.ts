@@ -38,12 +38,7 @@ describe('EpicHandler', () => {
 
 describe('createEGSGame', () => {
   it('should create a game correctly', () => {
-    const game = createEGSGame(
-      'catalog-123',
-      'Test Game',
-      '/path/to/game',
-      ['hash1', 'hash2']
-    );
+    const game = createEGSGame('catalog-123', 'Test Game', '/path/to/game', ['hash1', 'hash2']);
 
     expect(game.id).toBe('catalog-123');
     expect(game.name).toBe('Test Game');

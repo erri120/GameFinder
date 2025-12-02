@@ -28,11 +28,6 @@ export interface Game {
 /**
  * Creates a new Game object
  */
-export function createGame(
-  id: string,
-  name: string,
-  path: string,
-  store: GameStore
-): Game {
+export function createGame(id: string, name: string, path: string, store: GameStore): Game {
   return { id, name, path, store };
 }

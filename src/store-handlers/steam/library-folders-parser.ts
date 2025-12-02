@@ -5,13 +5,7 @@
 import { Result, ok, err } from 'neverthrow';
 import type { GameFinderError } from '../../common/index.js';
 import type { LibraryFolder, AppId } from './types.js';
-import {
-  parseVdfFile,
-  getObject,
-  getString,
-  getBigInt,
-  type VdfObject,
-} from './vdf-parser.js';
+import { parseVdfFile, getObject, getString, getBigInt, type VdfObject } from './vdf-parser.js';
 
 /**
  * Parse a single library folder entry from the VDF
@@ -61,9 +55,7 @@ function parseLibraryFolderEntry(
 /**
  * Parse the libraryfolders.vdf file
  */
-export function parseLibraryFolders(
-  filePath: string
-): Result<LibraryFolder[], GameFinderError> {
+export function parseLibraryFolders(filePath: string): Result<LibraryFolder[], GameFinderError> {
   const parseResult = parseVdfFile(filePath);
   if (parseResult.isErr()) {
     return err(parseResult.error);

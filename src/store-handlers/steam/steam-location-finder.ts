@@ -61,10 +61,9 @@ async function findSteamPathFromRegistry(): Promise<string | null> {
     const { promisify } = await import('node:util');
     const execAsync = promisify(exec);
 
-    const { stdout } = await execAsync(
-      'reg query "HKCU\\Software\\Valve\\Steam" /v SteamPath',
-      { encoding: 'utf8' }
-    );
+    const { stdout } = await execAsync('reg query "HKCU\\Software\\Valve\\Steam" /v SteamPath', {
+      encoding: 'utf8',
+    });
 
     // Parse registry output: "    SteamPath    REG_SZ    C:\Program Files (x86)\Steam"
     const match = /SteamPath\s+REG_SZ\s+(.+)/i.exec(stdout);

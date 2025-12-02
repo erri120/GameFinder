@@ -5,14 +5,7 @@
 /**
  * Supported game stores/platforms
  */
-export type GameStore =
-  | 'steam'
-  | 'gog'
-  | 'epic'
-  | 'origin'
-  | 'ea-desktop'
-  | 'xbox'
-  | 'heroic';
+export type GameStore = 'steam' | 'gog' | 'epic' | 'origin' | 'ea-desktop' | 'xbox' | 'heroic';
 
 /**
  * Result type for operations that can fail

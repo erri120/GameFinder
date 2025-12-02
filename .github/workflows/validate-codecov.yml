@@ -3,14 +3,14 @@
 on:
   push:
     paths:
-      - "codecov.yml"
-      - ".github/workflows/validate-codecov.yml"
-    branches: [ master ]
+      - 'codecov.yml'
+      - '.github/workflows/validate-codecov.yml'
+    branches: [master]
   pull_request:
     paths:
-      - "codecov.yml"
-      - ".github/workflows/validate-codecov.yml"
-    branches: [ master ]
+      - 'codecov.yml'
+      - '.github/workflows/validate-codecov.yml'
+    branches: [master]
 
 jobs:
   validate:

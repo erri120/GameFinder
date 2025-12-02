@@ -30,10 +30,7 @@ function parseRegistryValue(output: string, valueName: string): string | undefin
 /**
  * Read a single registry value
  */
-async function readRegistryValue(
-  keyPath: string,
-  valueName: string
-): Promise<string | undefined> {
+async function readRegistryValue(keyPath: string, valueName: string): Promise<string | undefined> {
   try {
     const { stdout } = await execAsync(`reg query "${keyPath}" /v "${valueName}"`, {
       encoding: 'utf8',

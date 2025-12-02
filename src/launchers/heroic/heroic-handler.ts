@@ -54,9 +54,7 @@ function findHeroicConfigPath(): string | undefined {
 /**
  * Parse the installed.json file for a specific store
  */
-function parseInstalledJson(
-  filePath: string
-): Result<HeroicInstalledJson, GameFinderError> {
+function parseInstalledJson(filePath: string): Result<HeroicInstalledJson, GameFinderError> {
   try {
     const content = readFileSync(filePath, 'utf8');
     const data = JSON.parse(content) as HeroicInstalledJson;
@@ -130,7 +128,12 @@ export class HeroicHandler implements StoreHandler {
     }
 
     // Check for Epic store installed games (legendary backend)
-    const legendaryInstalledPath = join(configPath, 'legendaryConfig', 'legendary', 'installed.json');
+    const legendaryInstalledPath = join(
+      configPath,
+      'legendaryConfig',
+      'legendary',
+      'installed.json'
+    );
     if (existsSync(legendaryInstalledPath)) {
       const epicResult = parseInstalledJson(legendaryInstalledPath);
       if (epicResult.isOk()) {
