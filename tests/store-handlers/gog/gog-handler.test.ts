@@ -1,6 +1,6 @@
 import { platform } from 'node:os';
-import { GOGHandler } from '../../../src/store-handlers/gog/gog-handler.js';
-import { createGOGGame } from '../../../src/store-handlers/gog/types.js';
+import { GOGHandler } from '../../../src/store-handlers/gog/gog-handler';
+import { createGOGGame } from '../../../src/store-handlers/gog/types';
 
 describe('GOGHandler', () => {
   let handler: GOGHandler;

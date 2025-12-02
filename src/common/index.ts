@@ -2,6 +2,6 @@
  * Common utilities and types for GameFinder
  */
 
-export * from './types.js';
-export * from './game.js';
-export * from './store-handler.js';
+export * from './types';
+export * from './game';
+export * from './store-handler';

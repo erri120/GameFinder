@@ -3,11 +3,11 @@
  * GameFinder CLI - Find games installed on your system
  */
 
-import { SteamHandler } from './store-handlers/steam/index.js';
-import { GOGHandler } from './store-handlers/gog/index.js';
-import { EpicHandler } from './store-handlers/epic/index.js';
-import { XboxHandler } from './store-handlers/xbox/index.js';
-import type { StoreHandler, Game } from './common/index.js';
+import { SteamHandler } from './store-handlers/steam/index';
+import { GOGHandler } from './store-handlers/gog/index';
+import { EpicHandler } from './store-handlers/epic/index';
+import { XboxHandler } from './store-handlers/xbox/index';
+import type { StoreHandler, Game } from './common/index';
 
 interface HandlerInfo {
   name: string;

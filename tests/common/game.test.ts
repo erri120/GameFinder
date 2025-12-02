@@ -1,5 +1,5 @@
-import { createGame } from '../../src/common/game.js';
-import type { Game } from '../../src/common/game.js';
+import { createGame } from '../../src/common/game';
+import type { Game } from '../../src/common/game';
 
 describe('createGame', () => {
   it('should create a game object with all properties', () => {

@@ -6,11 +6,11 @@ import { readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { Result, ok, err } from 'neverthrow';
 import type { StoreHandler, GameFinderError } from '../../common/index.js';
-import type { SteamGame, LibraryFolder } from './types.js';
-import { createSteamGame, StateFlags } from './types.js';
-import { findSteamPath, getLibraryFoldersPath, getSteamAppsPath } from './steam-location-finder.js';
-import { parseLibraryFolders } from './library-folders-parser.js';
-import { parseAppManifest } from './app-manifest-parser.js';
+import type { SteamGame, LibraryFolder } from './types';
+import { createSteamGame, StateFlags } from './types';
+import { findSteamPath, getLibraryFoldersPath, getSteamAppsPath } from './steam-location-finder';
+import { parseLibraryFolders } from './library-folders-parser';
+import { parseAppManifest } from './app-manifest-parser';
 
 /**
  * Handler for finding games installed via Steam

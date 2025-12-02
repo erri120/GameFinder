@@ -1,9 +1,9 @@
-import { SteamHandler } from './store-handlers/steam/index.js';
-import { GOGHandler } from './store-handlers/gog/index.js';
-import { EpicHandler } from './store-handlers/epic/index.js';
-import { XboxHandler } from './store-handlers/xbox/index.js';
-import type { Game, GameFinderError, StoreHandler } from './common/index.js';
-import type { GameStore } from './common/types.js';
+import { SteamHandler } from './store-handlers/steam/index';
+import { GOGHandler } from './store-handlers/gog/index';
+import { EpicHandler } from './store-handlers/epic/index';
+import { XboxHandler } from './store-handlers/xbox/index';
+import type { Game, GameFinderError, StoreHandler } from './common/index';
+import type { GameStore } from './common/types';
 
 /**
  * Options for findAllGames

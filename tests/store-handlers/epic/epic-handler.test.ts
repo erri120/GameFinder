@@ -1,5 +1,5 @@
-import { EpicHandler } from '../../../src/store-handlers/epic/epic-handler.js';
-import { createEGSGame } from '../../../src/store-handlers/epic/types.js';
+import { EpicHandler } from '../../../src/store-handlers/epic/epic-handler';
+import { createEGSGame } from '../../../src/store-handlers/epic/types';
 
 describe('EpicHandler', () => {
   let handler: EpicHandler;

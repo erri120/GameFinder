@@ -1,5 +1,5 @@
 import { Result } from 'neverthrow';
-import type { Game } from './game.js';
+import type { Game } from './game';
 
 /**
  * Error types that can occur when finding games

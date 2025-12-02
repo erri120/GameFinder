@@ -1,4 +1,4 @@
-import type { GameStore } from './types.js';
+import type { GameStore } from './types';
 
 /**
  * Represents a game found on the system

@@ -8,9 +8,9 @@ import { join } from 'node:path';
 import { platform } from 'node:os';
 import { Result, ok, err } from 'neverthrow';
 import type { StoreHandler, GameFinderError } from '../../common/index.js';
-import type { XboxGame } from './types.js';
-import { parseGamingRootFile } from './gaming-root-parser.js';
-import { parseAppxManifest } from './appxmanifest-parser.js';
+import type { XboxGame } from './types';
+import { parseGamingRootFile } from './gaming-root-parser';
+import { parseAppxManifest } from './appxmanifest-parser';
 
 /**
  * Get all available drive letters on Windows

@@ -5,7 +5,7 @@
 import { join, dirname } from 'node:path';
 import { Result, ok, err } from 'neverthrow';
 import type { GameFinderError } from '../../common/index.js';
-import type { AppManifest, InstalledDepot, StateFlags, AppId, DepotId } from './types.js';
+import type { AppManifest, InstalledDepot, StateFlags, AppId, DepotId } from './types';
 import {
   parseVdfFile,
   getObject,
@@ -15,7 +15,7 @@ import {
   getBigInt,
   parseTimestamp,
   type VdfObject,
-} from './vdf-parser.js';
+} from './vdf-parser';
 
 /**
  * Parse installed depots from the AppState object

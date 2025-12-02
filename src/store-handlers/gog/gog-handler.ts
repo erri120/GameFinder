@@ -8,8 +8,8 @@ import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { Result, ok, err } from 'neverthrow';
 import type { StoreHandler, GameFinderError } from '../../common/index.js';
-import type { GOGGame, GOGGameId, GOGBuildId } from './types.js';
-import { createGOGGame } from './types.js';
+import type { GOGGame, GOGGameId, GOGBuildId } from './types';
+import { createGOGGame } from './types';
 
 const execAsync = promisify(exec);
 

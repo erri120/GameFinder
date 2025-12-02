@@ -2,5 +2,5 @@
  * Epic Games Store handler
  */
 
-export * from './epic-handler.js';
-export * from './types.js';
+export * from './epic-handler';
+export * from './types';

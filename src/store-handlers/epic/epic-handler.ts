@@ -9,8 +9,8 @@ import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { Result, ok, err } from 'neverthrow';
 import type { StoreHandler, GameFinderError } from '../../common/index.js';
-import type { EGSGame, EGSManifestFile } from './types.js';
-import { createEGSGame } from './types.js';
+import type { EGSGame, EGSManifestFile } from './types';
+import { createEGSGame } from './types';
 
 const execAsync = promisify(exec);
 

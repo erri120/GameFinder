@@ -1,5 +1,5 @@
-import { findAllGames } from '../src/game-finder.js';
-import type { FindAllGamesResult } from '../src/game-finder.js';
+import { findAllGames } from '../src/game-finder';
+import type { FindAllGamesResult } from '../src/game-finder';
 
 describe('findAllGames', () => {
   it('should return a result with games, errors, and skipped arrays', async () => {

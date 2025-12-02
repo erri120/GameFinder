@@ -1,5 +1,5 @@
-import { SteamHandler } from '../../../src/store-handlers/steam/steam-handler.js';
-import type { SteamGame } from '../../../src/store-handlers/steam/types.js';
+import { SteamHandler } from '../../../src/store-handlers/steam/steam-handler';
+import type { SteamGame } from '../../../src/store-handlers/steam/types';
 
 describe('SteamHandler', () => {
   let handler: SteamHandler;

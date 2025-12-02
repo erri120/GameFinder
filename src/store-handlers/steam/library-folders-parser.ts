@@ -4,8 +4,8 @@
 
 import { Result, ok, err } from 'neverthrow';
 import type { GameFinderError } from '../../common/index.js';
-import type { LibraryFolder, AppId } from './types.js';
-import { parseVdfFile, getObject, getString, getBigInt, type VdfObject } from './vdf-parser.js';
+import type { LibraryFolder, AppId } from './types';
+import { parseVdfFile, getObject, getString, getBigInt, type VdfObject } from './vdf-parser';
 
 /**
  * Parse a single library folder entry from the VDF
