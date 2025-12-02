@@ -3,3 +3,4 @@
  */
 
 export * from './ea-desktop-handler.js';
+export * from './types.js';
