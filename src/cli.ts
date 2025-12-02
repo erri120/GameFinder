@@ -3,23 +3,8 @@
  * GameFinder CLI - Find games installed on your system
  */
 
-import { SteamHandler } from './store-handlers/steam/index';
-import { GOGHandler } from './store-handlers/gog/index';
-import { EpicHandler } from './store-handlers/epic/index';
-import { XboxHandler } from './store-handlers/xbox/index';
-import type { StoreHandler, Game } from './common/index';
-
-interface HandlerInfo {
-  name: string;
-  handler: StoreHandler;
-}
-
-const handlers: HandlerInfo[] = [
-  { name: 'Steam', handler: new SteamHandler() },
-  { name: 'GOG', handler: new GOGHandler() },
-  { name: 'Epic Games', handler: new EpicHandler() },
-  { name: 'Xbox', handler: new XboxHandler() },
-];
+import { findAllGames } from './game-finder';
+import type { Game } from './common/index';
 
 function formatSize(bytes: bigint): string {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -34,58 +19,62 @@ function formatSize(bytes: bigint): string {
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
 
+function printGame(game: Game): void {
+  console.log(`   📦 ${game.name}`);
+  console.log(`      ID: ${game.id}`);
+  console.log(`      Path: ${game.path}`);
+
+  // Show extra info for Steam games
+  if (game.store === 'steam' && 'appManifest' in game) {
+    const steamGame = game as Game & { appManifest: { sizeOnDisk: bigint } };
+    if (steamGame.appManifest.sizeOnDisk > 0n) {
+      console.log(`      Size: ${formatSize(steamGame.appManifest.sizeOnDisk)}`);
+    }
+  }
+
+  console.log('');
+}
+
 async function main(): Promise<void> {
   console.log('🎮 GameFinder - Scanning for installed games...\n');
 
-  let totalGames = 0;
+  const { games, errors, skipped } = await findAllGames();
 
-  for (const { name, handler } of handlers) {
-    const available = await handler.isAvailable();
+  // Group games by store
+  const gamesByStore = new Map<string, Game[]>();
+  for (const game of games) {
+    const storeGames = gamesByStore.get(game.store) ?? [];
+    storeGames.push(game);
+    gamesByStore.set(game.store, storeGames);
+  }
 
-    if (!available) {
-      console.log(`❌ ${name}: Not available on this system`);
-      continue;
+  // Print results by store
+  const storeNames: Record<string, string> = {
+    steam: 'Steam',
+    gog: 'GOG',
+    epic: 'Epic Games',
+    xbox: 'Xbox',
+  };
+
+  for (const [store, storeGames] of gamesByStore) {
+    console.log(`🔍 ${storeNames[store] ?? store}: Found ${storeGames.length} game(s)\n`);
+    for (const game of storeGames) {
+      printGame(game);
     }
+  }
 
-    console.log(`🔍 ${name}: Scanning...`);
+  // Print errors
+  for (const [store, error] of errors) {
+    console.log(`⚠️  ${storeNames[store] ?? store}: ${error.message}`);
+  }
 
-    const result = await handler.findAllGames();
-
-    if (result.isErr()) {
-      console.log(`   ⚠️  Error: ${result.error.message}`);
-      continue;
-    }
-
-    const games = result.value;
-
-    if (games.length === 0) {
-      console.log(`   No games found`);
-      continue;
-    }
-
-    console.log(`   Found ${games.length} game(s):\n`);
-
-    for (const game of games) {
-      console.log(`   📦 ${game.name}`);
-      console.log(`      ID: ${game.id}`);
-      console.log(`      Path: ${game.path}`);
-
-      // Show extra info for Steam games
-      if (game.store === 'steam' && 'appManifest' in game) {
-        const steamGame = game as Game & { appManifest: { sizeOnDisk: bigint } };
-        if (steamGame.appManifest.sizeOnDisk > 0n) {
-          console.log(`      Size: ${formatSize(steamGame.appManifest.sizeOnDisk)}`);
-        }
-      }
-
-      console.log('');
-    }
-
-    totalGames += games.length;
+  // Print skipped stores
+  for (const store of skipped) {
+    console.log(`❌ ${storeNames[store] ?? store}: Not available on this system`);
   }
 
   console.log('━'.repeat(50));
-  console.log(`\n✅ Total games found: ${totalGames}`);
+  console.log(`\n✅ Total games found: ${games.length}`);
 }
 
 main().catch((error: unknown) => {
