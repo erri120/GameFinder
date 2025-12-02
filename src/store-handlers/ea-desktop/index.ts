@@ -1,0 +1,5 @@
+/**
+ * EA Desktop store handler
+ */
+
+export * from './ea-desktop-handler.js';

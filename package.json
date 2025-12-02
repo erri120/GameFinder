@@ -1,0 +1,102 @@
+{
+  "name": "gamefinder",
+  "version": "0.1.0",
+  "description": "A library for finding games installed on your system across multiple game launchers and platforms",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./common": {
+      "import": "./dist/common/index.js",
+      "types": "./dist/common/index.d.ts"
+    },
+    "./steam": {
+      "import": "./dist/store-handlers/steam/index.js",
+      "types": "./dist/store-handlers/steam/index.d.ts"
+    },
+    "./gog": {
+      "import": "./dist/store-handlers/gog/index.js",
+      "types": "./dist/store-handlers/gog/index.d.ts"
+    },
+    "./epic": {
+      "import": "./dist/store-handlers/epic/index.js",
+      "types": "./dist/store-handlers/epic/index.d.ts"
+    },
+    "./origin": {
+      "import": "./dist/store-handlers/origin/index.js",
+      "types": "./dist/store-handlers/origin/index.d.ts"
+    },
+    "./ea-desktop": {
+      "import": "./dist/store-handlers/ea-desktop/index.js",
+      "types": "./dist/store-handlers/ea-desktop/index.d.ts"
+    },
+    "./xbox": {
+      "import": "./dist/store-handlers/xbox/index.js",
+      "types": "./dist/store-handlers/xbox/index.d.ts"
+    },
+    "./heroic": {
+      "import": "./dist/launchers/heroic/index.js",
+      "types": "./dist/launchers/heroic/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "rm -rf dist coverage",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": [
+    "games",
+    "steam",
+    "gog",
+    "epic",
+    "origin",
+    "xbox",
+    "game-launcher",
+    "game-finder"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erri120/GameFinder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/erri120/GameFinder/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "eslint": "^9.16.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.4.2",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.48.1"
+  },
+  "dependencies": {
+    "neverthrow": "^8.1.1"
+  }
+}

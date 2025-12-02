@@ -344,3 +344,9 @@ healthchecksdb
 
 # Rider specific file
 global.json
+
+# Node.js
+dist/
+coverage/
+.pnpm-debug.log
+*.tsbuildinfo
