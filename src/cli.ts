@@ -6,10 +6,8 @@
 import { SteamHandler } from './store-handlers/steam/index.js';
 import { GOGHandler } from './store-handlers/gog/index.js';
 import { EpicHandler } from './store-handlers/epic/index.js';
-import { OriginHandler } from './store-handlers/origin/index.js';
 import { EADesktopHandler } from './store-handlers/ea-desktop/index.js';
 import { XboxHandler } from './store-handlers/xbox/index.js';
-import { HeroicHandler } from './launchers/heroic/index.js';
 import type { StoreHandler, Game } from './common/index.js';
 
 interface HandlerInfo {
@@ -21,10 +19,8 @@ const handlers: HandlerInfo[] = [
   { name: 'Steam', handler: new SteamHandler() },
   { name: 'GOG', handler: new GOGHandler() },
   { name: 'Epic Games', handler: new EpicHandler() },
-  { name: 'Origin', handler: new OriginHandler() },
   { name: 'EA Desktop', handler: new EADesktopHandler() },
   { name: 'Xbox', handler: new XboxHandler() },
-  { name: 'Heroic', handler: new HeroicHandler() },
 ];
 
 function formatSize(bytes: bigint): string {

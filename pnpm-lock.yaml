@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      js-sha3:
+        specifier: ^0.9.3
+        version: 0.9.3
       neverthrow:
         specifier: ^8.1.1
         version: 8.2.0
@@ -1076,6 +1079,9 @@ packages:
     peerDependenciesMeta:
       node-notifier:
         optional: true
+
+  js-sha3@0.9.3:
+    resolution: {integrity: sha512-BcJPCQeLg6WjEx3FE591wVAevlli8lxsxm9/FzV4HXkV49TmBH38Yvrpce6fjbADGMKFrBMGTqrVz3qPIZ88Gg==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -2941,6 +2947,8 @@ snapshots:
       - babel-plugin-macros
       - supports-color
       - ts-node
+
+  js-sha3@0.9.3: {}
 
   js-tokens@4.0.0: {}
 

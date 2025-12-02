@@ -26,10 +26,6 @@
       "import": "./dist/store-handlers/epic/index.js",
       "types": "./dist/store-handlers/epic/index.d.ts"
     },
-    "./origin": {
-      "import": "./dist/store-handlers/origin/index.js",
-      "types": "./dist/store-handlers/origin/index.d.ts"
-    },
     "./ea-desktop": {
       "import": "./dist/store-handlers/ea-desktop/index.js",
       "types": "./dist/store-handlers/ea-desktop/index.d.ts"
@@ -37,10 +33,6 @@
     "./xbox": {
       "import": "./dist/store-handlers/xbox/index.js",
       "types": "./dist/store-handlers/xbox/index.d.ts"
-    },
-    "./heroic": {
-      "import": "./dist/launchers/heroic/index.js",
-      "types": "./dist/launchers/heroic/index.d.ts"
     }
   },
   "bin": {
@@ -70,7 +62,7 @@
     "steam",
     "gog",
     "epic",
-    "origin",
+    "ea-desktop",
     "xbox",
     "game-launcher",
     "game-finder"
@@ -102,6 +94,7 @@
     "typescript-eslint": "^8.48.1"
   },
   "dependencies": {
+    "js-sha3": "^0.9.3",
     "neverthrow": "^8.1.1",
     "vdf-parser": "^1.2.1"
   }
