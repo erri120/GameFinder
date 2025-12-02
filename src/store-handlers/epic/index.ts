@@ -3,3 +3,4 @@
  */
 
 export * from './epic-handler.js';
+export * from './types.js';
