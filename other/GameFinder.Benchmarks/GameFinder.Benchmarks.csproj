@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <PackageReference Include="BenchmarkDotNet" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\GameFinder.Common\GameFinder.Common.csproj" />
-    </ItemGroup>
-</Project>

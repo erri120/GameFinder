@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\GameFinder.RegistryUtils\GameFinder.RegistryUtils.csproj" />
-        <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
-    </ItemGroup>
-</Project>

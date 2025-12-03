@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\GameFinder.StoreHandlers.EGS\GameFinder.StoreHandlers.EGS.csproj" />
-        <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
-    </ItemGroup>
-</Project>
