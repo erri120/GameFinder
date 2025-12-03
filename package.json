@@ -26,10 +26,6 @@
       "import": "./dist/store-handlers/epic/index.js",
       "types": "./dist/store-handlers/epic/index.d.ts"
     },
-    "./ea-desktop": {
-      "import": "./dist/store-handlers/ea-desktop/index.js",
-      "types": "./dist/store-handlers/ea-desktop/index.d.ts"
-    },
     "./xbox": {
       "import": "./dist/store-handlers/xbox/index.js",
       "types": "./dist/store-handlers/xbox/index.d.ts"
@@ -62,7 +58,6 @@
     "steam",
     "gog",
     "epic",
-    "ea-desktop",
     "xbox",
     "game-launcher",
     "game-finder"
