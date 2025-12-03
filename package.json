@@ -95,6 +95,7 @@
     "typescript-eslint": "^8.48.1"
   },
   "dependencies": {
+    "fast-xml-parser": "^5.3.2",
     "js-sha3": "^0.9.3",
     "neverthrow": "^8.1.1",
     "vdf-parser": "^1.2.1"

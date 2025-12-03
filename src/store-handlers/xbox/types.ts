@@ -5,7 +5,7 @@
 import type { Game } from '../../common/index.js';
 
 /**
- * Xbox product ID
+ * Xbox product ID (Identity Name from appxmanifest.xml)
  */
 export type XboxProductId = string;
 
@@ -16,7 +16,7 @@ export interface XboxGame extends Game {
   store: 'xbox';
 
   /**
-   * Xbox product ID
+   * Xbox product ID (Identity Name from appxmanifest.xml)
    */
   productId: XboxProductId;
 }
