@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [nodejs-conversion]
+    branches: [master, nodejs-conversion]
   pull_request:
-    branches: [nodejs-conversion]
+    branches: [master, nodejs-conversion]
 
 jobs:
   build:
@@ -60,32 +60,3 @@ jobs:
 
       - name: Check formatting
         run: pnpm run format:check
-
-  coverage:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Use Node.js 22.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run tests with coverage
-        run: pnpm run test:coverage
-
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage/lcov.info
-          fail_ci_if_error: false
